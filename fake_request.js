@@ -1,30 +1,37 @@
 var fs = require('fs')
 var readline = require('readline');
+var StringBuilder = require('stringbuilder')
+// var cities={};
+// fs.readFileSync('TextFile1.txt').toString().split("\r\n").forEach(function(line){
+// 	var pyh = line.split(' ');
+// 	var id = pyh[0].match(/\d+/);
+// 	var name = pyh[1];
+// 	cities[id]=name;
+// });
+// console.log(cities);
+// var sb = new StringBuilder();
 
-var stream = fs.createReadStream("TextFile1.txt");
-var rl = readline.createInterface({
-    input:stream,
-    output:process.stdout
-});
-var cities={};
-rl.on('line',function(line){
-    if(!line) return;
-    var pah = line.split(' ');
-    var id = Number(pah[0].match(/\d+/));
-    var name = pah[1];
-    cities[id]=name;
-});
+// sb.append("fdfds");
+// sb.append(",");
+// sb.appendLine();
+// sb.build(function(err,result){
+// 	console.log(result);
+// });
 
 var hotels=[];
 var hotel=function(){
+    this.city=0;
     this.id = 0;
     this.name = "";
     this.shortName = "";
-    this.star="";
+    this.star=0;
     this.currency = "";
     this.lowPrice="";
     this.points="";
     this.zoneName="";
+
+    this.commentCount=0;
+
     this.isGift=false;
     this.isNew=false;
     this.isFan=false;
@@ -38,6 +45,14 @@ var hotel=function(){
     this.isMorning=false;
     this.isStar=false;
     this.isRoomFull=false;
+
+    this.rooms = [];
+};
+var room = function(){
+    this.id=0;
+    this.name="";
+    this.price=0;
+    this.breakfast="";
 };
 var pageCount=1;
 var curPageIdx=1;
