@@ -1,0 +1,50 @@
+AddBed: "该房型不可加床"
+Applicability: ""
+AvgPrice: "550"
+BedType: "单人床1.35米"
+Breakfast: "单早" ------------------
+CouponAmount: "0"
+Currency: null
+Extension: null
+ExtraRemark: ""
+ExtraRequire: "安排无烟房,安排宽带"
+FanDesc: null----------------------
+FloorRange: "4-10"
+GiftDesc: null--------------------
+GiftEndDate: "0001/1/1 0:00:00"
+GiftName: null
+GiftStartDate: "0001/1/1 0:00:00"
+HasWindow: 2
+HoldRoom: 8
+Internet: "全部房间支持免费有线和无线宽带上网"
+IsCanBook: 1
+IsCu: 0------------------------
+IsFan: 0
+IsGift: 0
+IsGuarantee: 1
+IsMP: 0
+IsQuan: 0------------------------
+IsSendTravelMoney: 0
+LowestPrice: "495"
+MPDesc: ""
+PayType: 1-----------------------  0=预付
+Persons: 1
+PromoteInfo: ""
+QuanDesc: null
+QuanPrice: null
+QuanType: null
+RackPrice: "%0"
+RoomArea: "10"
+RoomID: 2597206
+RoomName: "经济房(限时抢购)"
+RoomPrice: "550"----------------------
+RoomStatus: 0
+RoomType: "单人床"----------------------
+RoomUrl: "http://images4.c-ctrip.com/target/hotel/1000/647/58e9620ccda34cc7aa59eeab46053af2_130_130.jpg,http://images4.c-ctrip.com/target/hotel/1000/647/58e9620ccda34cc7aa59eeab46053af2_550_412.jpg"
+SmokingRoom: ""
+TicketCalcType: 0
+TicketCalcValue: "0"
+TicketGiftDur: 0
+TicketType: 0
+TotalCashAmount: ""
+VendorID: 0
