@@ -68,6 +68,7 @@ var requestDetailData = function(cityId,hotelId){
 
 var cities={};
 var doneCities={};
+var doneHotels={};
 var curCity=0;
 var doneCityCount=0;
 var cityCount=0;
@@ -80,7 +81,11 @@ fs.readFileSync('TextFile1.txt').toString().split("\r\n").forEach(function(line)
     cities[id]={"name":name,pageCount:1,curPageIdx:1,rd:null,gotPageIdx:0};
     cityCount++;
 });
-
+fs.readFileSync('doneHotels.txt').toString().split("\r\n").forEach(function(line){
+    var id = line&&Number(line);
+	if(id)
+		doneHotels[id]=true;
+});
 var pageCount=1;
 var curPageIdx=1;
 var hotels={};
@@ -184,11 +189,18 @@ hotel.prototype.appendToFile=function(){
     sb.build(function(err,result){
         if(err) {
             console.log(err);
+			doneHotelCount++;
             return;
         }
         //console.log("writing "+id+"...");
         fs.appendFile("data.txt",result,function(e){
-            if(e) console.log(e);
+            if(e){
+				console.log(e);
+			}
+			else{
+				fs.appendFile("doneHotels.txt",id+"\r\n");
+				doneHotels[id]=true;
+			}
             console.log(++doneHotelCount+"/"+hotelCount);
             if(doneHotelCount==hotelCount) console.log("job complete.\r\n");
         });
@@ -258,6 +270,7 @@ function one_page_data(obj,cityId){
             for(var i=0;i<a[0].HotelLists.length;i++){
                 var h = new hotel();
                 var h_obj = a[0].HotelLists[i];
+				if(doneHotels[h_obj.HotelID]) continue;
                 h.city=cities[cityId]&&cities[cityId].name;
                 h.id=h_obj.HotelID;
                 h.name=h_obj.HotelName;

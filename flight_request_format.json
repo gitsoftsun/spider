@@ -1,0 +1,48 @@
+"http://m.ctrip.com/restapi/Flight/Domestic/FlightList/Query"
+
+{
+	"tabtype": 1,
+	"ver": 0,
+	"tripType": 1,
+	"ticketIssueCty": "BJS",
+	"flag": 0,
+	"pageIdx": 1,
+	"items": [{
+		"dCtyCode": "BJS",
+		"dCtyId": 1,
+		"dcityName": "北京",
+		"dkey": 3,
+		"aCtyCode": "SHA",
+		"aCtyId": 2,
+		"acityName": "上海",
+		"akey": 2,
+		"date": "2014/02/23"
+	}],
+	"_items": [{
+		"dCtyCode": "BJS",
+		"dCtyId": 1,
+		"dcityName": "北京",
+		"dkey": 3,
+		"aCtyCode": "SHA",
+		"aCtyId": 2,
+		"acityName": "上海",
+		"akey": 2,
+		"date": "2014/02/23"
+	}],
+	"class": 0,
+	"depart-sorttype": "time",
+	"depart-orderby": "asc",
+	"arrive-sorttype": "time",
+	"arrive-orderby": "asc",
+	"calendarendtime": "2014/06/3000: 00: 00",
+	"__tripType": 1,
+	"head": {
+		"cid": "cd3b6d6c-3f75-1fef-0930-69061427de9f",
+		"ctok": "351858059049938",
+		"cver": "1.0",
+		"lang": "01",
+		"sid": "8888",
+		"syscode": "09",
+		"auth": ""
+	}
+}
