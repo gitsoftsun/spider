@@ -10,22 +10,22 @@
 	"items": [{
 		"dCtyCode": "BJS",
 		"dCtyId": 1,
-		"dcityName": "北京",
+		"dcityName": "卤卤戮漏",
 		"dkey": 3,
 		"aCtyCode": "SHA",
 		"aCtyId": 2,
-		"acityName": "上海",
+		"acityName": "脡脧潞拢",
 		"akey": 2,
 		"date": "2014/02/23"
 	}],
 	"_items": [{
 		"dCtyCode": "BJS",
 		"dCtyId": 1,
-		"dcityName": "北京",
+		"dcityName": "卤卤戮漏",
 		"dkey": 3,
 		"aCtyCode": "SHA",
 		"aCtyId": 2,
-		"acityName": "上海",
+		"acityName": "脡脧潞拢",
 		"akey": 2,
 		"date": "2014/02/23"
 	}],
@@ -45,4 +45,49 @@
 		"syscode": "09",
 		"auth": ""
 	}
+}
+
+{
+	"count":43,
+	"followed":false,
+	"head":{"auth":null,"errcode":0},
+	"items":[
+		{
+			"aPortCode": "SHA",
+			"aTerminal": null,
+			"aTime":"2014/2/23 8:45:00",
+			"aaname": "铏规ˉ",
+			"airlineCode": "HO",
+			"aname": "鍚夌ゥ",
+			"cabins": [{
+				"activityBM": 0,
+				"class": 0,
+				"classForDisp": 6,
+				"discount": 3,
+				"flag": 8,
+				"price": 340,
+				"productType": 1,
+				"qty": 10,
+				"rebateAmt": 0,
+				"subClass": "P"
+				},
+			],
+			"ctinfo": {
+				"ckind": "M",
+				"ctname": "绌轰腑瀹㈣溅 A320",
+				"maxs": 180,
+				"mins": 123,
+				"wlvl": "N"
+			},
+			"dPortCode": "PEK",
+			"dTerminal": null,
+			"dTime": "2014/2/23 6:35:00",
+			"daname": "棣栭兘",
+			"flag": 0,
+			"flightNo": "HO1252",
+			"planeType": "320",
+			"puncRate": 93,
+			"stopCities": null
+		},
+	]
 }
