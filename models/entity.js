@@ -1,3 +1,4 @@
+var helper = require('../helpers/webhelper.js')
 exports.hotel=function(){
     this.city="";
     this.id = 0;
@@ -94,4 +95,58 @@ exports.room = function(){
     this.isCu=0;
     this.payType=1;
     this.price="";
+};
+
+exports.flight = function(){
+    this.aPortCode='';
+    this.aTerminal='';
+    this.aTime='';
+    this.aaname='';
+    this.airlineCode='';
+    this.aname='';
+    this.cmpName='';
+    this.cabins=[];
+    this.ctinfo=[];
+    this.dPortCode='PEK';
+    this.dTerminal=null;
+    this.dTime='2014/2/23 6:35:00';
+    this.daname='首都';
+    this.flag=0;
+    this.flightNo='HO1252';
+    this.planeType='320';
+    this.puncRate=93;
+    this.stopCities=null;
+    this.price = '';
+};
+
+exports.flight.prototype.toString=function(){
+    var sb = new helper.StringBuffer();
+    for(var i=0;i<this.cabins.length;i++){
+        sb.append(this.dname);
+        sb.append(',');
+        sb.append(this.aname);
+        sb.append(',');
+        sb.append(this.cmpName);
+        sb.append(this.flightNo);
+        sb.append(',');
+        sb.append(this.dTime);
+        sb.append(',');
+        sb.append(this.aTime);
+        sb.append(',');
+        sb.append(this.price);
+        sb.append(',');
+        sb.append(this.cabins[i].tui);
+        sb.append(',');
+        sb.append(this.cabins[i].gai);
+        sb.append(',');
+        sb.append(this.cabins[i].ctype);
+        sb.append(',');
+        sb.append(this.cabins[i].price);
+        sb.append(',');
+        sb.append(this.cabins[i].tCount);
+        sb.append('\r\n');
+    }
+    var result = sb.toString();
+    sb=null;
+    return result;
 };

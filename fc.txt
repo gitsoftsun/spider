@@ -1,0 +1,17 @@
+﻿aletai175 阿勒泰 AAT
+baotou141 包头 BAV
+shanghai2 上海 SHA
+sanya43 三亚 SYX
+suzhou14 苏州 SZV
+shenzhen30 深圳 SZX
+taizhou578 台州 HYN
+tacheng455 塔城 TCG
+tengchong1819 腾冲 TCZ
+tongliao458 通辽 TGO
+wenzhou491 温州 WNZ
+wuhai1133 乌海 WUA
+wuyishan26 武夷山 WUS
+wuzhou492 梧州 WUZ
+yiwu536 义乌 YIW
+yantai533 烟台 YNT
+yancheng1200 盐城 YNZ

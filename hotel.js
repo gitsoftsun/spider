@@ -6,12 +6,8 @@ var sys = require('sys')
 var entity = require('./models/entity.js')
 var helper = require('./helpers/webhelper.js')
 
-
-var hotel_list_options = new helper.basic_options();
-hotel_list_options.path = '/html5/Hotel/GetHotelList';
-
-var hotel_detail_options= new helper.basic_options();
-hotel_detail_options.path = '/html5/Hotel/GetHotelDetail';
+var hotel_list_options = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true);
+var hotel_detail_options= new helper.basic_options('/html5/Hotel/GetHotelDetail',"POST",true,true);
 
 var hotelListData = {"CheckInCityID":"2","CheckInCity":"上海","isHot":2,"OrderName":0,"OrderType":1,"CheckInDate":"2014-02-23","PageNumber":1,"CheckOutDate":"2014-02-24","Days":"1","KeyWord":"","DistrictId":-1,"ZoneName":"","Zone":"","Location":"","LocationName":"","MetroId":"","MetroName":"","BrandId":"","BrandName":"","IsMorning":"0","isYesterdayOrder":false,"Star":""};
 hotelListData.clone=function(){
@@ -102,10 +98,10 @@ function hotel_page_data(obj){
             
             h.commentCount=data[0].CommentTotal;
             h.custPoints = data[0].CustPoints;
-            h.faclPoints= data[0].FaclPoints;//设施
-            h.raAtPoints = data[0].RaAtPoints;//环境
-            h.ratPoints = data[0].RatPoints;//卫生
-            h.servPoints = data[0].ServPoints;//服务
+            h.faclPoints= data[0].FaclPoints;
+            h.raAtPoints = data[0].RaAtPoints;
+            h.ratPoints = data[0].RatPoints;
+            h.servPoints = data[0].ServPoints;
             if(data[0].HotelPicList)
                 h.picCount = data[0].HotelPicList.length;
             if(data[0].RoomDetailList){
