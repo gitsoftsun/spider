@@ -135,9 +135,9 @@ exports.flight.prototype.toString=function(){
         sb.append(',');
         sb.append(this.price);
         sb.append(',');
-        sb.append(this.cabins[i].tui);
+        sb.append(this.cabins[i].tui.replace(/[,]*/g,''));
         sb.append(',');
-        sb.append(this.cabins[i].gai);
+        sb.append(this.cabins[i].gai.replace(/[,]*/g,''));
         sb.append(',');
         sb.append(this.cabins[i].ctype);
         sb.append(',');
