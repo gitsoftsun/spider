@@ -44,7 +44,7 @@ function process_hotel_list(data,args){
 		new helper.basic_options('m.elong.com','/hotel/'+args.pinyin+'/'+h.id+'/','GET',true,false,{'checkindate':checkindate,'checkoutdate':checkoutdate}),
 		null,
 		process_one_hotel,
-		h
+		[h,args]
 		);
 	}
 	//get next page.
@@ -63,7 +63,7 @@ function process_hotel_list(data,args){
 }
 
 function process_one_hotel(data,args){
-	console.log(args.cname+": "+args.curPageIdx+"/"+args.pageCount+", "+(++args.curHotelIdx)+"/"+args.hotelCount);
+	console.log(args[1].cname+": "+(args[1].curPageIdx+1)+"/"+args[1].pageCount+", "+(++args[1].curHotelIdx)+"/"+args[1].hotelCount);
 	var doc = $(data);
 	var rooms = doc.find("ul.roomlist > li");
 	if(rooms.length==0)
@@ -73,7 +73,7 @@ function process_one_hotel(data,args){
 	// 	args.commentCount = Number(commNode[0].innerHTML.trim().match(/\d+/)[0]);
 	var picNode = doc.find('table.infotab tr:first-child td div');
 	if(picNode.length>0)
-		args.picCount = Number(picNode[0].innerHTML.trim().match(/\d+/)[0]);
+		args[0].picCount = Number(picNode[0].innerHTML.trim().match(/\d+/)[0]);
 	
 	rooms.each(function(idx,room){
 		var r = new entity.room();
@@ -111,9 +111,9 @@ function process_one_hotel(data,args){
 			r.price = priceNodes[0].children[0].innerHTML.trim();
 		if(priceNodes.length>1)
 			r.fan = priceNodes[1].childNodes.length==3&&priceNodes[1].childNodes[2].value;
-		args.rooms.push(r);
+		args[0].rooms.push(r);
 	});
-	appendToFile("app_elong_hotel.txt",args.toString("elong"));
+	appendToFile("app_elong_hotel.txt",args[0].toString("elong"));
 }
 
 
