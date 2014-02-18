@@ -3,6 +3,9 @@ var readline = require('readline');
 var StringBuilder = require('stringbuilder')
 var http = require('http')
 var zlib = require('zlib')
+var sprintf = require("sprintf-js").sprintf
+
+console.log(sprintf('{"cityname":"%1$s","checkindate":"%2$s","checkoutdate":"%3$s","pageindex":%4$d}', "cracker", "Polly", "wants",3));
 // var cities={};
 // fs.readFileSync('TextFile1.txt').toString().split("\r\n").forEach(function(line){
 // 	var pyh = line.split(' ');
@@ -42,12 +45,12 @@ var requestDetailData = function(cityId,hotelId){
     this.IsMorning= "0";
 };
 
-var rd = new requestDetailData("2",425161);
-get_res_data(rd,function(obj){
-	obj = obj&&obj.Data;
-	obj = JSON.CtripUnPack(obj);
-	console.log(obj[0].RoomDetailList);
-},"detail");
+// var rd = new requestDetailData("2",425161);
+// get_res_data(rd,function(obj){
+// 	obj = obj&&obj.Data;
+// 	obj = JSON.CtripUnPack(obj);
+// 	console.log(obj[0].RoomDetailList);
+// },"detail");
 
 JSON.CtripUnPack = function(e) {
     var q = "return o;";

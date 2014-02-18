@@ -10,7 +10,7 @@
     "xmlhttprequest" : "*",
     "request" : "*",
     "htmlparser" : "*",
-	"stringbuilder":"*"
-	
+	"stringbuilder":"*",
+	"sprintf-js":"*"
   }
 }

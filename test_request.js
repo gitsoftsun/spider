@@ -29,47 +29,33 @@ var qunar_query = function(dname,aname){
 
 var qunar_options = new helper.basic_options('m.qunar.com','/search.action','GET',true,false,qunar_query);
 var cityFls = {};
-var cities=[];
-var lines = fs.readFileSync("fc.txt").toString().split('\r\n');
-if(lines){
-    for(var i=0;i<lines.length;i++){
-  var c = lines[i].split(' ');
-  var city = {};
-  city["code"] = c[2];
-  city["cname"] = c[1];
-  city["id"] = c[0].match(/\d+/);
-  cities.push(city);
-    }
-    for(var j=0;j<cities.length;j++){
+var cities = helper.get_cities('fc.txt');
+
+for(var j=0;j<cities.length;j++){
   var dep = cities[j];
-  //if(doneCities[dep.cname]) continue;
-  //else
-      
   for(var k=0;k<cities.length;k++){
       if(k==j) continue;
       var arr = cities[k];
       var eq = new elong_query(dep.cname,arr.cname);
       var qq = new qunar_query(dep.cname,arr.cname);
       cityFls[dep.cname+'-'+arr.cname]={'pageCount':1,'equery':eq,'qquery':qq};
-
+      //get flight data from elong.com
       helper.request_data(
         new helper.basic_options('m.elong.com','/Flight/List','GET',true,false,eq),
         null,
         elong_fls,
         [dep.cname,arr.cname]
         );
-      setTimeout(function(){
-        helper.request_data(
-              new helper.basic_options('m.qunar.com','/search.action','GET',true,false,qq),
-              null,
-              qunarfl,
-              [dep.cname,arr.cname]
-              );
-      },j*cities.length+k);
-      
+      //get flight data from qunar.com
+      helper.request_data(
+        new helper.basic_options('m.qunar.com','/search.action','GET',true,false,qq),
+        null,
+        qunarfl,
+        [dep.cname,arr.cname]
+        );
   }
-    }
 }
+
 
 
 // helper.request_data(elong_options,null,function(data){

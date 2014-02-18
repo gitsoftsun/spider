@@ -33,7 +33,47 @@ exports.hotel=function(){
     this.servPoints = "0";//服务
     this.rooms = [];
 };
-exports.hotel.prototype.toString=function(){
+exports.hotel.prototype.toString=function(site){
+    if(site=='elong'){
+        var sb = new helper.StringBuffer();
+        for(var i=0;i<this.rooms.length;i++){
+            sb.append(this.city);
+            sb.append(',');
+            sb.append(this.name);
+            sb.append(',');
+            sb.append(this.star);
+            sb.append(',');
+            sb.append(this.rooms[i].name);
+            sb.append(',');
+            sb.append(this.rooms[i].price);
+            sb.append(',');
+            sb.append(this.rooms[i].fan);
+            sb.append(',');
+            sb.append(this.commentCount);
+            sb.append(',');
+            sb.append(this.prate);
+            sb.append(',');
+            sb.append(this.picCount);
+            sb.append(',');
+            sb.append(this.payType==0?'Y':'N');
+            sb.append(',');
+            sb.append(this.rooms[i].sjzx=='Y'?'Y':'N')
+            sb.append(',');
+            sb.append(this.rooms[i].jrtj=='Y'?'Y':'N');
+            sb.append(',');
+            if(this.rooms[i].breakfast=='无早')
+                sb.append('0');
+            else if(this.rooms[i].breakfast=='双早')
+                sb.append('2');
+            else if(this.rooms[i].breakfast=='单早')
+                sb.append('1');
+            
+            sb.append(',');
+            sb.append(this.rooms[i].lan);
+            sb.append('\r\n');
+        }
+        return sb.toString();
+    }
     var sb="";
     for(var i=0;i<this.rooms.length;i++){
         sb+=this.city+",";

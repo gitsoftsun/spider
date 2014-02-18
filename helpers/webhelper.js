@@ -1,5 +1,6 @@
 var http = require('http')
 var zlib = require('zlib')
+var fs = require('fs')
 
 exports.basic_options=function(host,path,method,isApp,isAjax,data){
     this.path=path||'/';
@@ -7,7 +8,7 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data){
     this.port=80;
     this.method=method||'GET';
     this.headers={
-        "Accept":"application/json, text/javascript, */*; q=0.01",
+        "Accept":"text/html,application/xhtml+xml,application/xml,application/json, text/javascript, */*; q=0.01",
         "Accept-Encoding":"gzip, deflate",
         "Accept-Language":"en-US,en;q=0.8,zh-Hans-CN;q=0.5,zh-Hans;q=0.3",
         "X_FORWARDED_FOR":"58.99.128.66"
@@ -139,4 +140,29 @@ exports.request_data=function(opts,data,fn,args){
     if(opts.method=='POST')
         req.write(strData);
     req.end();
+}
+
+exports.get_cities = function(filename){
+    if(!fs.existsSync(filename)) {
+        console.log("file not found: "+filename);
+        return;
+    }
+    
+    var lines = fs.readFileSync(filename).toString().split('\r\n');
+    if(!lines){
+        console.log("there are no cities in file: "+lines);
+        return;
+    }
+
+    var cities = [];
+    for(var i=0;i<lines.length;i++){
+      var c = lines[i].split(' ');
+      var city = {};
+      city["code"] = c[2];
+      city["cname"] = c[1];
+      city["id"] = c[0].match(/\d+/)[0];
+      city["pinyin"] = c[0].match(/[a-zA-Z]+/)[0];
+      cities.push(city);
+    }
+    return cities;
 }
