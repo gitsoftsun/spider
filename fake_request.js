@@ -4,8 +4,11 @@ var StringBuilder = require('stringbuilder')
 var http = require('http')
 var zlib = require('zlib')
 var sprintf = require("sprintf-js").sprintf
+var helper = require('./helpers/webhelper.js')
 
-console.log(sprintf('{"cityname":"%1$s","checkindate":"%2$s","checkoutdate":"%3$s","pageindex":%4$d}', "cracker", "Polly", "wants",3));
+helper.verifyproxy('all_proxy_unverify.txt');
+
+//console.log(sprintf('{"cityname":"%1$s","checkindate":"%2$s","checkoutdate":"%3$s","pageindex":%4$d}', "cracker", "Polly", "wants",3));
 // var cities={};
 // fs.readFileSync('TextFile1.txt').toString().split("\r\n").forEach(function(line){
 // 	var pyh = line.split(' ');

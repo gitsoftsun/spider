@@ -166,3 +166,22 @@ exports.get_cities = function(filename){
     }
     return cities;
 }
+
+
+exports.verifyproxy = function(filename){
+    if(!fs.existsSync(filename)){
+	console.log("proxy file not found: "+finename);
+	return;
+    }
+    var lines = fs.readFileSync(filename).toString().split('\r');
+    if(!lines) return;
+    for(var i=0;i<lines.length;i++){
+	var l = lines[i].split(':');
+	var host = l[0];
+	var port = l[1];
+	http.get({'host':host,'port':port,'path':'http://www.baidu.com'},function(res){
+	    console.log(res);
+	});
+    }
+
+}
