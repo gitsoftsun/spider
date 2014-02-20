@@ -74,6 +74,33 @@ exports.hotel.prototype.toString=function(site){
         }
         return sb.toString();
     }
+    else if(site=="qunar"){
+        var sb = new helper.StringBuffer();
+        for(var i=0;i<this.rooms.length;i++){
+            var r = this.rooms[i];
+            for(var j=0;j<r.sites.length;j++){
+                sb.append(this.city);
+                sb.append(',');
+                sb.append(this.name);
+                sb.append(',');
+                sb.append(this.star);
+                sb.append(',');
+                sb.append(r.name);
+                sb.append(',');
+                sb.append(r.sites[j].site)
+                sb.append(',');
+                sb.append(r.sites[j].price);
+                sb.append(',');
+                sb.append(this.commentCount);
+                sb.append(',');
+                sb.append(this.points);
+                sb.append(',');
+                sb.append(r.sites[j].tuan);
+                sb.append('\r\n');
+            }
+        }
+        return sb.toString();
+    }
     var sb="";
     for(var i=0;i<this.rooms.length;i++){
         sb+=this.city+",";

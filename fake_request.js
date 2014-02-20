@@ -6,7 +6,22 @@ var zlib = require('zlib')
 var sprintf = require("sprintf-js").sprintf
 var helper = require('./helpers/webhelper.js')
 
-helper.verifyproxy('all_proxy_unverify.txt');
+helper.verifyproxy('all_proxy_unverify4.txt');
+
+//var options = new helper.basic_options('m.qunar.com','/','GET',true,false,null);
+function getdata(){
+    http.get(options,function(res){
+    var chunks = [];
+    res.on('data',function(chunk){
+        chunks.push(chunk);
+    });
+    res.on('end',function(){
+        var buffer = Buffer.concat(chunks);
+    console.log(buffer.length);
+    });
+});
+
+}
 
 //console.log(sprintf('{"cityname":"%1$s","checkindate":"%2$s","checkoutdate":"%3$s","pageindex":%4$d}', "cracker", "Polly", "wants",3));
 // var cities={};
@@ -25,28 +40,28 @@ helper.verifyproxy('all_proxy_unverify.txt');
 // sb.build(function(err,result){
 // 	console.log(result);
 // });
-var hotel_detail_options={
-    host:'m.ctrip.com',
-    path:'/html5/Hotel/GetHotelDetail',
-    port:80,
-    method:'POST',
-    headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch)',
-        "X-Requested-With":"XMLHttpRequest",
-        "Accept":"application/json, text/javascript, */*; q=0.01",
-        "Accept-Encoding":"gzip, deflate",
-        "Accept-Language":"en-US,en;q=0.8,zh-Hans-CN;q=0.5,zh-Hans;q=0.3",
-        "Content-Type":"application/json",
-        "X_FORWARDED_FOR":"58.99.128.66",
-    }
-};
-var requestDetailData = function(cityId,hotelId){
-    this.CheckInDate= "2014-02-23";
-    this.CheckOutDate="2014-02-24";
-    this.CityID= cityId;
-    this.HotelID= hotelId;
-    this.IsMorning= "0";
-};
+// var hotel_detail_options={
+//     host:'m.ctrip.com',
+//     path:'/html5/Hotel/GetHotelDetail',
+//     port:80,
+//     method:'POST',
+//     headers: {
+//         'User-Agent': 'Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch)',
+//         "X-Requested-With":"XMLHttpRequest",
+//         "Accept":"application/json, text/javascript, */*; q=0.01",
+//         "Accept-Encoding":"gzip, deflate",
+//         "Accept-Language":"en-US,en;q=0.8,zh-Hans-CN;q=0.5,zh-Hans;q=0.3",
+//         "Content-Type":"application/json",
+//         "X_FORWARDED_FOR":"58.99.128.66",
+//     }
+// };
+// var requestDetailData = function(cityId,hotelId){
+//     this.CheckInDate= "2014-02-23";
+//     this.CheckOutDate="2014-02-24";
+//     this.CityID= cityId;
+//     this.HotelID= hotelId;
+//     this.IsMorning= "0";
+// };
 
 // var rd = new requestDetailData("2",425161);
 // get_res_data(rd,function(obj){
@@ -55,116 +70,81 @@ var requestDetailData = function(cityId,hotelId){
 // 	console.log(obj[0].RoomDetailList);
 // },"detail");
 
-JSON.CtripUnPack = function(e) {
-    var q = "return o;";
-    for (var u = [], f = [], i = e[0], n = i.length, l = e.length, x = -1, A = -1, a = 0, p = 0, d, o; a < n; ++a) {
-        f[++A] = i[a];
-        if (typeof i[a + 1] == "object") {
-            ++a;
-            for (d = 1; d < l; ++d) {
-                o = e[d];
-                o[p] = i[a][o[p]]
-            }
-        }
-        ++p
-    }
-    for (var k = 1; k < l; ++k)
-        for (var g = e[k], c = 0; c < f.length; c++)
-            if (typeof g[c] == "object")
-                if (g[c] && g[c].length > 0) {
-                    for (var t = [], h = [], s = g[c][0], m = s.length, v = g[c].length, w = -1, y = -1, b = 0, z = 0, j; b < m; ++b) {
-                        h[++y] = s[b];
-                        ++z
-                    }
-                    for (b = 0, m = h.length; b < m; ++b)
-                        h[b] = 'o["'.concat(h[b].replace('"', "\\x22"), '"]=a[', b, "];");
-                    var r = Function("o,a", h.join("") + q);
-                    for (j = 1; j < v; ++j)
-                        t[++w] = r({}, g[c][j]);
-                    e[k][c] = t
-                }
-    for (a = 0, n = f.length; a < n; ++a)
-        f[a] = 'o["'.concat(f[a].replace('"', "\\x22"), '"]=a[', a, "];");
-    var r = Function("o,a", f.join("") + q);
-    for (d = 1; d < l; ++d)
-        u[++x] = r({}, e[d]);
-    return u
-};
-function get_res_data(json_data,fn,type){
-    var strData = JSON.stringify(json_data);
-    var options=null;
-    if(type=="detail"){
-    	hotel_detail_options.headers['Content-Length'] = Buffer.byteLength(strData,'utf8');
-        options=hotel_detail_options;
+// function get_res_data(json_data,fn,type){
+//     var strData = JSON.stringify(json_data);
+//     var options=null;
+//     if(type=="detail"){
+//     	hotel_detail_options.headers['Content-Length'] = Buffer.byteLength(strData,'utf8');
+//         options=hotel_detail_options;
         
-    }
-    else{
-        hotel_list_options.headers['Content-Length'] = Buffer.byteLength(strData,'utf8');
-        options=hotel_list_options;
-    }
+//     }
+//     else{
+//         hotel_list_options.headers['Content-Length'] = Buffer.byteLength(strData,'utf8');
+//         options=hotel_list_options;
+//     }
         
-    var req = http.request(options, function(res) {
-	//res.setEncoding('utf8');
-	var chunks=[];
-	res.on('data', function (chunk) {
-	    chunks.push(chunk);
-	});
-	res.on('end',function(){
-  	    if(res.headers['content-encoding']=='gzip'){
-  		var buffer = Buffer.concat(chunks);
-  		zlib.gunzip(buffer,function(err,decoded){
-		    if(decoded){
-  			fn(JSON.parse(decoded.toString()),json_data['CheckInCityID']);
-		    }
-  		});
-	    }
-	});
-    });
-    req.on('error', function(e) {
-	console.log('problem with request: ' + e.message);
-    });
-    req.write(strData);
-    req.end();
-}
+//     var req = http.request(options, function(res) {
+// 	//res.setEncoding('utf8');
+// 	var chunks=[];
+// 	res.on('data', function (chunk) {
+// 	    chunks.push(chunk);
+// 	});
+// 	res.on('end',function(){
+//   	    if(res.headers['content-encoding']=='gzip'){
+//   		var buffer = Buffer.concat(chunks);
+//   		zlib.gunzip(buffer,function(err,decoded){
+// 		    if(decoded){
+//   			fn(JSON.parse(decoded.toString()),json_data['CheckInCityID']);
+// 		    }
+//   		});
+// 	    }
+// 	});
+//     });
+//     req.on('error', function(e) {
+// 	console.log('problem with request: ' + e.message);
+//     });
+//     req.write(strData);
+//     req.end();
+// }
 
-var hotels=[];
-var hotel=function(){
-    this.city=0;
-    this.id = 0;
-    this.name = "";
-    this.shortName = "";
-    this.star=0;
-    this.currency = "";
-    this.lowPrice="";
-    this.points="";
-    this.zoneName="";
+// var hotels=[];
+// var hotel=function(){
+//     this.city=0;
+//     this.id = 0;
+//     this.name = "";
+//     this.shortName = "";
+//     this.star=0;
+//     this.currency = "";
+//     this.lowPrice="";
+//     this.points="";
+//     this.zoneName="";
 
-    this.commentCount=0;
+//     this.commentCount=0;
 
-    this.isGift=false;
-    this.isNew=false;
-    this.isFan=false;
-    this.fanPrice=0;
-    this.fanType="";
-    this.isQuan=false;
-    this.quanPrice=0;
-    this.quanType="";
-    this.isCu = false;
-    this.isMp=false;
-    this.isMorning=false;
-    this.isStar=false;
-    this.isRoomFull=false;
+//     this.isGift=false;
+//     this.isNew=false;
+//     this.isFan=false;
+//     this.fanPrice=0;
+//     this.fanType="";
+//     this.isQuan=false;
+//     this.quanPrice=0;
+//     this.quanType="";
+//     this.isCu = false;
+//     this.isMp=false;
+//     this.isMorning=false;
+//     this.isStar=false;
+//     this.isRoomFull=false;
 
-    this.rooms = [];
-};
-var room = function(){
-    this.id=0;
-    this.name="";
-    this.price=0;
-    this.breakfast="";
-};
-var pageCount=1;
-var curPageIdx=1;
+//     this.rooms = [];
+// };
+// var room = function(){
+//     this.id=0;
+//     this.name="";
+//     this.price=0;
+//     this.breakfast="";
+// };
+// var pageCount=1;
+// var curPageIdx=1;
 
 // var file = fs.readFile("response_format.json","utf8",function(err,data){
 // 	if(err)

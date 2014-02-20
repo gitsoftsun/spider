@@ -2,10 +2,10 @@ var http = require('http')
 var zlib = require('zlib')
 var fs = require('fs')
 
-exports.basic_options=function(host,path,method,isApp,isAjax,data){
+exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
     this.path=path||'/';
     this.host=host||'m.ctrip.com';
-    this.port=80;
+    this.port=port||80;
     this.method=method||'GET';
     this.headers={
         "Accept":"text/html,application/xhtml+xml,application/xml,application/json, text/javascript, */*; q=0.01",
@@ -15,7 +15,7 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data){
     };
     if(method=="POST")
 	   this.headers["Content-Type"] = "application/json";
-    if(method=="GET"&&data instanceof Object){
+    if(method=="GET"&&data&&data instanceof Object){
         var sb = new exports.StringBuffer();
         sb.append('?');
         for(var k in data){
@@ -118,10 +118,16 @@ exports.request_data=function(opts,data,fn,args){
             }
             catch(e){
                 console.log(e.message);
-                //retry once.
-               // setTimeout(function(){
-            //  request_data(opts,data,fn,args);        
-              //  },2000);
+                var proxy = exports.randomip(proxys);
+                if(proxy.host&&proxy.port){
+                    opts.port = proxy.port;
+                    opts.host = proxy.host;    
+                }
+                
+                //retry
+                setTimeout(function(){
+                exports.request_data(opts,data,fn,args);        
+                },100);
             }
             }
         });
@@ -173,15 +179,49 @@ exports.verifyproxy = function(filename){
 	console.log("proxy file not found: "+finename);
 	return;
     }
-    var lines = fs.readFileSync(filename).toString().split('\r');
+    var lines = fs.readFileSync(filename).toString().split('\r\n');
     if(!lines) return;
+    var result = [];
     for(var i=0;i<lines.length;i++){
 	var l = lines[i].split(':');
 	var host = l[0];
 	var port = l[1];
-	http.get({'host':host,'port':port,'path':'http://www.baidu.com'},function(res){
-	    console.log(res);
-	});
+    console.log('try '+l);
+	verifyip(host,port);
     }
-
 }
+
+function verifyip(host,port){
+    http.get({'host':host,'port':port,'path':'http://m.qunar.com/search.action'},function(res){
+        var chunks = [];
+        res.on('data',function(chunk){
+            chunks.push(chunk);
+        });
+        res.on('end',function(){
+            var buffer = Buffer.concat(chunks);
+            if(buffer.length>1800){
+                //ip is avaliable.
+                //result.push({'host':host,'port':port});
+                console.log(host+":"+port);
+                fs.appendFile("avaliable_proxy5.txt",host+":"+port+'\r\n',function(err){
+                    if(err) console.log(err.message);
+                });
+            }
+        });
+    }).on('error',function(e){
+        //console.log("Got error: "+e.message);
+    });
+}
+exports.get_proxy=function(filename){
+    var lines = fs.readFileSync(filename).toString().split('\r\n');
+    return lines.map(function(l){
+        var str = l.split(':');
+        return {'host':str[0],'port':str[1]};
+    });
+}
+exports.randomip=function(proxys){
+  var idx = Math.random()*(proxys.length);
+  idx = parseInt(idx);
+  return proxys[idx];
+}
+var proxys = exports.get_proxy('avaliable_proxy4.txt');

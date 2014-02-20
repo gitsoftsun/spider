@@ -6,6 +6,8 @@ var $ = require('jquery')
 var entity = require('./models/entity.js')
 
 var departDate = '2014-02-23';
+var app_qunar_done_city_file = "app_qunar_done_city.txt";
+
 var elong_query = function(dname,aname){
 this.DepartCityName=dname;
 this.ArrivalCityName=aname;
@@ -18,7 +20,7 @@ var elong_options = new helper.basic_options('m.elong.com','/Flight/List','GET',
 var qunar_query = function(dname,aname){
   this.begin=dname;
   this.end=aname;
-  this.date=departDate.replace('-','');
+  this.date=departDate.replace(/\-/g,'');
   this.time=0;
   this.v=2;
   this.f="index";
@@ -30,32 +32,55 @@ var qunar_query = function(dname,aname){
 var qunar_options = new helper.basic_options('m.qunar.com','/search.action','GET',true,false,qunar_query);
 var cityFls = {};
 var cities = helper.get_cities('fc.txt');
+var proxys = helper.get_proxy('avaliable_proxy4.txt');
+var doneCities = {};
 
+function syncDoneCities(){
+  if(!fs.existsSync(app_qunar_done_city_file)) return;
+  var lines = fs.readFileSync(app_qunar_done_city_file).toString().split('\r\n');
+  for(var i=0;i<lines.length;i++){
+    doneCities[lines[i]] = true;
+  }
+}
+
+//get proxy random ip
+function randomip(proxys){
+  var idx = Math.random()*(proxys.length);
+  idx = parseInt(idx);
+  return proxys[idx];
+}
+function start(){
+  syncDoneCities();
 for(var j=0;j<cities.length;j++){
   var dep = cities[j];
   for(var k=0;k<cities.length;k++){
       if(k==j) continue;
       var arr = cities[k];
+      if(doneCities[dep.cname+'-'+arr.cname]) continue;
+
       var eq = new elong_query(dep.cname,arr.cname);
       var qq = new qunar_query(dep.cname,arr.cname);
       cityFls[dep.cname+'-'+arr.cname]={'pageCount':1,'equery':eq,'qquery':qq};
       //get flight data from elong.com
-      helper.request_data(
-        new helper.basic_options('m.elong.com','/Flight/List','GET',true,false,eq),
-        null,
-        elong_fls,
-        [dep.cname,arr.cname]
-        );
+      // helper.request_data(
+      //   new helper.basic_options('m.elong.com','/Flight/List','GET',true,false,eq),
+      //   null,
+      //   elong_fls,
+      //   [dep.cname,arr.cname]
+      //   );
       //get flight data from qunar.com
+      var proxy = randomip(proxys);
       helper.request_data(
-        new helper.basic_options('m.qunar.com','/search.action','GET',true,false,qq),
+        new helper.basic_options(proxy.host,'http://m.qunar.com/search.action','GET',true,false,qq,proxy.port),
         null,
         qunarfl,
         [dep.cname,arr.cname]
         );
   }
 }
+}
 
+start();
 
 
 // helper.request_data(elong_options,null,function(data){
@@ -126,7 +151,7 @@ function qunarfl(data,args){
   sb.append(atime);
   sb.append(',');
   sb.append(0);
-  sb.append('\r\n');  
+  sb.append('\r\n');
   }
   
 });
@@ -138,17 +163,24 @@ function qunarfl(data,args){
   var pageCount = Math.ceil(total/10);
   var cityf = cityFls[args[0]+'-'+args[1]];
   cityf.pageCount = pageCount;
+
   console.log(args[0]+'-'+args[1]+cityf.qquery["page.currPageNo"]+'/'+pageCount);
+  if(cityf.pageCount == cityf.qquery["page.currPageNo"]){
+    fs.appendFile(app_qunar_done_city_file,args[0]+'-'+args[1]+'\r\n',function(err){
+      if(err) console.log(err.message);
+    });
+  }
+
   while(cityf.qquery['page.currPageNo']<pageCount){
     cityf.qquery['page.currPageNo']++;
-    setTimeout(function(){
-      helper.request_data(
-      new helper.basic_options('m.qunar.com','/search.action','GET',true,false,cityf.qquery),
-      null,
-      qunarfl,
-      args
-      );    
-    },cityf.qquery['page.currPageNo']*2);
+    var proxy = randomip(proxys);
+    helper.request_data(
+    new helper.basic_options(proxy.host,'http://m.qunar.com/search.action','GET',true,false,cityf.qquery,proxy.port),
+    null,
+    qunarfl,
+    args
+    );
+    
     
   }
 
