@@ -1,12 +1,14 @@
 var http = require('http')
 var zlib = require('zlib')
 var fs = require('fs')
+var $ = require('jquery')
 
 exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
     this.path=path||'/';
     this.host=host||'m.ctrip.com';
     this.port=port||80;
     this.method=method||'GET';
+	this.data = data||{};
     this.headers={
         "Accept":"text/html,application/xhtml+xml,application/xml,application/json, text/javascript, */*; q=0.01",
         "Accept-Encoding":"gzip, deflate",
@@ -114,20 +116,17 @@ exports.request_data=function(opts,data,fn,args){
                 var obj = decoded.toString();
                 if(res.headers['content-type'].indexOf('application/json')!=-1)
                     obj =JSON.parse(decoded.toString());
-                fn(obj,args);
+				if(Array.isArray(args)){
+					args.push(opts.data);
+					fn(obj,args);
+				}else{
+					fn(obj,[args,opts.data]);
+				}
+                
             }
             catch(e){
                 console.log(e.message);
-                var proxy = exports.randomip(proxys);
-                if(proxy.host&&proxy.port){
-                    opts.port = proxy.port;
-                    opts.host = proxy.host;    
-                }
                 
-                //retry
-                setTimeout(function(){
-                exports.request_data(opts,data,fn,args);        
-                },100);
             }
             }
         });
@@ -141,7 +140,15 @@ exports.request_data=function(opts,data,fn,args){
     });
     });
     req.on('error', function(e) {
-    console.log('problem with request: ' + e.message);
+    console.log('error ,retry...');
+	var proxy = exports.randomip(proxys);
+                if(proxy.host&&proxy.port){
+                    opts.port = proxy.port;
+                    opts.host = proxy.host;    
+                }
+                
+                //retry
+                exports.request_data(opts,data,fn,args);
     });
     if(opts.method=='POST')
         req.write(strData);
@@ -162,7 +169,9 @@ exports.get_cities = function(filename){
 
     var cities = [];
     for(var i=0;i<lines.length;i++){
+	if(!lines[i]) continue;
       var c = lines[i].split(' ');
+
       var city = {};
       city["code"] = c[2];
       city["cname"] = c[1];
@@ -174,7 +183,8 @@ exports.get_cities = function(filename){
 }
 
 
-exports.verifyproxy = function(filename){
+exports.verifyproxy = function(filename,outfile){
+    if(!filename||!outfile) return;
     if(!fs.existsSync(filename)){
 	console.log("proxy file not found: "+finename);
 	return;
@@ -186,12 +196,12 @@ exports.verifyproxy = function(filename){
 	var l = lines[i].split(':');
 	var host = l[0];
 	var port = l[1];
-    console.log('try '+l);
-	verifyip(host,port);
+	verifyip(host,port,outfile);
     }
 }
 
-function verifyip(host,port){
+function verifyip(host,port,output){
+    if(!host||!port||!output) return;
     http.get({'host':host,'port':port,'path':'http://m.qunar.com/search.action'},function(res){
         var chunks = [];
         res.on('data',function(chunk){
@@ -200,12 +210,19 @@ function verifyip(host,port){
         res.on('end',function(){
             var buffer = Buffer.concat(chunks);
             if(buffer.length>1800){
+		if(res.headers['server']=='QWS/1.0'){
+		    
+		var cookies = res.headers['set-cookie'];
+		if(!cookies||cookies.length==0)
+		    return;
+
                 //ip is avaliable.
                 //result.push({'host':host,'port':port});
                 console.log(host+":"+port);
-                fs.appendFile("avaliable_proxy5.txt",host+":"+port+'\r\n',function(err){
+                fs.appendFile(output,host+":"+port+'\r\n',function(err){
                     if(err) console.log(err.message);
                 });
+		}
             }
         });
     }).on('error',function(e){
@@ -224,4 +241,33 @@ exports.randomip=function(proxys){
   idx = parseInt(idx);
   return proxys[idx];
 }
-var proxys = exports.get_proxy('avaliable_proxy4.txt');
+exports.fetchProxys=function(){
+    var proxySites = [];
+    proxySites.push('http://www.proxy360.cn/Proxy');
+    proxySites.push('http://www.cnproxy.com/proxy1.html');
+    
+	http.get(proxySites[0],function(res){
+	    var str ='';
+	    res.on('data',function(chunk){
+		str+=chunk;
+	    });
+	    res.on('end',function(){
+		var sb = new exports.StringBuffer();
+		var doc = $(str);
+		var itemNodes = doc.find("div.proxylistitem");
+		itemNodes.each(function(idx,items){
+		var item = items.children[0];
+			var ip = item.children[0].innerHTML.trim();
+			var port = item.children[1].innerHTML.trim();
+			sb.append(ip);
+			sb.append(":");
+			sb.append(port);
+			sb.append('\r\n');
+		});
+		var date  =new Date();
+		fs.writeFileSync("proxys-"+(date.getMonth()+1)+"-"+date.getDate()+".txt",sb.toString());
+	    });
+	});
+
+}
+var proxys = exports.get_proxy('avaliable_proxy6.txt');
