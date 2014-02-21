@@ -202,28 +202,25 @@ exports.verifyproxy = function(filename,outfile){
 
 function verifyip(host,port,output){
     if(!host||!port||!output) return;
-    http.get({'host':host,'port':port,'path':'http://m.qunar.com/search.action'},function(res){
+    http.get({'host':host,'port':port,'path':'http://www.baidu.com'},function(res){
         var chunks = [];
         res.on('data',function(chunk){
             chunks.push(chunk);
         });
         res.on('end',function(){
             var buffer = Buffer.concat(chunks);
-            if(buffer.length>1800){
-		if(res.headers['server']=='QWS/1.0'){
-		    
-		var cookies = res.headers['set-cookie'];
-		if(!cookies||cookies.length==0)
-		    return;
-
-                //ip is avaliable.
-                //result.push({'host':host,'port':port});
-                console.log(host+":"+port);
-                fs.appendFile(output,host+":"+port+'\r\n',function(err){
-                    if(err) console.log(err.message);
-                });
-		}
-            }
+            zlib.gunzip(buffer,function(err,decoded){
+				if(decoded){
+					var obj = decoded.toString();
+					if(obj.indexOf('030173')>-1){
+						console.log(host+":"+port);
+						fs.appendFile(output,host+":"+port+'\r\n',function(err){
+							if(err) console.log(err.message);
+						});
+					}
+				}
+            });
+			
         });
     }).on('error',function(e){
         //console.log("Got error: "+e.message);

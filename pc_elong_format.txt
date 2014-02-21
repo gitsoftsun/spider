@@ -1,0 +1,144 @@
+message: ""
+success: true
+value: [
+{CouponPrice: 55
+ElongStarLevel: 0
+FavorableMoneySymbol: ""
+FavorablePrice: 0
+HasGroupon: false
+HasLongCuiPromotion: false
+HasMoreRoom: true
+HasRoomData: true
+HasWeiFang: 0
+HotelAreaId: ""
+HotelId: "40801255"
+HotelName: "大连芙蓉国际酒店"
+HotelRoomSimpleList: [
+	{Area: ""
+		Bed: "床型：双床（120cm*200cm）/大床（180cm*200cm）"
+		BedShort: "双/大"
+		Floor: ""
+		IsHighspeed: true
+		IsShadow: false
+		LongCuiRatePlanList: null
+		Net: "免费"
+		NetMore: "上网方式：宽带[免费]"
+		Other: ""
+		PersonNum: "最多入住人数：2人"
+		RatePlanList: Array[1]
+		RoomBigImage: null
+		RoomId: "0009"
+		RoomImage: null
+		RoomImageList: null
+		RoomName: "特价房"
+		RoomVirtualImage: null
+		isShowFreeWifi: false
+	}
+
+]
+IsElongStar: true
+IsFullRoom: false
+IsLongcui: false
+IsRealStar: false
+IsXianshiqiang: true
+LongCuiHotelRoomSimpleList: null
+LowestPrice: "309"
+MoneySymbol: "&yen;"
+PriceComparison: null
+ReducePrice: 0
+RoomCount: 11
+ServiceIndex: {
+	ComplaintsRate: 0
+	ConfirmRate: 75
+	ServiceIndex: 4.7
+	SuccessRate: 100
+}
+ShowServiceIndex: false
+StarLevel: 0
+WarmTips: null}
+
+]
+
+
+//setup1. GET /shanghai/?aioIndex=-1&aioVal= HTTP/1.1
+//setup2. ajax request room
+//setup3. request detail of hotel
+//
+
+//request room data
+
+aioIndex: "-1"
+aioVal: ""
+citynameen: "shanghai"
+hotelIds: "30201106,30201096,40201167,40201027,40201982,40201904,30201068,50201489,40201944,60201579"
+hsr.ApCardNo: ""
+hsr.AreaId: ""
+hsr.AreaName: ""
+hsr.AreaType: 0
+hsr.BookingenableRate: 92
+hsr.BrandId: 0
+hsr.BrandIds: ""
+hsr.BrandName: ""
+hsr.Campaign_Id: ""
+hsr.CardNo: "192928"
+hsr.ChannelCode: "0000"
+hsr.CheckInDate: "2014/2/23 0:00"
+hsr.CheckOutDate: "2014/2/24 0:00"
+hsr.CityId: "0201"
+hsr.CityName: "上海"
+hsr.DetailNoResultCache: false
+hsr.Distance: 20
+hsr.EndLat: 0
+hsr.EndLng: 0
+hsr.FacilityIds: ""
+hsr.HighPrice: 0
+hsr.HotelChannel: "Hotel"
+hsr.HotelCount: 3743
+hsr.HotelName: ""
+hsr.HotelSort: "ByDefault"
+hsr.IsBigBed: false
+hsr.IsCashback: false
+hsr.IsCoupon: false
+hsr.IsDoubleBed: false
+hsr.IsFreeBreakfast: false
+hsr.IsFreeNet: false
+hsr.IsLimitTime: false
+hsr.IsLogin: false
+hsr.IsMystical: false
+hsr.IsNeedFilterProduct: false
+hsr.IsNeedNotContractedHotel: true
+hsr.IsNoGuarantee: false
+hsr.IsNotAcceptRecommend: false
+hsr.IsNotChange: false
+hsr.IsNotReturnNoRoomHotel: false
+hsr.IsPrePay: false
+hsr.Keywords: ""
+hsr.KeywordsType: "None"
+hsr.Language: "CN"
+hsr.ListType: "Common"
+hsr.LowPrice: 0
+hsr.MemberLevel: "Common"
+hsr.NationalCityName: "上海"
+hsr.OrderFromId: 50
+hsr.PageIndex: 1
+hsr.PageSize: 10
+hsr.PaymentType: "All"
+hsr.PersonNumOfRoom: 0
+hsr.PoiId: 0
+hsr.PoiName: ""
+hsr.RankType: 0
+hsr.ReturnKeywords: ""
+hsr.ReturnKeywordsType: "None"
+hsr.ShowPageSize: 40
+hsr.StarLevel: "None"
+hsr.StarLevels: ""
+hsr.StartLat: 0
+hsr.StartLng: 0
+hsr.SupplierIds: ""
+hsr.TagId: ""
+hsr.ThemeIds: ""
+isSquare: false
+viewpath: "~/Views/HotelListC/hotellist
+
+
+

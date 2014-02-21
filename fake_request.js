@@ -7,7 +7,7 @@ var sprintf = require("sprintf-js").sprintf
 var helper = require('./helpers/webhelper.js')
 
 //helper.fetchProxys();
-helper.verifyproxy('avaliable_proxy2.txt','verified-2-20.txt');
+helper.verifyproxy('avaliable_proxy.txt','verified-2-21.txt');
 
 //var options = new helper.basic_options('m.qunar.com','/','GET',true,false,null);
 function getdata(){
