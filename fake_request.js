@@ -6,8 +6,8 @@ var zlib = require('zlib')
 var sprintf = require("sprintf-js").sprintf
 var helper = require('./helpers/webhelper.js')
 
-helper.fetchProxys();
-//helper.verifyproxy('all_proxy_unverify.txt','avaliable_proxy7.txt');
+//helper.fetchProxys();
+helper.verifyproxy('avaliable_proxy2.txt','verified-2-20.txt');
 
 //var options = new helper.basic_options('m.qunar.com','/','GET',true,false,null);
 function getdata(){

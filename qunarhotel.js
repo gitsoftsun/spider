@@ -14,7 +14,7 @@ var app_qunar_done_hotel= "app_qunar_done_hotel.txt";
 
 //prepare data
 var cities = helper.get_cities('fc.txt');
-var proxys = helper.get_proxy('avaliable_proxy6.txt');
+var proxys = helper.get_proxy('verified-2-20.txt');
 var doneCities = {};
 var doneHotels = {};
 var doneLines = [];
@@ -60,7 +60,7 @@ function start(){
 		var query = {"checkin":checkindate.replace(/\-/g,''),"days":1,"city":c.cname,"pageNum":pageIdx};
 		var opt = new helper.basic_options(proxy.host,'http://h.qunar.com/list.jsp','GET',true,false,query,proxy.port);
 		helper.request_data(opt,null,process_hotel_list,c);
-	}	
+	}
 }
 start();
 
