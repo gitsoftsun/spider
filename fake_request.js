@@ -83,18 +83,18 @@ q["hsr.CityId"]= "1111"
 // q["hsr.ThemeIds"]= ""
 q["hotelId"]=41111001
 //helper.fetchProxys();
-//helper.verifyproxy('all_proxy_unverify.txt','verified-2-23.txt');
-var elong_query = function(dname,aname){
-this.DepartCityName=dname;
-this.ArrivalCityName=aname;
-this.DepartDate="2014/2/26";
-this.IsReturn="false";
-this.PageIndex = 0;
-this.FlightType='OneWay';
-};
-var options = new helper.basic_options('flight.elong.com','/isajax/OneWay/S','GET',false,true,new elong_query('北京','上海'));
-options.headers["referer"] = "http://flight.elong.com/";
-helper.request_data(options,null,function(data){console.log(data);});
+helper.verifyproxy('proxys-2-24.txt','verified-2-24.txt');
+// var elong_query = function(dname,aname){
+// this.DepartCityName=dname;
+// this.ArrivalCityName=aname;
+// this.DepartDate="2014/2/26";
+// this.IsReturn="false";
+// this.PageIndex = 0;
+// this.FlightType='OneWay';
+// };
+// var options = new helper.basic_options('flight.elong.com','/isajax/OneWay/S','GET',false,true,new elong_query('北京','上海'));
+// options.headers["referer"] = "http://flight.elong.com/";
+// helper.request_data(options,null,function(data){console.log(data);});
 // function getdata(){
 //     http.get(options,function(res){
 //     var chunks = [];

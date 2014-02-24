@@ -41142,3 +41142,8 @@ p:{"checkin":"20140223","days":1,"city":"苏州","pageNum":202}
 p:{"checkin":"20140223","days":1,"city":"苏州","pageNum":199}
 p:{"checkin":"20140223","days":1,"city":"苏州","pageNum":197}
 p:{"checkin":"20140223","days":1,"city":"苏州","pageNum":200}
+p:{"checkin":"20140301","days":1,"city":"上海","pageNum":15,"idxOfPage":4,"level":1}
+p:{"checkin":"20140301","days":1,"city":"上海","pageNum":63,"idxOfPage":7,"level":1}
+p:{"checkin":"20140301","days":1,"city":"上海","pageNum":28,"idxOfPage":3,"level":1}
+p:{"checkin":"20140301","days":1,"city":"上海","pageNum":61,"idxOfPage":1,"level":1}
+h:{"seq":"236","checkin":"20140301","days":1,"city":"上海","pageNum":1}

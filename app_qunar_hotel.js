@@ -7,10 +7,10 @@ var entity = require('./models/entity.js')
 var sprintf = require("sprintf-js").sprintf
 
 //basic settings.
-var checkindate = "2014-02-23";
-var checkoutdate = "2014-02-24";
+var checkindate = "2014-03-01";
+var checkoutdate = "2014-03-02";
 var app_qunar_done_city_file = "app_qunar_done_city_hotel.txt";
-var app_qunar_done_hotel= "app_qunar_done_hotel-02-21.txt";
+var app_qunar_done_hotel= "app_qunar_done_hotel-02-24.txt";
 
 //prepare data
 var proxy = new helper.proxy();
@@ -20,6 +20,9 @@ var doneCities = {};
 var doneHotels = {};
 var doneLines = [];
 var requestCount = 0;
+
+var arguments = process.argv.splice(2);
+var level = arguments[0]||1;
 
 function syncDoneCities(){
 	console.log("sync done cities...");
@@ -59,13 +62,14 @@ function start(){
 		
 		var pageIdx = 1;
 		
-		var query = {"checkin":checkindate.replace(/\-/g,''),"days":1,"city":c.cname,"pageNum":pageIdx};
+		var query = {"checkin":checkindate.replace(/\-/g,''),"days":1,"city":c.cname,"pageNum":pageIdx,"level":level};
 		var p = getProxy();
 		//var opt = new helper.basic_options(p.host,'http://h.qunar.com/list.jsp','GET',true,false,query,p.port);
 		var opt = new helper.basic_options("h.qunar.com",'/list.jsp','GET',true,false,query,null);
+		opt.headers["referer"] = "http://h.qunar.com/";
 		console.log("starting get "+c.cname+" page:"+pageIdx);
 		
-		helper.request_data(opt,null,process_hotel_list,c);
+		request_data(opt,null,process_hotel_list,c);
 	}
 }
 start();
@@ -121,70 +125,100 @@ function process_hotel_list(data,args){
 	var items = doc.find('table.fl tr td:first-child');
 	if(items.length==0) return;
 	console.log("available "+args[0].cname+" page:"+args[1].pageNum);
-	items.each(function(idx,td){
-	
-		var a = td.childNodes[1];
-	    if(!a||!a.innerHTML) return;
+	if(args[1].idxOfPage){
+		items.each(function(idx,td){
+			if(idx!=args[1].idxOfPage) return;
+			var a = td.childNodes[1];
+			if(!a||!a.innerHTML) return;
 
-		    var name = a.innerHTML&&a.innerHTML.trim();
-			var href = a.getAttribute('href');
-			var matches = href&&href.match(/seq=\w+/);
-			var id = matches&&matches[0].split('=')[1];;
-	    if(!id) return;
-	    		if(doneHotels[id]) {
-			if(args[0].curHotelIdx==undefined)
-				args[0].curHotelIdx=1;
-			else
-				args[0].curHotelIdx++;
-			//donehotelcount++;
-			return;
-		}
-	    	var h = new entity.hotel();
-		h.city = args[0].cname;
-	    h.id = id;
-	    h.name = name;
-		var pointsAndZone = td.childNodes[4].value&&td.childNodes[4].value.trim();
-		if(pointsAndZone){
-			var matches = pointsAndZone.match(/\d*\.\d*/);
-			h.points = matches&&matches[0];
-			h.zoneName = pointsAndZone.split(' ')[1];	
-		}
-		
-		var p = getProxy();
-		helper.request_data(
-		//new helper.basic_options(p.host,'http://h.qunar.com/preDetail.jsp','GET',true,false,{'seq':h.id,'checkin':checkindate.replace(/\-/g,''),'days':1,"city":args[0].cname,'pageNum':args[1].pageNum},p.port),
-		new helper.basic_options("h.qunar.com",'/preDetail.jsp','GET',true,false,{'seq':h.id,'checkin':checkindate.replace(/\-/g,''),'days':1,"city":args[0].cname,'pageNum':args[1].pageNum},null),
-		null,
-		process_one_hotel,
-		[h,args[0]]
-		);
-	});
-	
-	
-	//get next page.
-	var matches = data.match(/\d+\/\d+/g);
-	var pageCount = matches&&matches[0].split('/')[1];
-	var p = doc.find("div.ct p:first-child");
-	var hotelCount = 0;
-	if(p.length>0){
-		var matches=p[0].childNodes && p[0].childNodes[2].value&&p[0].childNodes[2].value.trim().match(/\d+/);
-		hotelCount=matches&&matches[0];
+				var name = a.innerHTML&&a.innerHTML.trim();
+				var href = a.getAttribute('href');
+				var matches = href&&href.match(/seq=\w+/);
+				var id = matches&&matches[0].split('=')[1];;
+			if(!id) return;
+					if(doneHotels[id]) {
+				if(args[0].curHotelIdx==undefined)
+					args[0].curHotelIdx=1;
+				else
+					args[0].curHotelIdx++;
+				//donehotelcount++;
+				return;
+			}
+				var h = new entity.hotel();
+			h.city = args[0].cname;
+			h.id = id;
+			h.name = name;
+			var pointsAndZone = td.childNodes[4].value&&td.childNodes[4].value.trim();
+			if(pointsAndZone){
+				var matches = pointsAndZone.match(/\d*\.\d*/);
+				h.points = matches&&matches[0];
+				h.zoneName = pointsAndZone.split(' ')[1];	
+			}
+			
+			var p = getProxy();
+			request_data(
+			//new helper.basic_options(p.host,'http://h.qunar.com/preDetail.jsp','GET',true,false,{'seq':h.id,'checkin':checkindate.replace(/\-/g,''),'days':1,"city":args[0].cname,'pageNum':args[1].pageNum},p.port),
+			new helper.basic_options("h.qunar.com",'/preDetail.jsp','GET',true,false,{'seq':h.id,'checkin':checkindate.replace(/\-/g,''),'days':1,"city":args[0].cname,'pageNum':args[1].pageNum},null),
+			null,
+			process_one_hotel,
+			[h,args[0]]
+			);
+		});
 	}
-	var c = args[0];
-	if(!c.pageCount) c.pageCount = pageCount;
-	if(!c.curPageIdx) c.curPageIdx = 1;
-	if(!c.hotelCount&&hotelCount>0) c.hotelCount=hotelCount;
-	if(c.curHotelIdx==undefined) c.curHotelIdx=0;
-	//console.log(c.cname+":"+c.curPageIdx+"/"+c.pageCount);
-	while(c.curPageIdx<c.pageCount-1){
-		c.curPageIdx++;
-		
-		var query = {"checkin":checkindate.replace(/\-/g,''),"days":1,"city":c.cname,"pageNum":c.curPageIdx};
-		//var opt = new helper.basic_options(proxy.host,'http://h.qunar.com/list.jsp','GET',true,false,query,proxy.port);
-		var opt = new helper.basic_options('h.qunar.com','/list.jsp','GET',true,false,query,null);
-		helper.request_data(opt,null,process_hotel_list,c);
+	else{
+		//get next page.
+		var matches = data.match(/\d+\/\d+/g);
+		var pageCount = matches&&matches[0].split('/')[1];
+		var p = doc.find("div.ct p:first-child");
+		var hotelCount = 0;
+		if(p.length>0){
+			var matches=p[0].childNodes && p[0].childNodes[2].value&&p[0].childNodes[2].value.trim().match(/\d+/);
+			hotelCount=matches&&matches[0];
+		}
+		var c = args[0];
+		if(!c.pageCount) c.pageCount = pageCount;
+		if(!c.curPageIdx) c.curPageIdx = 1;
+		if(!c.hotelCount&&hotelCount>0) c.hotelCount=hotelCount;
+		if(c.curHotelIdx==undefined) c.curHotelIdx=0;
+		var hotelToGet = getrandoms(hotelCount);
+		for(var x in hotelToGet){
+			var query = {"checkin":checkindate.replace(/\-/g,''),"days":1,"city":c.cname,"pageNum":hotelToGet[x].pageIdx,"idxOfPage":hotelToGet[x].idxOfPage,"level":level};
+			//var opt = new helper.basic_options(proxy.host,'http://h.qunar.com/list.jsp','GET',true,false,query,proxy.port);
+			var opt = new helper.basic_options('h.qunar.com','/list.jsp','GET',true,false,query,null);
+			request_data(opt,null,process_hotel_list,c);
+		}
 	}
 }
+function getrandoms(l){
+	var result = [];
+	if(l<=10){
+		while(l){
+			result.push(--l);
+		}
+		return result.map(function(i){
+			var page = Math.ceil(i/8);
+			var idxOfPage = i%8;
+			return {'pageIdx':page,'idxOfPage':idxOfPage};
+		});
+	}
+	
+	var i=0;
+	var tempdic = {};
+	while(i<10){
+		var x = Math.floor((Math.random()*l)+0);
+		if(!tempdic[x]){
+			tempdic[x]=true;
+			result.push(x);
+			i++;
+		}
+	}
+	return result.map(function(i){
+			var page = Math.ceil(i/8);
+			var idxOfPage = i%8;
+			return {'pageIdx':page,'idxOfPage':idxOfPage};
+		});
+}
+
 var donehotelcount=0;
 function process_one_hotel(data,args){
 	console.log("got hotel page.");
@@ -237,17 +271,17 @@ function process_one_hotel(data,args){
 	// 	helper.request_data(opt,null,process_hotel_list,c);
 	
 	// }
-	appendToFile("app_qunar_hotel.txt",args[0].toString("qunar"));
+	appendToFile("app_data/app_qunar_hotel-"+level+"-"+args[1].cname+".txt",args[0].toString("qunar"));
 	console.log(args[1].cname+": "+(++args[1].curHotelIdx)+"/"+args[1].hotelCount);
 	fs.appendFile(app_qunar_done_hotel,args[0].id+','+args[2].pageNum+','+args[1].id+'\r\n',function(err){
 		if(err) console.log(err.message);
 	});
-	if(args[1].curHotelIdx==args[1].hotelCount){
-		doneCities[args[1].cname] = true;
-		fs.appendFile(app_qunar_done_city_hotel,args[1].cname+'\r\n',function(err){
-			if(err) console.log(err.message);
-		});
-	}
+	// if(args[1].curHotelIdx==args[1].hotelCount){
+		// doneCities[args[1].cname] = true;
+		// fs.appendFile(app_qunar_done_city_hotel,args[1].cname+'\r\n',function(err){
+			// if(err) console.log(err.message);
+		// });
+	// }
 	//var c = args[1];
 	
 }
@@ -263,7 +297,7 @@ function appendToFile(file,data){
 
 
 
-request_data=function(opts,data,fn,args){
+function request_data(opts,data,fn,args){
     if(!opts || !fn) throw "argument null 'opt' or 'data'";
     var strData = data && JSON.stringify(data);
     if(opts.method=='POST')

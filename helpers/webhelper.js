@@ -34,7 +34,8 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
         for(var k in data){
             sb.append(k);
             sb.append('=');
-            sb.append(encodeURIComponent(data[k]));
+            //sb.append(encodeURIComponent(data[k]));
+			sb.append(data[k]);
             sb.append('&');
         }
         sb.removeLast();
@@ -231,6 +232,7 @@ function verifyip(host,port,output){
             chunks.push(chunk);
         });
         res.on('end',function(){
+			console.log("Got result: "+host);
             var buffer = Buffer.concat(chunks);
             zlib.gunzip(buffer,function(err,decoded){
 				if(decoded){
@@ -246,7 +248,7 @@ function verifyip(host,port,output){
 			
         });
     }).on('error',function(e){
-        //console.log("Got error: "+e.message);
+        console.log("Got error: "+host+" : "+e.message);
     });
 }
 
