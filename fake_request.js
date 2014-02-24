@@ -5,24 +5,131 @@ var http = require('http')
 var zlib = require('zlib')
 var sprintf = require("sprintf-js").sprintf
 var helper = require('./helpers/webhelper.js')
-
+//console.log("pre call exit.")
+//process.exit()
+//console.log("exited");
+var q={};
+//q["aioIndex"]= "-1"
+//q["aioVal"]= ""
+//q["citynameen"]= "xxx"
+//q["hotelIds"]= "30201106,30201096,40201167,40201027,40201982,40201904,30201068,50201489,40201944,60201579"
+//q["isSquare"]= false
+// q["viewpath"]= "~/Views/HotelListC/hotellist"
+// q["hsr.ApCardNo"]= ""
+// q["hsr.AreaId"]= ""
+// q["hsr.AreaName"]= ""
+// q["hsr.AreaType"]= 0
+// q["hsr.BookingenableRate"]= 92
+// q["hsr.BrandId"]= 0
+// q["hsr.BrandIds"]= ""
+// q["hsr.BrandName"]= ""
+// q["hsr.Campaign_Id"]= ""
+// q["hsr.CardNo"]= "192928"
+// q["hsr.ChannelCode"]= "0000"
+q["hsr.CheckInDate"]= "2014/2/23"
+q["hsr.CheckOutDate"]= "2014/2/24"
+q["hsr.CityId"]= "1111"
+// q["hsr.CityName"]= "上海"
+// q["hsr.DetailNoResultCache"]= false
+// q["hsr.Distance"]= 20
+// q["hsr.EndLat"]= 0
+// q["hsr.EndLng"]= 0
+// q["hsr.FacilityIds"]= ""
+// q["hsr.HighPrice"]= 0
+// q["hsr.HotelChannel"]= "Hotel"
+// q["hsr.HotelCount"]= 3743
+// q["hsr.HotelName"]= ""
+// q["hsr.HotelSort"]= "ByDefault"
+// q["hsr.IsBigBed"]= false
+// q["hsr.IsCashback"]= false
+// q["hsr.IsCoupon"]= false
+// q["hsr.IsDoubleBed"]= false
+// q["hsr.IsFreeBreakfast"]= false
+// q["hsr.IsFreeNet"]= false
+// q["hsr.IsLimitTime"]= false
+// q["hsr.IsLogin"]= false
+// q["hsr.IsMystical"]= false
+// q["hsr.IsNeedFilterProduct"]= false
+// q["hsr.IsNeedNotContractedHotel"]= true
+// q["hsr.IsNoGuarantee"]= false
+// q["hsr.IsNotAcceptRecommend"]= false
+// q["hsr.IsNotChange"]= false
+// q["hsr.IsNotReturnNoRoomHotel"]= false
+// q["hsr.IsPrePay"]= false
+// q["hsr.Keywords"]= ""
+// q["hsr.KeywordsType"]= "None"
+// q["hsr.Language"]= "CN"
+// q["hsr.ListType"]= "Common"
+// q["hsr.LowPrice"]= 0
+// q["hsr.MemberLevel"]= "Common"
+// q["hsr.NationalCityName"]= "上海"
+// q["hsr.OrderFromId"]= 50
+// q["hsr.PageIndex"]= 1
+// q["hsr.PageSize"]= 10
+// q["hsr.PaymentType"]= "All"
+// q["hsr.PersonNumOfRoom"]= 0
+// q["hsr.PoiId"]= 0
+// q["hsr.PoiName"]= ""
+// q["hsr.RankType"]= 0
+// q["hsr.ReturnKeywords"]= ""
+// q["hsr.ReturnKeywordsType"]= "None"
+// q["hsr.ShowPageSize"]= 40
+// q["hsr.StarLevel"]= "None"
+// q["hsr.StarLevels"]= ""
+// q["hsr.StartLat"]= 0
+// q["hsr.StartLng"]= 0
+// q["hsr.SupplierIds"]= ""
+// q["hsr.TagId"]= ""
+// q["hsr.ThemeIds"]= ""
+q["hotelId"]=41111001
 //helper.fetchProxys();
-helper.verifyproxy('avaliable_proxy.txt','verified-2-21.txt');
+//helper.verifyproxy('all_proxy_unverify.txt','verified-2-23.txt');
+var elong_query = function(dname,aname){
+this.DepartCityName=dname;
+this.ArrivalCityName=aname;
+this.DepartDate="2014/2/26";
+this.IsReturn="false";
+this.PageIndex = 0;
+this.FlightType='OneWay';
+};
+var options = new helper.basic_options('flight.elong.com','/isajax/OneWay/S','GET',false,true,new elong_query('北京','上海'));
+options.headers["referer"] = "http://flight.elong.com/";
+helper.request_data(options,null,function(data){console.log(data);});
+// function getdata(){
+//     http.get(options,function(res){
+//     var chunks = [];
+//     res.on('data',function(chunk){
+//         chunks.push(chunk);
+//     });
+//     res.on('end',function(){
+//         var buffer = Buffer.concat(chunks);
+//     console.log(buffer.toString());
+//     });
+//     res.on('error',function(e){
+//         console.log(e.message);
+//     });
+// });
 
-//var options = new helper.basic_options('m.qunar.com','/','GET',true,false,null);
-function getdata(){
-    http.get(options,function(res){
-    var chunks = [];
-    res.on('data',function(chunk){
-        chunks.push(chunk);
-    });
-    res.on('end',function(){
-        var buffer = Buffer.concat(chunks);
-    console.log(buffer.length);
-    });
-});
+// }
 
-}
+// var query = "?_=1393076714087&isSquare=false&citynameen=zhangjiagang&viewpath=~%2FViews%2FHotelListC%2Fhotellist.aspx&hsr.RankType=-1&hsr.CityId=1111&hsr.CityName=%E5%BC%A0%E5%AE%B6%E6%B8%AF%EF%BC%88%E8%8B%8F%E5%B7%9E%EF%BC%89&hsr.NationalCityName=%E5%BC%A0%E5%AE%B6%E6%B8%AF%EF%BC%88%E8%8B%8F%E5%B7%9E%EF%BC%89&hsr.CheckInDate=2014%2F2%2F24+0%3A00&hsr.CheckOutDate=2014%2F2%2F25+0%3A00&hsr.HotelName=&hsr.Keywords=&hsr.KeywordsType=None&hsr.ReturnKeywordsType=None&hsr.ReturnKeywords=&hsr.AreaId=&hsr.AreaName=&hsr.AreaType=0&hsr.PoiId=0&hsr.PoiName=&hsr.LowPrice=0&hsr.HighPrice=0&hsr.StarLevel=None&hsr.BrandId=0&hsr.BrandName=&hsr.StarLevels=&hsr.BrandIds=&hsr.TagId=&hsr.FacilityIds=&hsr.SupplierIds=&hsr.Distance=20&hsr.StartLat=0&hsr.StartLng=0&hsr.EndLat=0&hsr.EndLng=0&hsr.IsBigBed=false&hsr.IsDoubleBed=false&hsr.IsFreeBreakfast=false&hsr.IsFreeNet=false&hsr.IsCoupon=false&hsr.IsCashback=false&hsr.IsNoGuarantee=false&hsr.IsPrePay=false&hsr.PaymentType=All&hsr.IsLimitTime=false&hsr.IsNotReturnNoRoomHotel=false&hsr.ThemeIds=&hsr.HotelSort=ByDefault&hsr.PageIndex=2&hsr.PageSize=10&hsr.ShowPageSize=40&hsr.HotelCount=61&hsr.ListType=Common&hsr.Language=CN&hsr.CardNo=192928&hsr.MemberLevel=Common&hsr.ApCardNo=&hsr.Campaign_Id=&hsr.ChannelCode=0000&hsr.OrderFromId=50&hsr.PersonNumOfRoom=0&hsr.HotelChannel=Hotel&hsr.IsNotAcceptRecommend=false&hsr.IsNotChange=false&hsr.IsMystical=false&hsr.DetailNoResultCache=false&hsr.IsNeedNotContractedHotel=true&hsr.BookingenableRate=81&hsr.IsLogin=false&hsr.IsNeedFilterProduct=false";
+// //var query = "citynameen=zhangjiagang&hsr.CityId=1111&hsr.CityName=%E5%BC%A0%E5%AE%B6%E6%B8%AF%EF%BC%88%E8%8B%8F%E5%B7%9E%EF%BC%89";
+// var op = {"host":"hotel.elong.com","path":"/isajax/List/Search"+helper.toQuery(q)};
+// op.headers={};
+// op.headers["X-Requested-With"]="XMLHttpRequest";
+// op.headers["referer"]="http://hotel.elong.com/";
+// http.get(op,function(res){
+//     var chunks = [];
+//     res.on('data',function(chunk){
+//         chunks.push(chunk);
+//     });
+//     res.on('end',function(){
+//         var buffer = Buffer.concat(chunks);
+//         console.log(buffer.toString());
+//     });
+// });
+
+
 
 //console.log(sprintf('{"cityname":"%1$s","checkindate":"%2$s","checkoutdate":"%3$s","pageindex":%4$d}', "cracker", "Polly", "wants",3));
 // var cities={};
@@ -191,3 +298,5 @@ function getdata(){
 
     
 // });
+
+

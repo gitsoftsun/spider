@@ -101,6 +101,57 @@ exports.hotel.prototype.toString=function(site){
         }
         return sb.toString();
     }
+    else if(site=="elong_pc"){
+        var sb = new helper.StringBuffer();
+        for(var i = 0;i<this.rooms.length;i++){
+            var r = this.rooms[i];
+            for(var j=0;j<r.plans.length;j++){
+                sb.append(this.city);
+                sb.append(',');
+                sb.append(this.name);
+                sb.append(',');
+                sb.append(this.zoneName);
+                sb.append(',');
+                sb.append(this.star);
+                sb.append(',');
+                sb.append(r.name);
+                sb.append(',');
+                sb.append(r.bedType);
+                sb.append(',');
+                sb.append(this.commentCount);
+                sb.append(',');
+                sb.append(this.goodComment);
+                sb.append(',');
+                sb.append(this.badComment);
+                sb.append(',');
+                sb.append(this.prate);
+                sb.append(',');
+                sb.append(r.plans[j].name);
+                sb.append(',');
+                sb.append(r.plans[j].breakfast);
+                sb.append(',');
+                sb.append(r.plans[j].price);
+                sb.append(',');
+                sb.append(r.plans[j].fan);
+                sb.append(',');
+                sb.append(r.plans[j].lan);
+                sb.append(',');
+                sb.append(r.plans[j].payType);
+                sb.append(',');
+                sb.append(r.plans[j].hasWeifang);
+                sb.append(',');
+                sb.append(r.plans[j].needSurety);
+                sb.append(',');
+                sb.append(r.plans[j].gift.replace(/,/g,''));
+                sb.append(',');
+                sb.append(r.plans[j].reduce);
+                sb.append(',');
+                sb.append(r.plans[j].timeLimit);
+                sb.append('\r\n');
+            }
+        }
+        return sb.toString();
+    }
     var sb="";
     for(var i=0;i<this.rooms.length;i++){
         sb+=this.city+",";

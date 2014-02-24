@@ -2,7 +2,18 @@ var http = require('http')
 var zlib = require('zlib')
 var fs = require('fs')
 var $ = require('jquery')
-
+exports.toQuery = function(obj){
+    var sb = new exports.StringBuffer();
+    sb.append('?');
+    for(var k in obj){
+        sb.append(k);
+        sb.append('=');
+        sb.append(encodeURIComponent(obj[k]));
+        sb.append('&');
+    }
+    sb.removeLast();
+    return sb.toString();
+}
 exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
     this.path=path||'/';
     this.host=host||'m.ctrip.com';
@@ -110,6 +121,11 @@ exports.request_data=function(opts,data,fn,args){
     res.on('end',function(){
             if(res.headers['content-encoding']=='gzip'){
         var buffer = Buffer.concat(chunks);
+		if(buffer.length==157){
+			console.log("current ip has been forbidden.");
+            
+            //process.exit();
+		}
         zlib.gunzip(buffer,function(err,decoded){
             if(decoded){
             try{
@@ -140,12 +156,19 @@ exports.request_data=function(opts,data,fn,args){
     });
     });
     req.on('error', function(e) {
-    console.log('error ,retry...');
-	var proxy = exports.randomip(proxys);
-                if(proxy.host&&proxy.port){
-                    opts.port = proxy.port;
-                    opts.host = proxy.host;    
-                }
+	if(opts.path && opts.path.indexOf('list.jsp')!=-1){
+		console.log("page :"+opts.data.pageNum+"got error-"+e.message);
+		fs.appendFile("app_qunar_hotel_failed.txt","p:"+ JSON.stringify(opts.data)+'\r\n');
+	}else{
+		console.log("page of hotel:"+opts.data.seq+" got error-"+e.message);
+		fs.appendFile("app_qunar_hotel_failed.txt","h:"+JSON.stringify(opts.data)+'\r\n');
+	}
+    //console.log(e.message);
+	//var proxy = exports.randomip(proxys);
+    //            if(proxy.host&&proxy.port){
+    //                opts.port = proxy.port;
+    //                opts.host = proxy.host;    
+    //            }
                 
                 //retry
                 exports.request_data(opts,data,fn,args);
@@ -226,18 +249,46 @@ function verifyip(host,port,output){
         //console.log("Got error: "+e.message);
     });
 }
-exports.get_proxy=function(filename){
-    var lines = fs.readFileSync(filename).toString().split('\r\n');
-    return lines.map(function(l){
+
+exports.proxy = function(){
+	this.proxyList = [];
+	this.curIdx = -1;
+}
+
+exports.proxy.prototype.load = function(filename){
+    if(!fs.existsSync(filename)) {
+        console.log("file not found:"+filename);
+        return;
+    }
+	var lines = fs.readFileSync(filename).toString().split('\r\n');
+    this.proxyList = lines.map(function(l){
         var str = l.split(':');
         return {'host':str[0],'port':str[1]};
     });
+	this.curIdx = 0;
 }
-exports.randomip=function(proxys){
-  var idx = Math.random()*(proxys.length);
+
+exports.proxy.prototype.randomip=function(){
+  var idx = Math.random()*(this.proxyList.length);
   idx = parseInt(idx);
   return proxys[idx];
 }
+
+exports.proxy.prototype.getNext = function(){
+	if(this.curIdx == this.proxyList.length-1){
+		this.curIdx=0;
+	}else{
+		this.curIdx++;
+	}
+	return this.proxyList[this.curIdx];
+}
+exports.proxy.prototype.cur = function(){
+	if(this.proxyList.length>0)
+		return this.proxyList[this.curIdx];
+	else
+		return null;
+}
+
 exports.fetchProxys=function(){
     var proxySites = [];
     proxySites.push('http://www.proxy360.cn/Proxy');
@@ -261,10 +312,38 @@ exports.fetchProxys=function(){
 			sb.append(port);
 			sb.append('\r\n');
 		});
+		sb.removeLast();
 		var date  =new Date();
-		fs.writeFileSync("proxys-"+(date.getMonth()+1)+"-"+date.getDate()+".txt",sb.toString());
+		fs.appendFileSync("proxys-"+(date.getMonth()+1)+"-"+date.getDate()+".txt",sb.toString());
 	    });
 	});
+	
+	// http.get(proxySites[1],function(res){
+	// 	var str ='';
+	//     res.on('data',function(chunk){
+	// 	str+=chunk;
+	//     });
+	//     res.on('end',function(){
+        
+	// 	var sb = new exports.StringBuffer();
+	// 	var doc = $(str);
+	// 	var itemNodes = doc.find("#proxylisttb");
+ //        if(itemNodes.length==0)
+ //            return;
+ //        var table = itemNodes[0].children[2];
+ //        var trs = table.getElementsByTagName("tr");
+ //        console.log(trs[1].innerHTML);
+ //        for(var k=1;k<trs.length;k++){
+ //            var td = trs[k].children[0];
+ //            console.log(td.innerHTML);
+ //            sb.append(td.childNodes[0].value.trim()+td.childNodes[2].value.trim());
+ //            sb.append('\r\n');
+ //        }
+ //        sb.removeLast();
+ //        var date = new Date();
+ //        fs.writeFileSync("proxys-"+(date.getMonth()+1)+"-"+date.getDate()+".txt",sb.toString());
+	//     });
+	// });
 
 }
-var proxys = exports.get_proxy('avaliable_proxy6.txt');
+//var proxys = exports.get_proxy('avaliable_proxy6.txt');
