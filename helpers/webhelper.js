@@ -111,7 +111,7 @@ exports.request_data=function(opts,data,fn,args){
     if(!opts || !fn) throw "argument null 'opt' or 'data'";
     var strData = data && JSON.stringify(data);
     if(opts.method=='POST')
-        opts.headers['Content-Length']=Buffer.byteLength(strData);
+        opts.headers['Content-Length']=Buffer.byteLength(strData,'utf8');
     
     var req = http.request(opts, function(res) {
 
@@ -134,10 +134,10 @@ exports.request_data=function(opts,data,fn,args){
                 if(res.headers['content-type'].indexOf('application/json')!=-1)
                     obj =JSON.parse(decoded.toString());
 				if(Array.isArray(args)){
-					args.push(opts.data);
+					args.push(opts.data||data);
 					fn(obj,args);
 				}else{
-					fn(obj,[args,opts.data]);
+					fn(obj,[args,opts.data||data]);
 				}
                 
             }
@@ -153,6 +153,17 @@ exports.request_data=function(opts,data,fn,args){
       zlib.inflate(buffer,function(err,decoded){
         console.log(decoded&&decoded.toString());
       });
+    }else{
+        var buffer = Buffer.concat(chunks);
+        var obj = buffer.toString();
+        if(res.headers['content-type'].indexOf('application/json')!=-1)
+                    obj =JSON.parse(obj.toString());
+                if(Array.isArray(args)){
+                    args.push(opts.data||data);
+                    fn(obj,args);
+                }else{
+                    fn(obj,[args,opts.data||data]);
+                }
     }
     });
     });
@@ -220,11 +231,11 @@ exports.verifyproxy = function(filename,outfile){
 	var l = lines[i].split(':');
 	var host = l[0];
 	var port = l[1];
-	verifyip(host,port,outfile);
+	exports.verifyip(host,port,outfile);
     }
 }
 
-function verifyip(host,port,output){
+exports.verifyip = function(host,port,output){
     if(!host||!port||!output) return;
     http.get({'host':host,'port':port,'path':'http://www.baidu.com'},function(res){
         var chunks = [];
@@ -234,17 +245,28 @@ function verifyip(host,port,output){
         res.on('end',function(){
 			console.log("Got result: "+host);
             var buffer = Buffer.concat(chunks);
-            zlib.gunzip(buffer,function(err,decoded){
-				if(decoded){
-					var obj = decoded.toString();
-					if(obj.indexOf('030173')>-1){
-						console.log(host+":"+port);
-						fs.appendFile(output,host+":"+port+'\r\n',function(err){
-							if(err) console.log(err.message);
-						});
-					}
-				}
+            if(res.headers['content-encoding']=='gzip'){
+                zlib.gunzip(buffer,function(err,decoded){
+                if(decoded){
+                    var obj = decoded.toString();
+                    if(obj.indexOf('030173')>-1){
+                        console.log(host+":"+port);
+                        fs.appendFile(output,host+":"+port+'\r\n',function(err){
+                            if(err) console.log(err.message);
+                        });
+                    }
+                }
             });
+            }else{
+                var obj = buffer.toString();
+                if(obj.indexOf('030173')>-1){
+                    console.log(host+":"+port);
+                    fs.appendFile(output,host+":"+port+'\r\n',function(err){
+                        if(err) console.log(err.message);
+                    });
+                }
+            }
+            
 			
         });
     }).on('error',function(e){
@@ -253,16 +275,19 @@ function verifyip(host,port,output){
 }
 
 exports.proxy = function(){
-	this.proxyList = [];
-	this.curIdx = -1;
+	this.init();
 }
-
+exports.proxy.prototype.init = function(){
+    this.proxyList = [];
+    this.curIdx = -1;   
+}
 exports.proxy.prototype.load = function(filename){
     if(!fs.existsSync(filename)) {
         console.log("file not found:"+filename);
         return;
     }
 	var lines = fs.readFileSync(filename).toString().split('\r\n');
+    this.init();
     this.proxyList = lines.map(function(l){
         var str = l.split(':');
         return {'host':str[0],'port':str[1]};
@@ -291,35 +316,92 @@ exports.proxy.prototype.cur = function(){
 		return null;
 }
 
-exports.fetchProxys=function(){
-    var proxySites = [];
-    proxySites.push('http://www.proxy360.cn/Proxy');
-    proxySites.push('http://www.cnproxy.com/proxy1.html');
+exports.fetchProxys=function(filename){
+    // var proxySites = [];
+    // proxySites.push('http://www.proxy360.cn/Proxy');
+    // proxySites.push('http://www.cnproxy.com/proxy1.html');
     
-	http.get(proxySites[0],function(res){
-	    var str ='';
-	    res.on('data',function(chunk){
-		str+=chunk;
-	    });
-	    res.on('end',function(){
-		var sb = new exports.StringBuffer();
-		var doc = $(str);
-		var itemNodes = doc.find("div.proxylistitem");
-		itemNodes.each(function(idx,items){
-		var item = items.children[0];
-			var ip = item.children[0].innerHTML.trim();
-			var port = item.children[1].innerHTML.trim();
-			sb.append(ip);
-			sb.append(":");
-			sb.append(port);
-			sb.append('\r\n');
-		});
-		sb.removeLast();
-		var date  =new Date();
-		fs.appendFileSync("proxys-"+(date.getMonth()+1)+"-"+date.getDate()+".txt",sb.toString());
-	    });
-	});
-	
+	// http.get(proxySites[0],function(res){
+	//     var str ='';
+	//     res.on('data',function(chunk){
+	// 	str+=chunk;
+	//     });
+	//     res.on('end',function(){
+	// 	var sb = new exports.StringBuffer();
+	// 	var doc = $(str);
+	// 	var itemNodes = doc.find("div.proxylistitem");
+	// 	itemNodes.each(function(idx,items){
+	// 	var item = items.children[0];
+	// 		var ip = item.children[0].innerHTML.trim();
+	// 		var port = item.children[1].innerHTML.trim();
+	// 		sb.append(ip);
+	// 		sb.append(":");
+	// 		sb.append(port);
+	// 		sb.append('\r\n');
+	// 	});
+	// 	sb.removeLast();
+	// 	var date  =new Date();
+	// 	fs.appendFileSync("proxys-"+(date.getMonth()+1)+"-"+date.getDate()+".txt",sb.toString());
+	//     });
+	// });
+if(fs.existsSync(filename))
+    fs.unlinkSync(filename);
+	var query={
+"dd":547497070525017,
+"tqsl":1000,
+"ports":1998,
+"ports":18186,
+"ports":8080,
+"ports":9999,
+"qt":1,
+"cf":1
+}
+var opt = new this.basic_options('www.hungean.com',"/api.asp","GET",false,false,query,null);
+var that = this;
+http.get(opt,function(res){
+    var chunks = [];
+    res.on('data',function(chunk){
+        chunks.push(chunk);
+    });
+    res.on('end',function(){
+        var buffer = Buffer.concat(chunks);
+        var proxys = buffer.toString().split(' ');
+        for(var proxy in proxys){
+            var v = proxys[proxy].split(":");
+            var ip = v[0];
+            var port = v[1];
+            console.log(proxys[proxy]);
+            that.verifyip(ip,port,filename);
+        }
+    });
+    res.on('error',function(e){
+        console.log(e.message);
+    });
+});
+
+http://www.iphai.com/
+var q = {"un":"mike442144","pw":"mike442144","count":1000};
+var opts = new this.basic_options('www.iphai.com',"/apiProxy.ashx","GET",false,false,q,null);
+http.get(opts,function(res){
+    var chunks = [];
+    res.on('data',function(chunk){
+        chunks.push(chunk);
+    });
+    res.on('end',function(){
+        var buffer = Buffer.concat(chunks);
+        var proxys = buffer.toString().split('\r\n');
+        for(var proxy in proxys){
+            var v = proxys[proxy].split(":");
+            var ip = v[0];
+            var port = v[1];
+            console.log(proxys[proxy]);
+            that.verifyip(ip,port,filename);
+        }
+    });
+    res.on('error',function(e){
+        console.log(e.message);
+    });
+});
 	// http.get(proxySites[1],function(res){
 	// 	var str ='';
 	//     res.on('data',function(chunk){
@@ -349,3 +431,34 @@ exports.fetchProxys=function(){
 
 }
 //var proxys = exports.get_proxy('avaliable_proxy6.txt');
+
+
+exports.getrandoms = function(l){
+    var result = [];
+    if(l<=countOfHotelsPerCity){
+        while(l){
+            result.push(--l);
+        }
+        return result.map(function(i){
+            var page = Math.ceil((i+1)/8);
+            var idxOfPage = i%8;
+            return {'pageIdx':page,'idxOfPage':idxOfPage};
+        });
+    }
+    
+    var i=0;
+    var tempdic = {};
+    while(i<countOfHotelsPerCity){
+        var x = Math.floor((Math.random()*l)+0);
+        if(!tempdic[x]){
+            tempdic[x]=true;
+            result.push(x);
+            i++;
+        }
+    }
+    return result.map(function(i){
+            var page = Math.ceil((i+1)/8);
+            var idxOfPage = i%8;
+            return {'pageIdx':page,'idxOfPage':idxOfPage};
+        });
+}

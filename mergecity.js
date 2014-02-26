@@ -16,5 +16,5 @@ for(var i=0;i<lines.length;i++){
     var data = l.split(' ');
     //var c = data[1].replace(/\(w+\)/,'');
     
-    fs.appendFileSync("qunar_hot_city.txt",cities[data[0]]+' '+data[0]+'\r\n');
+    fs.appendFileSync("qunar_flight_hot_city.txt",cities[data[0]]+' '+data[0]+'\r\n');
 }

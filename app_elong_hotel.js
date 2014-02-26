@@ -7,12 +7,12 @@ var entity = require('./models/entity.js')
 var sprintf = require("sprintf-js").sprintf
 
 //basic settings.
-var checkindate = "2014-02-23";
-var checkoutdate = "2014-02-24";
+var checkindate = "2014-03-01";
+var checkoutdate = "2014-03-02";
 
 
 //get cities
-var cities = helper.get_cities('fc.txt');
+var cities = helper.get_cities('qunar_hot_city.txt');
 
 //request data
 for(var i=0;i<cities.length;i++){
