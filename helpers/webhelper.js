@@ -133,7 +133,10 @@ exports.request_data=function(opts,data,fn,args){
                 var obj = decoded.toString();
                 if(res.headers['content-type'].indexOf('application/json')!=-1)
                     obj =JSON.parse(decoded.toString());
-				if(Array.isArray(args)){
+                if(args==undefined){
+                    fn(obj,[data]);
+                }
+				else if(Array.isArray(args)){
 					args.push(opts.data||data);
 					fn(obj,args);
 				}else{
@@ -156,14 +159,18 @@ exports.request_data=function(opts,data,fn,args){
     }else{
         var buffer = Buffer.concat(chunks);
         var obj = buffer.toString();
-        if(res.headers['content-type'].indexOf('application/json')!=-1)
-                    obj =JSON.parse(obj.toString());
-                if(Array.isArray(args)){
-                    args.push(opts.data||data);
-                    fn(obj,args);
-                }else{
-                    fn(obj,[args,opts.data||data]);
-                }
+        if(res.headers['content-type']&&res.headers['content-type'].indexOf('application/json')!=-1){
+            obj =JSON.parse(obj.toString());
+        }
+        if(args==undefined){
+            fn(obj,[opts.data]);
+        }
+        else if(Array.isArray(args)){
+            args.push(opts.data||data);
+            fn(obj,args);
+        }else{
+            fn(obj,[args,opts.data||data]);
+        }
     }
     });
     });
@@ -344,8 +351,8 @@ exports.fetchProxys=function(filename){
 	// 	fs.appendFileSync("proxys-"+(date.getMonth()+1)+"-"+date.getDate()+".txt",sb.toString());
 	//     });
 	// });
-if(fs.existsSync(filename))
-    fs.unlinkSync(filename);
+// if(fs.existsSync(filename))
+//     fs.unlinkSync(filename);
 	var query={
 "dd":547497070525017,
 "tqsl":1000,
@@ -358,14 +365,38 @@ if(fs.existsSync(filename))
 }
 var opt = new this.basic_options('www.hungean.com',"/api.asp","GET",false,false,query,null);
 var that = this;
-http.get(opt,function(res){
+// http.get(opt,function(res){
+//     var chunks = [];
+//     res.on('data',function(chunk){
+//         chunks.push(chunk);
+//     });
+//     res.on('end',function(){
+//         var buffer = Buffer.concat(chunks);
+//         var proxys = buffer.toString().split(' ');
+//         for(var proxy in proxys){
+//             var v = proxys[proxy].split(":");
+//             var ip = v[0];
+//             var port = v[1];
+//             console.log(proxys[proxy]);
+//             that.verifyip(ip,port,filename);
+//         }
+//     });
+//     res.on('error',function(e){
+//         console.log(e.message);
+//     });
+// });
+
+//http://www.iphai.com/
+var q = {"un":"mike442144","pw":"mike442144","count":1000};
+var opts = new this.basic_options('www.iphai.com',"/apiProxy.ashx","GET",false,false,q,null);
+http.get(opts,function(res){
     var chunks = [];
     res.on('data',function(chunk){
         chunks.push(chunk);
     });
     res.on('end',function(){
         var buffer = Buffer.concat(chunks);
-        var proxys = buffer.toString().split(' ');
+        var proxys = buffer.toString().split('\r\n');
         for(var proxy in proxys){
             var v = proxys[proxy].split(":");
             var ip = v[0];
@@ -378,18 +409,15 @@ http.get(opt,function(res){
         console.log(e.message);
     });
 });
-
-http://www.iphai.com/
-var q = {"un":"mike442144","pw":"mike442144","count":1000};
-var opts = new this.basic_options('www.iphai.com',"/apiProxy.ashx","GET",false,false,q,null);
-http.get(opts,function(res){
+http.get("http://www.acintb.com/proxyG.php?ddh=548040106065017&sl=1000&dq=&dianxin=a&liantong=b&yidong=c&tietong=d&qita=e&dk18186=A&dk1998=B&dk8080=C&dk3128=D&dk80=E&dk78=F&kt=",
+function(res){
     var chunks = [];
     res.on('data',function(chunk){
         chunks.push(chunk);
     });
     res.on('end',function(){
         var buffer = Buffer.concat(chunks);
-        var proxys = buffer.toString().split('\r\n');
+        var proxys = buffer.toString().split(' ');
         for(var proxy in proxys){
             var v = proxys[proxy].split(":");
             var ip = v[0];
@@ -433,15 +461,17 @@ http.get(opts,function(res){
 //var proxys = exports.get_proxy('avaliable_proxy6.txt');
 
 
-exports.getrandoms = function(l){
+exports.getrandoms = function(l,countOfHotelsPerCity,PageSize){
     var result = [];
+    if(l<1||countOfHotelsPerCity<1||PageSize<1)
+        return result;
     if(l<=countOfHotelsPerCity){
         while(l){
             result.push(--l);
         }
         return result.map(function(i){
-            var page = Math.ceil((i+1)/8);
-            var idxOfPage = i%8;
+            var page = Math.ceil((i+1)/PageSize);
+            var idxOfPage = i%PageSize;
             return {'pageIdx':page,'idxOfPage':idxOfPage};
         });
     }
@@ -457,8 +487,19 @@ exports.getrandoms = function(l){
         }
     }
     return result.map(function(i){
-            var page = Math.ceil((i+1)/8);
-            var idxOfPage = i%8;
+            var page = Math.ceil((i+1)/PageSize);
+            var idxOfPage = i%PageSize;
             return {'pageIdx':page,'idxOfPage':idxOfPage};
         });
+}
+
+exports.syncDoneCities = function(filename){
+  if(!fs.existsSync(filename)) return;
+  var doneCities={};
+  var lines = fs.readFileSync(filename).toString().split('\r\n');
+  for(var i=0;i<lines.length;i++){
+    doneCities[lines[i]] = {};
+  }
+  console.log(lines.length+" cities' flights has been done.");
+  return doneCities;
 }

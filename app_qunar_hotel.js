@@ -20,9 +20,9 @@ var doneCities = {};
 var doneHotels = {};
 var doneLines = [];
 var requestCount = 0;
-
+var pageSize=8;
 var arguments = process.argv.splice(2);
-var level = arguments[0]||1;
+var level = arguments[0]||'';
 
 function syncDoneCities(){
 	console.log("sync done cities...");
@@ -182,7 +182,7 @@ function process_hotel_list(data,args){
 		if(!c.curPageIdx) c.curPageIdx = 1;
 		if(!c.hotelCount&&hotelCount>0) c.hotelCount=hotelCount;
 		if(c.curHotelIdx==undefined) c.curHotelIdx=0;
-		var hotelToGet = helper.getrandoms(hotelCount);
+		var hotelToGet = helper.getrandoms(hotelCount,countOfHotelsPerCity,pageSize);
 		for(var x in hotelToGet){
 			var query = {"checkin":checkindate.replace(/\-/g,''),"days":1,"city":c.cname,"pageNum":hotelToGet[x].pageIdx,"idxOfPage":hotelToGet[x].idxOfPage,"level":level};
 			var p = getProxy();

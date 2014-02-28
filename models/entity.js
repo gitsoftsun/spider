@@ -230,16 +230,71 @@ exports.flight = function(){
     this.dTime='2014/2/23 6:35:00';
     this.daname='首都';
     this.flag=0;
-    this.flightNo='HO1252';
+    this.flightNo='';
     this.planeType='320';
     this.puncRate=93;
     this.stopCities=null;
     this.price = '';
 };
 
-exports.flight.prototype.toString=function(){
+exports.flight.prototype.toString=function(site,cabin){
     var sb = new helper.StringBuffer();
-    for(var i=0;i<this.cabins.length;i++){
+    if(site=="elong_pc"){
+        //for(var i=0;i<this.cabins.length;i++){
+            //var i=idx;
+            //if(this.cabins[i].tui==undefined) continue;
+            if(!cabin) {
+                console.log("cabin null.");
+                return;
+            }
+            sb.append(this.dname);
+            sb.append(',');
+            sb.append(this.aname);
+            sb.append(',');
+            sb.append(this.flightNo);
+            sb.append(',');
+            sb.append(this.dTime);
+            sb.append(',');
+            sb.append(this.aTime);
+            sb.append(',');
+            sb.append(this.price);
+            sb.append(',');
+            //if(this.cabins[i].tui)
+                sb.append(cabin.tui.replace(/[,\r\n]*/g,''));
+
+            sb.append(',');
+            //if(this.cabins[i].gai)
+                sb.append(cabin.gai.replace(/[,\r\n]*/g,''));
+            sb.append(',');
+            //if(this.cabins[i].qian)
+                sb.append(cabin.qian.replace(/[,\r\n]*/g,''));
+            sb.append(',');
+            sb.append(cabin.ctype);
+            sb.append(',');
+            sb.append(cabin.price);
+            sb.append(',');
+            sb.append(cabin.fan);
+            sb.append(',');
+            sb.append(cabin.tCount);
+            sb.append('\r\n');
+        //}
+
+    }else if(site=="qunar_pc"){
+        sb.append(this.dname);
+        sb.append(',');
+        sb.append(this.aname);
+        sb.append(',');
+        sb.append(this.flightNo);
+        sb.append(',');
+        sb.append(this.dTime);
+        sb.append(',');
+        sb.append(this.aTime);
+        sb.append(',');
+        sb.append(this.price);
+        sb.append('\r\n');
+    }
+    else{
+        for(var i=0;i<this.cabins.length;i++){
         sb.append(this.dname);
         sb.append(',');
         sb.append(this.aname);
@@ -263,8 +318,10 @@ exports.flight.prototype.toString=function(){
         sb.append(',');
         sb.append(this.cabins[i].tCount);
         sb.append('\r\n');
+        }
     }
     var result = sb.toString();
     sb=null;
+    this.cabins = [];
     return result;
 };

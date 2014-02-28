@@ -174,7 +174,7 @@ if(Buffer.byteLength(data)==1939){
   var flno = cols[1].childNodes[1].innerHTML;
   //var da = cols[1].childNodes[3] && cols[1].childNodes[3].value.trim();
 
-  //var pricePic = cols[2].childNodes[1].getAttribute("src");
+  var pricePic = cols[2].childNodes[1].getAttribute("src");
   var discount = cols[2].childNodes[3].innerHTML;
   var times = cols[2].childNodes[5].value.trim().split('-');
   var dtime = times[0];
@@ -190,7 +190,7 @@ if(Buffer.byteLength(data)==1939){
   sb.append(',');
   sb.append(atime);
   sb.append(',');
-  sb.append(0);
+  sb.append(pricePic);
   sb.append('\r\n');
   }
   

@@ -1,4 +1,7 @@
 ﻿shanghai2 上海 SHA
+dalian6 大连 DLC
+hangzhou17 杭州 HGH
+chongqing4 重庆 CKG
 beijing1 北京 BJS
 qingdao7 青岛 TAO
 haerbin5 哈尔滨 HRB
@@ -25,6 +28,3 @@ shenzhen30 深圳 SZX
 xiamen25 厦门 XMN
 wulumuqi39 乌鲁木齐 URC
 nanjing12 南京 NKG
-chongqing4 重庆 CKG
-hangzhou17 杭州 HGH
-dalian6 大连 DLC
