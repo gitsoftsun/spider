@@ -8,8 +8,36 @@ var helper = require('./helpers/webhelper.js')
 
 var hotel_list_options = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true);
 var hotel_detail_options= new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelDetail',"POST",true,true);
+var checkindate = "2014-04-01";
+var checkoutdate = "2014-04-02";
+var doneFile = "app_ctrip_done_hotels.txt";
+var resultFile = "app_ctrip_hotel.txt";
+var cityFile = "qunar_hot_city.txt";
 
-var hotelListData = {"CheckInCityID":"2","CheckInCity":"上海","isHot":2,"OrderName":0,"OrderType":1,"CheckInDate":"2014-03-01","PageNumber":1,"CheckOutDate":"2014-03-02","Days":"1","KeyWord":"","DistrictId":-1,"ZoneName":"","Zone":"","Location":"","LocationName":"","MetroId":"","MetroName":"","BrandId":"","BrandName":"","IsMorning":"0","isYesterdayOrder":false,"Star":""};
+var hotelListData = {
+    "CheckInCityID":"2",
+    "CheckInCity":"上海",
+    "isHot":2,
+    "OrderName":0,
+    "OrderType":1,
+    "CheckInDate":checkindate,
+    "PageNumber":1,
+    "CheckOutDate":checkoutdate,
+    "Days":"1",
+    "KeyWord":"",
+    "DistrictId":-1,
+    "ZoneName":"",
+    "Zone":"",
+    "Location":"",
+    "LocationName":"",
+    "MetroId":"",
+    "MetroName":"",
+    "BrandId":"",
+    "BrandName":"",
+    "IsMorning":"0",
+    "isYesterdayOrder":false,
+    "Star":""
+};
 hotelListData.clone=function(){
     var result = {};
     result["CheckInCityID"]=this["CheckInCityID"];
@@ -29,8 +57,8 @@ hotelListData.clone=function(){
 };
 
 var requestDetailData = function(cityId,hotelId){
-    this.CheckInDate= "2014-03-01";
-    this.CheckOutDate="2014-03-02";
+    this.CheckInDate= checkindate;
+    this.CheckOutDate=checkoutdate;
     this.CityID= cityId;
     this.HotelID= hotelId;
     this.IsMorning= "0";
@@ -38,10 +66,10 @@ var requestDetailData = function(cityId,hotelId){
 entity.hotel.prototype.appendToFile=function(){
     
     var id=this.id;
-    fs.appendFile("app_ctrip_hotel.txt",this.toString(),function(e){
+    fs.appendFile(resultFile,this.toString(),function(e){
         if(e) console.log(e);
         else{
-            fs.appendFile("doneHotels.txt",id+"\r\n");
+            fs.appendFile(doneFile,id+"\r\n");
             doneHotels[id]=true;
         }
         console.log(++doneHotelCount+"/"+hotelCount);
@@ -59,18 +87,21 @@ var doneCityCount=0;
 var cityCount=0;
 var doneHotelCount=0;
 var hotelCount=0;
-fs.readFileSync('qunar_hot_city.txt').toString().split("\r\n").forEach(function(line){
+fs.readFileSync(cityFile).toString().split("\r\n").forEach(function(line){
     var pyh = line.split(' ');
     var id = pyh[0].match(/\d+/);
     var name = pyh[1];
     cities[id]={"name":name,pageCount:1,curPageIdx:1,rd:null,gotPageIdx:0};
     cityCount++;
 });
-fs.readFileSync('doneHotels.txt').toString().split("\r\n").forEach(function(line){
+if(fs.existsSync(doneFile)){
+    fs.readFileSync(doneFile).toString().split("\r\n").forEach(function(line){
     var id = line&&Number(line);
-	if(id)
-		doneHotels[id]=true;
-});
+    if(id)
+        doneHotels[id]=true;
+});    
+}
+
 var pageCount=1;
 var curPageIdx=1;
 var hotels={};
@@ -209,6 +240,7 @@ function get_res_data(json_data,fn,type){
     });
     req.on('error', function(e) {
     console.log('problem with request: ' + e.message);
+
     });
     req.write(strData);
     req.end();

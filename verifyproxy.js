@@ -3,7 +3,7 @@ var http = require('http')
 
 //http://www.iphai.com/apiProxy.ashx?un=mike442144&pw=mike442144&count=1000
 //http://www.hungean.com/api.asp?
-var proxyfile = "verified-2-25.txt";
+var proxyfile = "verified-03-03.txt";
 helper.fetchProxys(proxyfile);
 
 
@@ -23,7 +23,7 @@ function getdata(){
 			var ip = v[0];
 			var port = v[1];
 			console.log(proxys[proxy]);
-			helper.verifyip(ip,port,"verified-2-25.txt");
+			helper.verifyip(ip,port,"verified-03-01.txt");
 		}
     
     });

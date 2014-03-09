@@ -5,8 +5,11 @@ var helper = require('./helpers/webhelper.js')
 var $ = require('jquery')
 var entity = require('./models/entity.js')
 
-var departDate = '2014-03-01';
+var departDate = '2014-04-01';
 var app_qunar_done_city_file = "app_qunar_done_city.txt";
+
+var arguments = process.argv.splice(2);
+var useProxy = arguments[0]!=undefined&&arguments[0]!=0;
 
 var elong_query = function(dname,aname){
 this.DepartCityName=dname;
@@ -29,58 +32,62 @@ var qunar_query = function(dname,aname){
 }
 
 var citySkip = {
-  "北京-天津":true,
-"哈尔滨-沈阳":true,
-"长沙-南昌":true,
-"沈阳-哈尔滨":true,
-"福州-南昌":true,
-"天津-北京":true,
-"南昌-长沙":true,
-"南昌-福州":true,
-"南昌-太原":true,
-"太原-南昌":true,
-"青岛-丽江":true,
-"哈尔滨-丽江":true,
-"沈阳-丽江":true,
-"福州-丽江":true,
-"南昌-丽江":true,
-"太原-丽江":true,
-"丽江-青岛":true,
-"丽江-哈尔滨":true,
-"丽江-沈阳":true,
-"丽江-福州":true,
-"丽江-南昌":true,
-"丽江-太原":true,
-"青岛-济南":true,
-"哈尔滨-长春":true,
-"长沙-武汉":true,
-"沈阳-长春":true,
-"天津-济南":true,
-"丽江-长春":true,
-"丽江-三亚":true,
-"丽江-武汉":true,
-"长春-哈尔滨":true,
-"长春-沈阳":true,
-"长春-丽江":true,
-"济南-青岛":true,
-"济南-天津":true,
-"三亚-丽江":true,
-"武汉-长沙":true,
-"武汉-丽江":true,
-"丽江-海口":true,
-"三亚-海口":true,
-"海口-丽江":true,
-"海口-三亚":true,
-"丽江-贵阳":true,
-"长春-贵阳":true,
-"贵阳-丽江":true,
-"贵阳-长春":true,
-"长沙-郑州":true,
-"太原-郑州":true,
-"武汉-郑州":true,
-"郑州-长沙":true,
-"郑州-太原":true,
-"郑州-武汉":true
+	"南京-杭州":true,
+	"杭州-南京":true,
+   "北京-天津":true,
+   "上海-杭州":true,
+   "杭州-上海":true,
+ "哈尔滨-沈阳":true,
+ "长沙-南昌":true,
+ "沈阳-哈尔滨":true,
+ "福州-南昌":true,
+ "天津-北京":true,
+ "南昌-长沙":true,
+ "南昌-福州":true,
+ "南昌-太原":true,
+ "太原-南昌":true,
+ "青岛-丽江":true,
+ "哈尔滨-丽江":true,
+ "沈阳-丽江":true,
+ "福州-丽江":true,
+ "南昌-丽江":true,
+ "太原-丽江":true,
+ "丽江-青岛":true,
+ "丽江-哈尔滨":true,
+ "丽江-沈阳":true,
+ "丽江-福州":true,
+ "丽江-南昌":true,
+ "丽江-太原":true,
+ "青岛-济南":true,
+ "哈尔滨-长春":true,
+ "长沙-武汉":true,
+ "沈阳-长春":true,
+ "天津-济南":true,
+ "丽江-长春":true,
+ "丽江-三亚":true,
+ "丽江-武汉":true,
+ "长春-哈尔滨":true,
+ "长春-沈阳":true,
+ "长春-丽江":true,
+ "济南-青岛":true,
+ "济南-天津":true,
+ "三亚-丽江":true,
+ "武汉-长沙":true,
+ "武汉-丽江":true,
+ "丽江-海口":true,
+ "三亚-海口":true,
+ "海口-丽江":true,
+ "海口-三亚":true,
+ "丽江-贵阳":true,
+ "长春-贵阳":true,
+ "贵阳-丽江":true,
+ "贵阳-长春":true,
+ "长沙-郑州":true,
+ "太原-郑州":true,
+ "武汉-郑州":true,
+ "郑州-长沙":true,
+ "郑州-太原":true,
+ "郑州-武汉":true
 };
 
 
@@ -89,14 +96,14 @@ var qunar_options = new helper.basic_options('m.qunar.com','/search.action','GET
 var cityFls = {};
 var cities = helper.get_cities('qunar_flight_hot_city.txt');
 var proxy = new helper.proxy();
-var proxyfile = "verified-2-25.txt";
+var proxyfile = "verified-03-02.txt";
 proxy.load(proxyfile);
 // var proxysGetterTimer = setInterval(function(){
 //   helper.fetchProxys(proxyfile);
 // },600000);
-var proxysReaderTimer = setInterval(function(){
-  proxy.load(proxyfile);
-},30000);
+// var proxysReaderTimer = setInterval(function(){
+  // proxy.load(proxyfile);
+// },30000);
 
 var doneCities = {};
 
@@ -131,10 +138,16 @@ for(var j=0;j<cities.length;j++){
       //   );
       //get flight data from qunar.com
       console.log("getting "+dep.cname+'-'+arr.cname + "...");
-      var p = getProxy();
+	  var opt = null;
+	  if(useProxy){
+		var p = getProxy();
+		opt = new helper.basic_options(p.host,'http://m.qunar.com/search.action','GET',true,false,qq,p.port);
+	  }else{
+		opt = new helper.basic_options('m.qunar.com','/search.action','GET',true,false,qq,null);
+	  }
+      
       helper.request_data(
-        new helper.basic_options(p.host,'http://m.qunar.com/search.action','GET',true,false,qq,p.port),
-        //new helper.basic_options('m.qunar.com','/search.action','GET',true,false,qq,null),
+        opt,
         null,
         qunarfl,
         [dep.cname,arr.cname]
@@ -147,7 +160,7 @@ start();
 
 function getProxy(){
   requestCount++;
-  if(requestCount==3){
+  if(requestCount==1){
     requestCount=0;
     return proxy.getNext();
   }else{
@@ -213,10 +226,16 @@ if(Buffer.byteLength(data)==1939){
 
   while(cityf.qquery['page.currPageNo']<pageCount){
     cityf.qquery['page.currPageNo']++;
-    var p = getProxy();
+	var opt = null;
+	if(useProxy){
+		var p = getProxy();
+		opt = new helper.basic_options(p.host,'http://m.qunar.com/search.action','GET',true,false,cityf.qquery,p.port);
+	}else{
+		opt = new helper.basic_options('m.qunar.com','/search.action','GET',true,false,cityf.qquery,null);
+	}
+    
     helper.request_data(
-    new helper.basic_options(p.host,'http://m.qunar.com/search.action','GET',true,false,cityf.qquery,p.port),
-    //new helper.basic_options('m.qunar.com','/search.action','GET',true,false,cityf.qquery,null),
+	opt,
     null,
     qunarfl,
     args

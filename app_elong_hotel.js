@@ -7,8 +7,8 @@ var entity = require('./models/entity.js')
 var sprintf = require("sprintf-js").sprintf
 
 //basic settings.
-var checkindate = "2014-03-01";
-var checkoutdate = "2014-03-02";
+var checkindate = "2014-04-01";
+var checkoutdate = "2014-04-02";
 
 
 //get cities
@@ -41,14 +41,14 @@ function process_hotel_list(data,args){
 		h.zoneName = item.BusinessAreaName;
 		h.commentCount = item.CommentCount;
 		helper.request_data(
-		new helper.basic_options('m.elong.com','/hotel/'+args.pinyin+'/'+h.id+'/','GET',true,false,{'checkindate':checkindate,'checkoutdate':checkoutdate}),
+		new helper.basic_options('m.elong.com','/hotel/'+args[0].pinyin+'/'+h.id+'/','GET',true,false,{'checkindate':checkindate,'checkoutdate':checkoutdate}),
 		null,
 		process_one_hotel,
-		[h,args]
+		[h,args[0]]
 		);
 	}
 	//get next page.
-	var c = args;
+	var c = args[0];
 	if(!c.pageCount) c.pageCount = data.PageCount;
 	if(!c.curPageIdx) c.curPageIdx = 0;
 	if(!c.hotelCount) c.hotelCount=data.HotelCount;

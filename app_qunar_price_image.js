@@ -16,14 +16,15 @@ function downloadImg(filename){
 		var vals = lines[i].split(",");
 		var len = vals.length;
 		if(len!=6) continue;
-		var addr = vals[len-1];
-		var p = getProxy();
+		//var addr = vals[len-1];
 		getData(vals);
 	}
 }
-
+//downloadImg(datafile);
 function getData(vals){
-	http.get({"host":p.host,"port":p.port,"path":"http://m.qunar.com/"+addr},function(res){
+	var p = getProxy();
+	//http.get({"host":p.host,"port":p.port,"path":"http://m.qunar.com/"+vals[vals.length-1]},function(res){
+	http.get("http://m.qunar.com/"+vals[vals.length-1],function(res){
 		var chunks = [];
 	    res.on('data',function(chunk){
 	        chunks.push(chunk);
@@ -44,7 +45,7 @@ function getData(vals){
 }
 function getProxy(){
   requestCount++;
-  if(requestCount==3){
+  if(requestCount==1){
     requestCount=0;
     return proxy.getNext();
   }else{
@@ -67,4 +68,4 @@ function outputHtmlTag(arr){
 	}
 }
 
-outputHtmlTag(scanImageFiles("imgs/"));
+//outputHtmlTag(scanImageFiles("imgs/"));

@@ -11,6 +11,8 @@
     "request" : "*",
     "htmlparser" : "*",
 	"stringbuilder":"*",
-	"sprintf-js":"*"
+	"sprintf-js":"*",
+	"selenium-webdriver":"*",
+	"iconv":"*"
   }
 }

@@ -34,7 +34,55 @@ exports.hotel=function(){
     this.rooms = [];
 };
 exports.hotel.prototype.toString=function(site){
-    if(site=='elong'){
+    if(site=="qunar_pc"){
+        var sb = new helper.StringBuffer();
+        for(var i=0;i<this.rooms.length;i++){
+            for(var j=0;j<this.rooms[i].book.length;j++){
+                sb.append(this.city);
+                sb.append(',');
+                sb.append(this.name);
+                sb.append(',');
+                sb.append(this.rooms[i].name);
+                sb.append(',');
+                sb.append(this.rooms[i].book[j].name);
+                sb.append(",");
+                sb.append(this.rooms[i].book[j].price);
+                sb.append(',');
+                sb.append(this.rooms[i].book[j].fan);
+                sb.append("\r\n");
+            }
+        }
+        return sb.toString();
+    }
+    else if(site=="ctrip_pc"){
+        var sb = new helper.StringBuffer();
+        for(var i = 0;i<this.rooms.length;i++){
+            sb.append(this.id);
+            sb.append(',');
+            sb.append(this.city);
+            sb.append(',');
+            sb.append(this.name);
+            sb.append(',');
+            sb.append(this.star);
+            sb.append(',');
+            sb.append(this.rooms[i].name);
+            sb.append(',');
+            sb.append(this.rooms[i].bedType);
+            sb.append(',');
+            sb.append(this.rooms[i].price);
+            sb.append(',');
+            sb.append(this.rooms[i].fan);
+            sb.append(',');
+            sb.append(this.commentCount);
+            sb.append(',');
+            sb.append(this.rooms[i].breakfast);
+            sb.append(',');
+            sb.append(this.rooms[i].lan);
+            sb.append('\r\n');
+        }
+        return sb.toString();
+    }
+    else if(site=='elong'){
         var sb = new helper.StringBuffer();
         for(var i=0;i<this.rooms.length;i++){
             sb.append(this.city);
@@ -239,7 +287,50 @@ exports.flight = function(){
 
 exports.flight.prototype.toString=function(site,cabin){
     var sb = new helper.StringBuffer();
-    if(site=="elong_pc"){
+    if(site=="ctrip_pc"){
+        for(var i=0;i<this.cabins.length;i++){
+            var c = this.cabins[i];
+            sb.append(this.dname);
+            sb.append(',');
+            sb.append(this.aname);
+            sb.append(',');
+            sb.append(this.flightNo);
+            sb.append(',');
+            sb.append(this.planeType);
+            sb.append(',');
+            sb.append(this.dTime);
+            sb.append(',');
+            sb.append(this.aTime);
+            sb.append(',');
+            sb.append(c.discount?c.discount:'');
+            sb.append(',');
+            sb.append(c.price);
+            sb.append(',');
+            sb.append(c.ctype);
+            sb.append(',');
+            sb.append(c.fan);
+            sb.append(',');
+            sb.append(c.tCount);
+            sb.append(',');
+            sb.append(this.puncRate);
+            sb.append(',');
+            sb.append(c.tui?c.tui:'');
+            sb.append(',');
+            sb.append(c.gai?c.gai:'');
+            sb.append(',');
+            sb.append(c.qian?c.qian:'');
+            sb.append(',');
+            sb.append(c.hui);
+            sb.append(',');
+            sb.append(c.lv);
+            sb.append(',');
+            sb.append(c.isSpec);
+            sb.append(',');
+            sb.append(c.isAgent);
+            sb.append("\r\n");
+        }
+    }
+    else if(site=="elong_pc"){
         //for(var i=0;i<this.cabins.length;i++){
             //var i=idx;
             //if(this.cabins[i].tui==undefined) continue;
