@@ -102,7 +102,7 @@ function qunar(){
 			if(last.price==undefined||last.price>price){
 				last.price = price;
 				last.fan = vals[5];
-				last.site = vals[3];
+				last.book = vals[3];
 			}
 		}
 	    }
@@ -133,15 +133,25 @@ function ctrip(){
 		var roomName = vals[3].trim().replace(/[\(|\[].+/,'');
 			roomName = roomName.replace('房','').replace('间','').trim();
 			roomName = roomName.replace('携程标准价','');
-		if(roomName==last.room){
-		    last.price = vals[5];
-		    last.fan = '';
-		    if(vals[6]){
-			var matches = vals[6].match(/\d+/);
+			var price = vals[5];
+			if(price){
+				price = price.replace('¥','');
+				if(isNumber(price))
+					price = Number(price);
+				else
+					price = 100000;
+			}
+
+			if(vals[6]){
+				var matches = vals[6].match(/\d+/);
 			if(matches&&matches.length>0)
-			    last.fan = matches[0];
+			    var fan = matches[0];
+				if(fan)
+					price = price - Number(fan);
 		    }
-		    
+		if(roomName==last.room&&(last.price==undefined||last.price>price)){
+		    last.price = price;
+		    last.fan = '';
 		}else{
 			
 			//console.log(last.c+","+last.sname+","+last.room.replace(/\([^\)]*\)/,'')+","+vals[3].trim());
@@ -152,6 +162,9 @@ function ctrip(){
 	}
     }
     
+}
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
 }
 //cityName,fullName,siteName,star,room,book_site,price,fan,url
 //2->ctrip,1->qunar,0->elong

@@ -188,8 +188,10 @@ def one_driver_hotel(driver, city, hotel):
             for elem in elems:
                 elem.click()
             elems = driver.find_elements_by_css_selector('a.icoR_open')
+            time.sleep(1)
             for e in elems:
                 e.click();
+            time.sleep(1);
                 # classes = elem.get_attribute('class')
                 # print classes
                 # if not 'e_prcDetail_on' in classes:

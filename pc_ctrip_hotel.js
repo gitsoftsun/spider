@@ -339,8 +339,8 @@ function process_one(data,args){
 				room.name = prefix + nextRow.find("td.hotel_room div.child_room_box span.hotel_room_style").text();
 				var tds = nextRow.find('td');
 				room.bedType = $(tds[1]).find('span').text();
-				room.breakfast = $(tds[2]).find('td span').text();
-				room.lan = $(tds[3]).find('td span').text();
+				room.breakfast = $(tds[2]).text();
+				room.lan = $(tds[3]).text();
 				room.price = $(tds[5]).text();
 				room.fan = $(tds[6]).find('span').text();
 				h.rooms.push(room);
