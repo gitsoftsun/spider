@@ -34,18 +34,51 @@ stat:success|error
 Collector.prototype.processMsg=function(msg,remote){
     var message = JSON.parse(msg);
     switch(message.type){
-	case 'check':
+    case 'check':
 	if(message.stat=='success'){
 	    console.log('server '+ remote.address + ':' + remote.port +' is ready');
+	    this.start();
 	}
 	break;
-	default:break;
+    case 'todo':
+	this.processWork(msg);
+	break;
+    case 'done':break;
+    default:break;
     }
 }
-Collector.prototype.getTask=function(){
-
+/*
+type:todo
+data:{
+uc:app|pc
+site:elong|ctrip|qunar
+rs:hotel|flight
+}
+meta:{
+city:id,pinyin,cname,code,
+date,
+star?
+}
+*/
+Collector.prototype.processWork=function(msg){
+    if(!msg.meta){
+	//done ?
+	return;
+    }else{
+	
+    }
 }
 
+Collector.prototype.onDone=function(msg){
+    msg.type='done';
+    this.send(msg);
+}
+Collector.prototype.start=function(){
+    var msg={};
+    msg.type='todo';
+    msg.data={'uc':'pc','site':'elong','rs':'hotel'};
+    this.send(msg);
+}
 var c = new Collector();
 c.init();
 c.checkSrv();
