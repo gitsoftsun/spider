@@ -69,50 +69,12 @@ function process_hotel_list(data,args){
 	if(!data||!data.success)
 		return;
 	//get hotel list data
-	// if(args[1].idxOfPage!=undefined){
-	// 	var item = data.value.ListStaticInfos[args[1].idxOfPage];
-	// 	var h = new entity.hotel();
-	// 	h.id = item.HotelId+'';
-	// 	h.name = item.HotelNameCn;
-	// 	h.city = args[0].cname;
-	// 	h.star = item.Star;
-	// 	h.prate = item.CommentGoodRate;
-	// 	h.zoneName = item.Commerical&&item.Commerical.HotelAreaName;
-	// 	h.commentCount = item.TotalComment;
-	// 	var opt = new helper.basic_options('hotel.elong.com','/isajax/HotelDetailNew/GetHotelRoomset','GET',false,true,{'hsr.CheckInDate':checkindate,'hsr.CheckOutDate':checkoutdate,'hotelId':h.id,'hsr.CityId':args[0].id});
-	// 	opt.headers["referer"] = "http://hotel.elong.com/";
-	// 	request_data(
-	// 	opt,
-	// 	null,
-	// 	process_one_hotel,
-	// 	[h,args[0]]
-	// 	);
-	// }else{
-		
-	// 	//get next page.
+	//get next page.
 		var c = args[0];
 		if(!c.pageCount) c.pageCount = data.value.PageInfo.PageCount;
 		if(!c.curPageIdx) c.curPageIdx = data.value.PageInfo.PageIndex;
 		if(!c.hotelCount) c.hotelCount=data.value.PageInfo.TotalRow;
 		if(c.curHotelIdx==undefined) c.curHotelIdx=0;
-	// 	var hotelToGet = helper.getrandoms(c.hotelCount,countOfHotelsPerCity,pageSize);
-	// 	for(var x in hotelToGet){
-	// 		// var query = {};
-	// 		// query["hsr.CheckInDate"]= checkindate;
-	// 		// query["hsr.CheckOutDate"]= checkoutdate;
-	// 		// query["hsr.CityId"]= c.id;
-	// 		// query["hsr.PageIndex"]=hotelToGet[x].pageIdx;
-	// 		// query["hsr.StarLevels"]=level;
-	// 		// query["idxOfPage"] = hotelToGet[x].idxOfPage;
-	// 		var query = {"hsr.CheckInDate":checkindate,"hsr.CheckOutDate":checkoutdate,"hsr.CityId":c.id,"hsr.PageIndex":hotelToGet[x].pageIdx,"idxOfPage":hotelToGet[x].idxOfPage,"hsr.StarLevels":level,"hsr.PageSize":pageSize};
-	// 		//var p = getProxy();
-	// 		//var opt = new helper.basic_options(p.host,'http://h.qunar.com/list.jsp','GET',true,false,query,p.port);
-	// 		var opt = new helper.basic_options('hotel.elong.com',"/isajax/List/Search",'GET',false,true,query,null);
-	// 		opt.headers["referer"] = "http://hotel.elong.com/";
-	// 		request_data(opt,null,process_hotel_list,c);
-	// 	}
-	// 	console.log("done processing page: "+args[1]["hsr.PageIndex"]);
-	// }
 	
 	for(var i=0;i<data.value.ListStaticInfos.length;i++){
 		var item = data.value.ListStaticInfos[i];
@@ -192,22 +154,7 @@ function process_one_hotel(data,args){
 		}
 		args[0].rooms.push(r);
 	}
-//console.log(args[1].cname+": "+(++args[1].curHotelIdx)+"/"+args[1].hotelCount);
-	// var query = {};
-	// 	query["hotelId"]= args[0].id;
-	// 	query["pageIndex"]= 1;
-	// 	query["pageSize"]= 10;
-	// 	query["recommentType"]=2;
-	// 	var opt = null;
-	// 	if(useproxy){
-	// 		var p = getProxy();
-	// 		opt = new helper.basic_options(p.host,'http://hotel.elong.com/isajax/HotelDetailNew/GetHotelReviews',"GET",false,true,query,p.prot);
-	// 	}else{
-	// 		opt = new helper.basic_options('hotel.elong.com','/isajax/HotelDetailNew/GetHotelReviews','GET',false,true,query);
-	// 	}
-		
-	// 	opt.headers["referer"] = "http://hotel.elong.com/";
-	// 	helper.request_data(opt,null,process_one_hotel_info,[args[0],args[1]]);
+
 	fs.appendFile(resultFile,args[0].toString("elong_pc"),function(err){
 		if(err){
 			console.log();
