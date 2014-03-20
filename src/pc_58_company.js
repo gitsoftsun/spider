@@ -61,6 +61,8 @@ Company.prototype.preProcess=function(){
 	helper.request_data(r.cmpUrl,null,function(data,args){
 	    that.filterCmpUrl(data,args);
 	},r);
+    }else{
+	this.onPreProcessed();
     }
 }
 Company.prototype.filterCmpUrl=function(data,args){
@@ -128,7 +130,7 @@ Company.prototype.wget=function(){
 }
 Company.prototype.process = function(data,args){
     console.log("Processing "+args[0].cmpName);
-    fs.writeFileSync(this.cmpDir+args[0].cmpId+".html",data);
+    //fs.writeFileSync(this.cmpDir+args[0].cmpId+".html",data);
     var doc = jsdom(data);
     var document = doc.parentWindow.document;
     var container = document.getElementsByClassName('basicMsg')[0];

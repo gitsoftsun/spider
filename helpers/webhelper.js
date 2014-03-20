@@ -1,8 +1,9 @@
 var http = require('http')
 var zlib = require('zlib')
 var fs = require('fs')
-var $ = require('jquery')
+var $ = require('jQuery')
 var Iconv = require('iconv').Iconv
+var url = require('url')
 exports.toQuery = function(obj){
     var sb = new exports.StringBuffer();
     sb.append('?');
@@ -24,7 +25,7 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
     this.headers={
         // "Accept":"text/html,application/xhtml+xml,application/xml,application/json, text/javascript, */*; q=0.01",
         // "Accept-Encoding":"gzip, deflate",
-        // "Accept-Language":"en-US,en;q=0.8,zh-Hans-CN;q=0.5,zh-Hans;q=0.3"
+        "Accept-Language":"zh-CN,zh;q=0.8,en;q=0.6",
         // "X_FORWARDED_FOR":"58.99.128.66"
     };
     //there are some problems in below code.
@@ -116,12 +117,22 @@ exports.request_data=function(opts,data,fn,args){
         opts.headers['Content-Length']=Buffer.byteLength(strData,'utf8');
     
     var req = http.request(opts, function(res) {
+	if (res.statusCode > 300 && res.statusCode < 400&& res.headers.location) {
 
+        if (url.parse(res.headers.location).hostname){
+	    console.log("Redirecting to "+res.headers.location);
+	    exports.request_data(res.headers.location,data,fn,args);
+	}
+        else {
+
+        }
+    }
     var chunks=[];
     res.on('data', function (chunk) {
             chunks.push(chunk);
     });
     res.on('end',function(){
+	if(res.statusCode>300&&res.statusCode<400) return;
             if(res.headers['content-encoding']=='gzip'){
         var buffer = Buffer.concat(chunks);
 		if(buffer.length==157){
@@ -213,13 +224,13 @@ exports.request_data=function(opts,data,fn,args){
     });
     });
     req.on('error', function(e) {
-	if(opts.path && opts.path.indexOf('list.jsp')!=-1){
-		console.log("page :"+opts.data.pageNum+"got error-"+e.message);
-		fs.appendFile("app_qunar_hotel_failed.txt","p:"+ JSON.stringify(opts.data)+'\r\n');
-	}else{
-		console.log("page of hotel:"+opts.data.seq+" got error-"+e.message);
-		fs.appendFile("app_qunar_hotel_failed.txt","h:"+JSON.stringify(opts.data)+'\r\n');
-	}
+//	if(opts.path && opts.path.indexOf('list.jsp')!=-1){
+//		console.log("page :"+opts.data.pageNum+"got error-"+e.message);
+//		fs.appendFile("app_qunar_hotel_failed.txt","p:"+ JSON.stringify(opts.data)+'\r\n');
+//	}else{
+//		console.log("page of hotel:"+opts.data.seq+" got error-"+e.message);
+//		fs.appendFile("app_qunar_hotel_failed.txt","h:"+JSON.stringify(opts.data)+'\r\n');
+//	}
     //console.log(e.message);
 	//var proxy = exports.randomip(proxys);
     //            if(proxy.host&&proxy.port){

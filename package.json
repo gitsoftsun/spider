@@ -11,6 +11,6 @@
     "request" : "*",
     "htmlparser" : "*",
 	"sprintf-js":"*",
-	"iconv":"*",
+	"iconv":"*"
   }
 }

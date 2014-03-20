@@ -134,7 +134,9 @@ Job.prototype.wgetList=function(city,cate){
 	    that.wgetList(args[0],args[1]);
 	}else{
 	    console.log("Category done: "+cate.cl3);
-	    that.wgetList(args[0],that.getCate());
+	    var c = that.getCate();
+	    if(!c) return;
+	    that.wgetList(args[0],c);
 	}
     },[city,cate]);
 }
@@ -142,6 +144,7 @@ var arguments = process.argv.splice(2);
 var start = arguments[0];
 var len = arguments[1];
 Job.prototype.getCate=function(){
+    if(this.industries.length==0) return null;
     var line = this.industries.pop().split(',');
     var category = {};
     category.cl1=line[0];
@@ -156,11 +159,14 @@ Job.prototype.start = function(){
     if(!fs.existsSync(this.dataDir+"ganjijob.txt"))
 	return;
     this.industries = [];
-    var inds = fs.readFileSync(this.dataDir+"ganjijob.txt").toString().split("\r\n");
-    for(var j=start;j<len;j++){
+    var inds = fs.readFileSync(this.dataDir+"ganjijob.txt").toString().split("\n");
+    for(var j=start,c=0;c<len;c++,j++){
 	this.industries.push(inds[j]);
     }
+    inds=null;
     var category = this.getCate();
+    if(category==null) return;
+    console.log(this.industries.length);
     this.wgetList(city,category);
 /*    for(var cl1 in this.ind){
 	for(var cl2 in this.ind[cl1]){

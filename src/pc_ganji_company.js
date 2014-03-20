@@ -126,7 +126,7 @@ Company.prototype.wget=function(){
 //<li><em>公司行业：</em>计算机/网络/通信</li>
 Company.prototype.process = function(data,args){
     console.log("Processing "+args[0].cmpName);
-    fs.writeFileSync(this.cmpDir+args[0].cmpId+".html",data);
+    //fs.writeFileSync(this.cmpDir+args[0].cmpId+".html",data);
     var match = data.match(/公司行业：([^l]+)/);
     if(!match){
 	console.log('Page unavaliable: ',args[0]);
@@ -166,6 +166,7 @@ Company.prototype.save=function(r){
 
     sb.clear();
     if(!this.company[r.cmpId]){
+	this.company[r.cmpId] = {cmpId:r.cmpId,cmpName:r.cmpName,member:r.member,ind:r.ind,site:r.cmpUrl};
 	sb.append(r.cmpId);
 	sb.append(',');
 	sb.append(r.cmpName);

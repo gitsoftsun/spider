@@ -8,6 +8,7 @@ function Job(){
     this.dataDir='../appdata/';
     this.resultDir='../result/58job/';
     this.industryFile = '58job.json';
+    this.indTxtFile = '58job.txt';
     this.ind = null;
     this.host = '58.com';
     this.cmpWorker = null;
@@ -29,13 +30,14 @@ Job.prototype.processList=function(fileName){
 	console.log('File not found: ' + fileName);
 	return;
     }
-    var worker = this.cmpWorker;
+//    var worker = this.cmpWorker;
     fs.readFile(this.resultDir+fileName,function(err,data){
 	if(err){
 	    console.log('Read file error: '+err.message);
 	    return;
 	}
 	var doc = jsdom(data);
+	console.log("document loaded");
 	//set to null to tell gc to collect
 	data = null;
 	var document = doc.parentWindow.document;
@@ -67,9 +69,10 @@ Job.prototype.processList=function(fileName){
 	    record.fileName=fileName;
 	    records.push(record);
 	}
+	console.log(records.length);
 	doc=null;
 //	worker.send(records);
-	cp.fork('./pc_58_company.js').send(records);
+//	cp.fork('./pc_58_company.js').send(records);
 	records=null;
     });
 }
@@ -102,48 +105,61 @@ Job.prototype.wgetList=function(city,cate){
 	    +args[1].cl3+','
 	    +args[0].cname+','
 	    +args[1].pidx+'.html';
-	fs.writeFile(that.resultDir+fileName,data,function(err){
-	    data=null;
-	    if(err) console.log(err.message);
-	    else{
-		console.log("File saved: ",fileName);
-//		that.processList(fileName);
-	    }
-	});
+	fs.writeFileSync(that.resultDir+fileName,data);
+	console.log("File saved: ",fileName);
+	that.processList(fileName);
 	if(data.search('pagerout')!=-1&&args[1].pidx<100){
+	    data=null;
 	    args[1].pidx++;
 	    that.wgetList(args[0],args[1]);
+	}else{
+	    console.log("Category done: "+cate.cl3);
+	    var c = that.getCate();
+	    if(!c) return;
+	    that.wgetList(args[0],c);
 	}
     },[city,cate]);
 }
 var arguments = process.argv.splice(2);
 var start = arguments[0];
 var len = arguments[1];
+Job.prototype.getCate=function(){
+    if(this.industries.length==0) return null;
+    var line = this.industries.pop().split(',');
+    var category = {};
+    category.cl1=line[0];
+    category.cl2=line[1];
+    category.cl3=line[2];
+    category.pidx=1;
+    return category;
+}
 Job.prototype.start = function(){
     var cities=[{'cname':'北京','cen':'bj'}];
     var city = cities.pop();
-    var i=0;
-    var str='';
-    for(var cl1 in this.ind){
-	for(var cl2 in this.ind[cl1]){
-	    for(var cl3 in this.ind[cl1][cl2].cl3){
-//		i++;
-		var category = {};
-		category.cl1=cl1;
-		category.cl2=cl2;
-		category.cl3=cl3;
-		category.pidx=1;
-//		if(str) str+=' ';
-//		str+=category.cl1+','+category.cl2+','+category.cl3+','+this.ind[cl1][cl2].cl3[cl3];
-//		if(i==5) {
-//		    i=0;
-//		    console.log(str);
-//		    str=null;
-//		}
-//		this.wgetList(city,category);
-	    }
-	}
+    if(!fs.existsSync(this.dataDir+this.indTxtFile))
+	return;
+    this.industries=[];
+    var inds = fs.readFileSync(this.dataDir+this.indTxtFile).toString().split("\n");
+    for(var j=start,c=0;c<len;c++,j++){
+	this.industries.push(inds[j]);
     }
+    inds=null;
+    var category = this.getCate();
+    if(category==null) return;
+    this.wgetList(city,category);
+//    for(var cl1 in this.ind){
+//	for(var cl2 in this.ind[cl1]){
+//	    for(var cl3 in this.ind[cl1][cl2].cl3){
+//		var category = {};
+//		category.cl1=cl1;
+//		category.cl2=cl2;
+//		category.cl3=cl3;
+//		category.pidx=1;
+//		str+=category.cl1+','+category.cl2+','+category.cl3+','+this.ind[cl1][cl2].cl3[cl3];
+//		this.wgetList(city,category);
+//	    }
+//	}
+    //}
 }
 Job.prototype.test=function(){
     var c = {'cname':'北京','cen':'bj'};
@@ -158,5 +174,5 @@ Job.prototype.test=function(){
 var job = new Job();
 job.init();
 //job.test();
-//job.processList("生活 | 服务业,餐饮,服务员,北京,1.html");
-job.start();
+job.processList("生活 | 服务业,餐饮,后厨,北京,3.html");
+//job.start();
