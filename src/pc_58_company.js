@@ -41,6 +41,8 @@ Company.prototype.init=function(){
 	    var vals = line.split(',');
 	    that.company[vals[0]] = {cmpId:vals[0],cmpName:vals[1],member:vals[2],ind:vals[3],site:vals[4]};
 	});
+    }else{
+	console.log("Company File not found");
     }
 }
 Company.prototype.preProcess=function(){
@@ -257,7 +259,7 @@ Company.prototype.processList=function(fileName){
 	record.fileName = fileName;
 	record.name=$('a.t',this).text();
 	var line = record.fileName+','+record.name+','+record.cmpName+','+record.time+','+record.jing+','+record.top+','+record.cmpUrl+'\n';
-	fs.appendFileSync(that.resultDir+that.listFile,line);	
+	fs.appendFileSync(that.dataDir+that.listFile,line);	
 	//records.push(record);
     });
     
@@ -269,6 +271,9 @@ Company.prototype.processList=function(fileName){
 Company.prototype.onRecordsReady=function(){
     this.preProcess();
 }
+var arguments = process.argv.splice(2);
+var start = arguments[0];
+var len = arguments[1];
 Company.prototype.start=function(){
 //    this.files = fs.readdirSync('../result/58job/');
 //    for(var i=0;i<this.files.length;i++){
@@ -277,7 +282,7 @@ Company.prototype.start=function(){
 //    if(this.files.length>0){
 //	this.processList(this.files.pop());
 //    }
-    this.records = fs.readFileSync(this.resultDir+this.listFile).toString().split('\n').map(function(line){
+    var records = fs.readFileSync(this.dataDir+this.listFile).toString().split('\n').map(function(line){
 	var vals = line.split(',');
 	var record = {};
 	record.cl1=vals[0];
@@ -292,6 +297,9 @@ Company.prototype.start=function(){
 	record.cmpUrl = vals[10];
 	return record;
     });
+    for(var j=start,c=0;j<records.length&&c<len;c++,j++){
+	this.records.push(records[j]);
+    }
     console.log("Total count: "+this.records.length);
     this.preProcess();
 }
