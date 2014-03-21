@@ -3,7 +3,6 @@ var zlib = require('zlib')
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
 var dhelper = require('../helpers/domhelper.js')
-var jsdom = require('jsdom').jsdom
 var cp = require('child_process')
 function Job(){
     this.dataDir='../appdata/';

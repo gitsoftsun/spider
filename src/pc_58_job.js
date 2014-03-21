@@ -2,7 +2,6 @@ var http = require('http')
 var zlib = require('zlib')
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
-var jsdom = require('jsdom').jsdom
 var cp = require('child_process')
 var cheerio = require('cheerio')
 function Job(){
@@ -32,6 +31,7 @@ Job.prototype.processList=function(fileName){
 	return;
     }
 //    var worker = this.cmpWorker;
+    var that = this;
     fs.readFile(this.resultDir+fileName,function(err,data){
 	if(err){
 	    console.log('Read file error: '+err.message);
@@ -39,8 +39,7 @@ Job.prototype.processList=function(fileName){
 	}
 	
 	var $ = cheerio.load(data);
-	console.log("document loaded");
-	var records = [];	
+	var records = [];
 	$('#infolist dl').each(function(i,e){
 	    var record={};
 	    record.top=$('a.ico ding1',this).length==1?"是":"否";
@@ -54,6 +53,9 @@ Job.prototype.processList=function(fileName){
 //	worker.send(records);
 	cp.fork('./pc_58_company.js').send(records);
 	records=null;
+	if(files.length>0){
+	    that.processList(files.pop());
+	}
     });
 }
 /*
@@ -156,5 +158,8 @@ Job.prototype.test=function(){
 var job = new Job();
 job.init();
 //job.test();
-job.processList("生活 | 服务业,餐饮,后厨,北京,3.html");
+var files = fs.readdirSync('../result/58job/');
+if(files.length>0){
+    job.processList(files.pop());
+}
 //job.start();
