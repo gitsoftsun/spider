@@ -46,7 +46,7 @@ Job.prototype.processList=function(fileName){
 	var records = [];
 	cntNode.find('dl').each(function(){
 	    var record={};
-	    record.name = $('.list_title',this).text();
+	    record.name = $('.list_title',this).text().replace(/,/g,' ');
 	    record.hot = $('.ico-hot',this).length==1?"是":"否";
 	    record.top = $('.ico-stick-yellow',this).length==1?"是":"否";
 	    record.adTop = $('.ico-stick-red',this).length==1?"是":"否";
@@ -131,7 +131,6 @@ Job.prototype.start = function(){
     inds=null;
     var category = this.getCate();
     if(category==null) return;
-    console.log(this.industries.length);
     this.wgetList(city,category);
 /*    for(var cl1 in this.ind){
 	for(var cl2 in this.ind[cl1]){

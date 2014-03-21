@@ -12,6 +12,7 @@ function Job(){
     this.ind = null;
     this.host = '58.com';
     this.cmpWorker = null;
+    this.lastSendTime=new Date();
 }
 
 Job.prototype.init=function(){
@@ -22,7 +23,16 @@ Job.prototype.init=function(){
     var str = fs.readFileSync(this.dataDir+this.industryFile).toString();
     this.ind = JSON.parse(str);
     str=null;
-//    this.cmpWorker = cp.fork('./pc_58_company.js');
+    this.cmpWorker = cp.fork('./pc_58_company.js');
+    var that = this;
+    this.cmpWorker.on('message',function(msg){
+	if(msg=='done'){
+	    console.log('Last page period : '+((new Date())-that.lastSendTime)/1000+' , '+files.length+" files left.");
+	    if(files.length>0){
+		that.processList(files.pop());
+	    }
+	}
+    });
 }
 
 Job.prototype.processList=function(fileName){
@@ -50,11 +60,10 @@ Job.prototype.processList=function(fileName){
 	    record.name=$('a.t',this).text();
 	    records.push(record);
 	});
-	cp.fork('./pc_58_company.js').send(records);
+//	cp.fork('./pc_58_company.js').send(records);
+	that.cmpWorker.send(records);
+	this.lastSendTime=new Date();
 	records=null;
-	if(files.length>0){
-	    that.processList(files.pop());
-	}
     });
 }
 /*

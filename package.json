@@ -12,6 +12,7 @@
     "htmlparser" : "*",
 	"sprintf-js":"*",
 	"iconv":"*",
-"cheerio":"*"
+"cheerio":"*",
+"mongodb":"*"
   }
 }

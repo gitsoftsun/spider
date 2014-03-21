@@ -45,63 +45,11 @@ Company.prototype.init=function(){
 	that.wget();
     });
 }
-Company.prototype.preProcess=function(){
-    var that = this;
-    this.records.forEach(function(e){
-	if(e.jing=='是'){
-	    that.preRecords.push(e);
-	}
-    });
-    this.pretodoCount = this.preRecords.length;
-    console.log(this.pretodoCount+" of "+this.todoCount+" item need preprocess");
-    
-//    for(var i =0;i<this.records.length;i++){
-    if(this.preRecords.length>0){
-	var r = this.preRecords.pop();
-	helper.request_data(r.cmpUrl,null,function(data,args){
-	    that.filterCmpUrl(data,args);
-	},r);
-    }
-}
-Company.prototype.filterCmpUrl=function(data,args){
-    console.log('Preprocessing '
-		+(this.predoneCount+1)
-		+' of '
-		+this.pretodoCount
-	       );
-    var doc = jsdom(data);
-    var document = doc.parentWindow.document;
-    var nodes = document.getElementsByClassName('company');
-    if(nodes.length!=0) {
-	var link = nodes[0].children[0];
-	args[0].cmpUrl = link.href;
-    }
-    doc=null;
-    document=null;
-    this.predoneCount++;
-    if(this.pretodoCount==this.predoneCount){
-	this.onPreProcessed();
-    }
-    if(this.preRecords.length==0) return;
-    var r = this.preRecords.pop();
-    var that = this;
-    helper.request_data(r.cmpUrl,null,function(data,args){
-	that.filterCmpUrl(data,args);
-    },r);
-}
-Company.prototype.onPreProcessed=function(){
-    console.log('Preprocess done.');    
-//    for(var i=0;i<this.records.length;i++){
-
-//  }
-    this.wget();
-}
 Company.prototype.wget=function(){
     if(this.records.length==0) return;
     var r = null;
     while(this.records.length>0){
 	var r=this.records.pop();
-	console.log("Start "+r.cmpUrl);
 	var m = r.cmpUrl.match(/\/(\d+)\//);
 	if(m){
 	    r.cmpId = m[1];
@@ -111,21 +59,18 @@ Company.prototype.wget=function(){
 		r=null;
 	    }
 	    else{
-		//r.cmpUrl = this.cmpHost+"/"+r.cmpId;
-		break;
+		console.log("GET "+r.cmpUrl);
+		var that = this;
+		helper.request_data(r.cmpUrl,null,function(data,args){
+		    that.process(data,args);
+		},r);
 	    }
 	}
     }
-    if(r==null) return;
-    var that = this;
-    helper.request_data(r.cmpUrl,null,function(data,args){
-	that.process(data,args);
-	that.wget();
-    },r);
 }
-//<li><em>公司行业：</em>计算机/网络/通信</li>
+
 Company.prototype.process = function(data,args){
-    console.log("Processing "+args[0].cmpName);
+//    console.log("Processing "+args[0].cmpName);
     //fs.writeFileSync(this.cmpDir+args[0].cmpId+".html",data);
     var match = data.match(/公司行业：([^l]+)/);
     if(!match){

@@ -10,7 +10,7 @@ for(var i=0;i<host.length;i++){
     if(!host[i]) continue;
     var sshCmd = 'ssh -i bda2014032.pem ubuntu@'+host[i];
     sshCmds.push(sshCmd+' exit');
-    var cmd = sshCmd+' \'sudo add-apt-repository ppa:chris-lea/node.js;sudo apt-get update;sudo apt-get install -y build-essential;sudo apt-get install -y git;mkdir spider;cd spider;git init;git pull https://github.com/mike442144/spider.git; sudo apt-get install -y nodejs;sudo apt-get install -y npm;mkdir node_modules;mkdir result;cd result;mkdir ganjijob;mkdir ganjicompany;mkdir 58job;mkdir 58company;rm 58.*.txt;cd ../;npm config set registry http://registry.npmjs.org/;sudo npm install -d;cd src;node pc_58_job.js '+i*25+' 25\'';
+    var cmd = sshCmd+' \'sudo add-apt-repository ppa:chris-lea/node.js;sudo apt-get update;sudo apt-get install -y build-essential;sudo apt-get install -y git;mkdir spider;cd spider;git init;git pull https://github.com/mike442144/spider.git; sudo apt-get install -y nodejs;sudo apt-get install -y npm;mkdir node_modules;mkdir result;cd result;mkdir ganjijob;mkdir ganjicompany;mkdir 58job;mkdir 58company;rm ganji.original.txt;cd ../;npm config set registry http://registry.npmjs.org/;sudo npm install -d;cd src;node pc_ganji_job.js '+i*25+' 25\'';
     cmds.push(cmd);
 //    var downo = 'scp -i bda2014032.pem ubuntu@'+host[i]+':/home/ubuntu/spider/result/58job/*.html ./result/';
     var downc = 'scp -i bda2014032.pem ubuntu@'+host[i]+':/home/ubuntu/spider/result/ganji.company.txt ./ganji/ganji.'+i+'.company.txt';
