@@ -111,6 +111,7 @@ Job.prototype.wgetList=function(city,cate){
 	return;
     }
     var host=city.cen+'.'+this.host;
+//    console.log(cate);
     var curCategory = this.ind[cate.cl1][cate.cl2].cl3[cate.cl3];
     
     var path = '/'+curCategory+'/u1o'+cate.pidx+'/';
@@ -160,7 +161,8 @@ Job.prototype.start = function(){
 	return;
     this.industries = [];
     var inds = fs.readFileSync(this.dataDir+"ganjijob.txt").toString().split("\n");
-    for(var j=start,c=0;c<len;c++,j++){
+    for(var j=start,c=0;c<len&&j<inds.length;c++,j++){
+	if(!inds[j]) continue;
 	this.industries.push(inds[j]);
     }
     inds=null;

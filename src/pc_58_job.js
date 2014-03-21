@@ -107,11 +107,13 @@ Job.prototype.wgetList=function(city,cate){
 	    +args[1].pidx+'.html';
 	fs.writeFileSync(that.resultDir+fileName,data);
 	console.log("File saved: ",fileName);
-	that.processList(fileName);
+//	that.processList(fileName);
 	if(data.search('pagerout')!=-1&&args[1].pidx<100){
 	    data=null;
 	    args[1].pidx++;
-	    that.wgetList(args[0],args[1]);
+	    setTimeout(function(){
+		that.wgetList(args[0],args[1]);
+	    },(Math.random()*15+1)*1000);
 	}else{
 	    console.log("Category done: "+cate.cl3);
 	    var c = that.getCate();
@@ -140,7 +142,7 @@ Job.prototype.start = function(){
 	return;
     this.industries=[];
     var inds = fs.readFileSync(this.dataDir+this.indTxtFile).toString().split("\n");
-    for(var j=start,c=0;c<len;c++,j++){
+    for(var j=start,c=0;c<len&&j<inds.length;c++,j++){
 	this.industries.push(inds[j]);
     }
     inds=null;
@@ -174,5 +176,5 @@ Job.prototype.test=function(){
 var job = new Job();
 job.init();
 //job.test();
-job.processList("生活 | 服务业,餐饮,后厨,北京,3.html");
-//job.start();
+//job.processList("生活 | 服务业,餐饮,后厨,北京,3.html");
+job.start();
