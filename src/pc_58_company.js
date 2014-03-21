@@ -92,12 +92,10 @@ Company.prototype.wget=function(){
     var r = null;
     while(this.records.length>0){
 	var r=this.records.pop();
-	console.log("Start ",r.cmpUrl);
 	var m = r.cmpUrl.match(/\/(\d+)\//);
 	if(m){
 	    r.cmpId = m[1];
 	    if(this.company[r.cmpId]){
-		console.log("Company exists");
 		r.cmpUrl = this.company[r.cmpId].cmpUrl;
 		r.member = this.company[r.cmpId].member;
 		r.ind = this.company[r.cmpId].ind;
@@ -116,7 +114,9 @@ Company.prototype.wget=function(){
     console.log('GET '+r.cmpUrl);
     helper.request_data(r.cmpUrl,null,function(data,args){
 	that.process(data,args);
-	that.wget();
+	setTimeout(function(){
+	    that.wget();	    
+	},Math.random()*10+1)*1000);
     },r);
 }
 Company.prototype.process = function(data,args){
@@ -130,37 +130,6 @@ Company.prototype.process = function(data,args){
 	args[0].site=args[0].cmpUrl;
     });
     this.save(args[0]);
-/*    var doc = jsdom(data);
-    var document = doc.parentWindow.document;
-    var container = document.getElementsByClassName('basicMsg')[0];
-    if(!container){
-	console.log('Page unavaliable: ',args[0]);
-	this.failedCount++;
-	return;
-    }
-    var table = container.getElementsByTagName('table')[0];
-    if(table){
-	var trs = table.getElementsByTagName('tr');
-	var memberEle = trs[0].getElementsByClassName("yearIco")[0];
-	if(memberEle){
-	    args[0].member = memberEle.children[0].innerHTML;
-	}else{
-	    args[0].member = '否';
-	}
-	var ind = trs[1].getElementsByClassName("c33")[0];
-	if(ind){
-	    args[0].ind = ind.innerHTML;
-	}
-	var site = trs[3].getElementsByTagName("a")[0];
-	if(site){
-	    args[0].site = site.innerHTML;
-	}
-
-	this.save(args[0]);
-    }
-    doc=null;
-    document=null;
-    data=null;*/
 }
 Company.prototype.save=function(r){
     var sb = new helper.StringBuffer();
