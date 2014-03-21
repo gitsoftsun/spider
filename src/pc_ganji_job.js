@@ -4,6 +4,7 @@ var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
 var dhelper = require('../helpers/domhelper.js')
 var cp = require('child_process')
+var cheerio = require('cheerio')
 function Job(){
     this.dataDir='../appdata/';
     this.resultDir='../result/ganjijob/';
@@ -35,67 +36,30 @@ Job.prototype.processList=function(fileName){
 	    console.log('Read file error: '+err.message);
 	    return;
 	}
-	var doc = jsdom(data);
-	//set to null to tell gc to collect
-	data = null;
-	var document = doc.parentWindow.document;
-	var recommend = document.getElementById('list_recommend');
-	if(!recommend){
-	    console.log('No avaliable content in page');
-	    return;
-	}
-	var listContainer = dhelper.getPrevElementSibling(recommend);
-	
-	if(listContainer.className=='lab-zbd'){
+	var $=cheerio.load(data);
+	var cntNode = $('#list_recommend').prev('div');
+	var cntName=cntNode.attr('class');
+	if(cntName=='lab-zbd'){
 	    console.log('No data on this page');
 	    return;
 	}
-	var items = listContainer.getElementsByTagName('dl');
 	var records = [];
-	for(var i=0;i<items.length;i++){
+	cntNode.find('dl').each(function(){
 	    var record={};
-	    var titLink = items[i].getElementsByClassName("list_title")[0];
-	    if(titLink){
-		record.name=titLink.innerHTMl;
-	    }
-	    var sBox = items[i].getElementsByClassName("s-box")[0];
-	    var typeEle = dhelper.getNextElementSibling(sBox);
-	    record.hot = "否";
-	    record.top = "否";
-	    record.adTop = "否";
-	    if(typeEle&&typeEle.tagName=='SPAN'&&typeEle.className=="ico-hot"){
-		record.hot="是";
-	    }else if(typeEle&&typeEle.tagName=="A"){
-		if(typeEle.children[0]&&typeEle.children[0].className=="ico-stick-yellow"){
-		    record.top = "是";
-		}else if(typeEle.children[0]&&typeEle.children[0].className=="ico-stick-red"){
-		    record.adTop = "是";
-		}
-	    }
-	    var cmpEle = items[i].getElementsByClassName("company")[0];
-	    if(cmpEle){
-		var cmpLink = cmpEle.getElementsByTagName("a")[0];
-		if(cmpLink){
-		    record.cmpName = cmpLink.title;
-		    record.cmpUrl = cmpLink.href;
-		}
-		var bangIco = cmpEle.getElementsByClassName("ico-bang-new")[0];
-		if(bangIco){
-		    record.member = bangIco.innerHTML;
-		}else{
-		    record.member = "否";
-		}
-	    }
-	    var timeEle = items[i].getElementsByClassName("pub-time")[0];
-	    if(timeEle){
-		record.time = timeEle.innerHTML;
-	    }
+	    record.name = $('.list_title',this).text();
+	    record.hot = $('.ico-hot',this).length==1?"是":"否";
+	    record.top = $('.ico-stick-yellow',this).length==1?"是":"否";
+	    record.adTop = $('.ico-stick-red',this).length==1?"是":"否";
+	    record.cmpName=$('.company a',this).attr('title');
+	    record.cmpUrl=$('.company a',this).attr('href');
+	    record.member=$('span.ico-bang-new',this).first().text();
+	    if(!record.member) record.member="否";
+	    record.time = $('.pub-time',this).text();
 	    record.fileName=fileName;
 	    records.push(record);
-	}
-	doc=null;
+	});
+	
 	cp.fork('./pc_ganji_company.js').send(records);
-//	console.log(records);
 	records=null;
     });
 }
@@ -197,4 +161,4 @@ var job = new Job();
 job.init();
 job.start();
 //job.test();
-//job.processList("销售|客服|人力|行政,销售,电话销售,北京,1.html");
+//job.processList("技工|生产|物流,技工|工人,搬运工,北京,1.html");

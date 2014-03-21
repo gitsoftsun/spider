@@ -134,9 +134,8 @@ Company.prototype.process = function(data,args){
 	this.failedCount++;
 	return;
     }
-    args[0].ind = match[1].replace(/[<\/\em>\s]/g,'');
+    args[0].ind = match[1].replace(/[<\/\em,>\s]/g,'');
     this.save(args[0]);
-    data=null;
 }
 Company.prototype.save=function(r){
     var sb = new helper.StringBuffer();

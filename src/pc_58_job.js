@@ -30,7 +30,6 @@ Job.prototype.processList=function(fileName){
 	console.log('File not found: ' + fileName);
 	return;
     }
-//    var worker = this.cmpWorker;
     var that = this;
     fs.readFile(this.resultDir+fileName,function(err,data){
 	if(err){
@@ -48,9 +47,9 @@ Job.prototype.processList=function(fileName){
 	    record.cmpUrl = $('a.fl',this).attr('href');
 	    record.time = $('dd.w68',this).text();
 	    record.fileName = fileName;
+	    record.name=$('a.t',this).text();
 	    records.push(record);
 	});
-//	worker.send(records);
 	cp.fork('./pc_58_company.js').send(records);
 	records=null;
 	if(files.length>0){
@@ -61,6 +60,7 @@ Job.prototype.processList=function(fileName){
 /*
  */
 Job.prototype.wgetList=function(city,cate){
+    if(cate==null) return;
     var fileName = cate.cl1+','
 	+cate.cl2+','
 	+cate.cl3+','
@@ -89,7 +89,7 @@ Job.prototype.wgetList=function(city,cate){
 	    +args[1].pidx+'.html';
 	fs.writeFileSync(that.resultDir+fileName,data);
 	console.log("File saved: ",fileName);
-//	that.processList(fileName);
+	that.processList(fileName);
 	if(data.search('pagerout')!=-1&&args[1].pidx<100){
 	    data=null;
 	    args[1].pidx++;
@@ -98,9 +98,7 @@ Job.prototype.wgetList=function(city,cate){
 	    },(Math.random()*10+1)*1000);
 	}else{
 	    console.log("Category done: "+cate.cl3);
-	    var c = that.getCate();
-	    if(!c) return;
-	    that.wgetList(args[0],c);
+	    that.wgetList(args[0],that.getCate());
 	}
     },[city,cate]);
 }

@@ -116,7 +116,7 @@ Company.prototype.wget=function(){
 	that.process(data,args);
 	setTimeout(function(){
 	    that.wget();	    
-	},Math.random()*10+1)*1000);
+	},(Math.random()*10+1)*1000);
     },r);
 }
 Company.prototype.process = function(data,args){
