@@ -45,7 +45,6 @@ Company.prototype.init=function(){
     });
 }
 Company.prototype.preProcess=function(){
-    
     var that = this;
     this.records.forEach(function(e){
 	if(e.jing=='是'){
@@ -101,7 +100,7 @@ Company.prototype.wget=function(){
     var r = null;
     while(this.records.length>0){
 	var r=this.records.pop();
-	console.log("Start ",r.cmpUrl);
+	console.log("Start "+r.cmpUrl);
 	var m = r.cmpUrl.match(/\/(\d+)\//);
 	if(m){
 	    r.cmpId = m[1];
