@@ -113,7 +113,7 @@ Job.prototype.wgetList=function(city,cate){
 	    args[1].pidx++;
 	    setTimeout(function(){
 		that.wgetList(args[0],args[1]);
-	    },(Math.random()*15+1)*1000);
+	    },(Math.random()*10+1)*1000);
 	}else{
 	    console.log("Category done: "+cate.cl3);
 	    var c = that.getCate();

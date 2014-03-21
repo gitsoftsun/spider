@@ -17,6 +17,7 @@ function Company(){
     this.cmpHost="www.ganji.com/gongsi";
     this.originalFile = "ganji.original.txt";
     this.companyFile = "ganji.company.txt";
+    this.failedFile = "ganji.company.txt";
 }
 /*
 { name: '酒店诚聘男女服务员包食宿',
@@ -129,6 +130,7 @@ Company.prototype.process = function(data,args){
     var match = data.match(/公司行业：([^l]+)/);
     if(!match){
 	console.log('Page unavaliable: ',args[0]);
+	fs.appendFileSync(this.resultDir+this.failedFile,args[0].cmpUrl+'\r\n');
 	this.failedCount++;
 	return;
     }
