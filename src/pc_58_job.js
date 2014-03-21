@@ -4,6 +4,7 @@ var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
 var jsdom = require('jsdom').jsdom
 var cp = require('child_process')
+var cheerio = require('cheerio')
 function Job(){
     this.dataDir='../appdata/';
     this.resultDir='../result/58job/';
@@ -36,43 +37,22 @@ Job.prototype.processList=function(fileName){
 	    console.log('Read file error: '+err.message);
 	    return;
 	}
-	var doc = jsdom(data);
+	
+	var $ = cheerio.load(data);
 	console.log("document loaded");
-	//set to null to tell gc to collect
-	data = null;
-	var document = doc.parentWindow.document;
-	var infoContainer = document.getElementById('infolist');
-	if(!infoContainer){
-	    console.log('No avaliable content in page');
-	    return;
-	}
-	var items = infoContainer.getElementsByTagName('dl');
-	var records = [];
-	for(var i=0;i<items.length;i++){
+	var records = [];	
+	$('#infolist dl').each(function(i,e){
 	    var record={};
-	    var ch = items[i].children;
-	    var nameEles = ch[1].children;
-	    record.name = nameEles[0].innerHTML.trim();
-	    var lastEleCls = nameEles[nameEles.length-1].className;
-	    record.jing = '否';
-	    record.top = '否';
-	    if(lastEleCls=='ico ding1'){
-		record.top='是';
-	    }
-	    if(lastEleCls=='ico jingpin'){
-		//cannot get company url in current page.
-		record.jing = '是';
-	    }
-	    record.cmpName = ch[2].children[0].title;
-	    record.time = ch[4].innerHTML;
-	    record.cmpUrl = ch[2].children[0].href;
-	    record.fileName=fileName;
+	    record.top=$('a.ico ding1',this).length==1?"是":"否";
+	    record.jing=$('a.ico jingpin',this).length==1?"是":"否";
+	    record.cmpName=$('a.fl',this).attr('title');
+	    record.cmpUrl = $('a.fl',this).attr('href');
+	    record.time = $('dd.w68',this).text();
+	    record.fileName = fileName;
 	    records.push(record);
-	}
-	console.log(records.length);
-	doc=null;
+	});
 //	worker.send(records);
-//	cp.fork('./pc_58_company.js').send(records);
+	cp.fork('./pc_58_company.js').send(records);
 	records=null;
     });
 }
@@ -176,5 +156,5 @@ Job.prototype.test=function(){
 var job = new Job();
 job.init();
 //job.test();
-//job.processList("生活 | 服务业,餐饮,后厨,北京,3.html");
-job.start();
+job.processList("生活 | 服务业,餐饮,后厨,北京,3.html");
+//job.start();

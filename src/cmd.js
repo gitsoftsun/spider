@@ -12,8 +12,10 @@ for(var i=0;i<host.length;i++){
     sshCmds.push(sshCmd+' exit');
     var cmd = sshCmd+' \'sudo add-apt-repository ppa:chris-lea/node.js;sudo apt-get update;sudo apt-get install -y build-essential;sudo apt-get install -y git;mkdir spider;cd spider;git init;git pull https://github.com/mike442144/spider.git; sudo apt-get install -y nodejs;sudo apt-get install -y npm;mkdir node_modules;mkdir result;cd result;mkdir ganjijob;mkdir ganjicompany;mkdir 58job;mkdir 58company;cd ../;npm config set registry http://registry.npmjs.org/;sudo npm install -d;cd src;\\cp utils.js ../node_modules/jsdom/lib/jsdom/browser/;node pc_ganji_job.js '+i*25+' 25\'';
     cmds.push(cmd);
-    var down = 'scp -i bda2014032.pem ubuntu@'+host[i]+':/home/ubuntu/spider/result/ganji.original.txt ' + i+'.ganji.original.txt';
-    downs.push(down);
+    var downo = 'scp -i bda2014032.pem ubuntu@'+host[i]+':/home/ubuntu/spider/result/58job/*.html ./result/';
+//    var downc = 'scp -i bda2014032.pem ubuntu@'+host[i]+':/home/ubuntu/spider/result/58.company.txt ./result/58.'+i+'.company.txt';
+    downs.push(downo);
+//    downs.push(downc);
     cmds58.push(sshCmd+' \'cd spider/src;node pc_58_job.js '+i*5+' 25\'');
     killCmds.push(sshCmd+' \'sudo kill -9 $(pidof node);exit\'');
 }
@@ -26,4 +28,5 @@ fs.writeFileSync('cmds58.sh',"#!/bin/bash\n");
 fs.appendFileSync('cmds58.sh',cmds58.join(' &'));
 fs.writeFileSync("killCmds.sh","#!/bin/bash\n");
 fs.appendFileSync("killCmds.sh",killCmds.join('\n'));
-//var strDown = downs.join(' &');
+fs.writeFileSync('down.sh',"#!/bin/bash\n");
+fs.appendFileSync('down.sh',downs.join(' &'));

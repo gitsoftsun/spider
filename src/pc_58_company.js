@@ -1,7 +1,7 @@
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
 var jsdom = require('jsdom').jsdom
-
+var cheerio = require('cheerio')
 function Company(){
     console.log('Company worker starting');
     this.doneCount=0;
@@ -14,7 +14,7 @@ function Company(){
     this.resultDir="../result/";
     this.records=[];
     this.preRecords=[];
-    this.cmpHost="qy.58.com";
+    this.cmpHost="http://qy.58.com";
     this.originalFile = "58.original.txt";
     this.companyFile = "58.company.txt";
 }
@@ -41,7 +41,6 @@ Company.prototype.init=function(){
     process.on('message',function(msg){
 	that.records=msg;
 	that.preProcess();
-
     });
 }
 Company.prototype.preProcess=function(){
@@ -71,15 +70,8 @@ Company.prototype.filterCmpUrl=function(data,args){
 		+' of '
 		+this.pretodoCount
 	       );
-    var doc = jsdom(data);
-    var document = doc.parentWindow.document;
-    var nodes = document.getElementsByClassName('company');
-    if(nodes.length!=0) {
-	var link = nodes[0].children[0];
-	args[0].cmpUrl = link.href;
-    }
-    doc=null;
-    document=null;
+    var $=cheerio.load(data);
+    args[0].cmpUrl = $('div.company a').attr('href');
     this.predoneCount++;
     if(this.pretodoCount==this.predoneCount){
 	this.onPreProcessed();
@@ -93,9 +85,6 @@ Company.prototype.filterCmpUrl=function(data,args){
 }
 Company.prototype.onPreProcessed=function(){
     console.log('Preprocess done.');    
-//    for(var i=0;i<this.records.length;i++){
-
-//  }
     this.wget();
 }
 Company.prototype.wget=function(){
@@ -108,6 +97,7 @@ Company.prototype.wget=function(){
 	if(m){
 	    r.cmpId = m[1];
 	    if(this.company[r.cmpId]){
+		console.log("Company exists");
 		r.cmpUrl = this.company[r.cmpId].cmpUrl;
 		r.member = this.company[r.cmpId].member;
 		r.ind = this.company[r.cmpId].ind;
@@ -116,13 +106,14 @@ Company.prototype.wget=function(){
 		r=null;
 	    }
 	    else{
-		r.cmpUrl = this.cmpHost+"/"+r.cmpId;
+		r.cmpUrl = this.cmpHost+"/"+r.cmpId+"/";
 		break;
 	    }
 	}
     }
     if(r==null) return;
     var that = this;
+    console.log('GET '+r.cmpUrl);
     helper.request_data(r.cmpUrl,null,function(data,args){
 	that.process(data,args);
 	that.wget();
@@ -131,7 +122,15 @@ Company.prototype.wget=function(){
 Company.prototype.process = function(data,args){
     console.log("Processing "+args[0].cmpName);
     //fs.writeFileSync(this.cmpDir+args[0].cmpId+".html",data);
-    var doc = jsdom(data);
+    var $ = cheerio.load(data);
+    $('.basicMsg table').each(function(){
+	var member = $('.yearIco i',this).text();
+	args[0].member = member?member:"否";
+	args[0].ind=$('.c33',this).text();
+	args[0].site=args[0].cmpUrl;
+    });
+    this.save(args[0]);
+/*    var doc = jsdom(data);
     var document = doc.parentWindow.document;
     var container = document.getElementsByClassName('basicMsg')[0];
     if(!container){
@@ -161,7 +160,7 @@ Company.prototype.process = function(data,args){
     }
     doc=null;
     document=null;
-    data=null;
+    data=null;*/
 }
 Company.prototype.save=function(r){
     var sb = new helper.StringBuffer();
