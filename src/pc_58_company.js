@@ -199,7 +199,7 @@ Company.prototype.save=function(r){
     sb.append(',');
     sb.append(r.member);
     sb.append(',');
-    sb.append(r.ind.replace(/,/g,''));
+    sb.append(r.ind&&r.ind.replace(/,/g,''));
 //    sb.append(',');
 //    sb.append(r.site);
     sb.append('\r\n');
@@ -272,7 +272,7 @@ Company.prototype.onRecordsReady=function(){
     this.preProcess();
 }
 var arguments = process.argv.splice(2);
-var start = arguments[0];
+var start = argpuments[0];
 var len = arguments[1];
 Company.prototype.start=function(){
 //    this.files = fs.readdirSync('../result/58job/');
