@@ -272,7 +272,7 @@ Company.prototype.onRecordsReady=function(){
     this.preProcess();
 }
 var arguments = process.argv.splice(2);
-var start = argpuments[0];
+var start = arguments[0];
 var len = arguments[1];
 Company.prototype.start=function(){
 //    this.files = fs.readdirSync('../result/58job/');
