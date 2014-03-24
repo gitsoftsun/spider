@@ -249,7 +249,7 @@ Company.prototype.processList=function(fileName){
 //    this.records=null;
 //    var records = [];
     var that=this;
-    $('#infolist dl').each(function(i,e){
+    $('#infolist dl')p.each(function(i,e){
 	var record={};
 	record.top=$('a.ding1',this).length==1?"是":"否";
 	record.jing=$('a.jingpin',this).length==1?"是":"否";
