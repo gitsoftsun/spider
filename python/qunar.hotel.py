@@ -205,7 +205,7 @@ def one_driver_hotel(driver, city, hotel):
         elem = driver.find_element_by_xpath("//*")
         source_code = elem.get_attribute("outerHTML")
         # print type(source_code)
-        f = codecs.open('./data/hotel/' + city + ',' + hotel + ',2014-04-01' + '.html',
+        f = codecs.open('../result/qunar_hotel/' + city + ',' + hotel + ',2014-04-01' + '.html',
                         'w+',
                         'utf8')
         f.write(source_code)

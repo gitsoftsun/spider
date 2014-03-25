@@ -22,6 +22,10 @@ function Company(){
     this.files=[];
     this.retry=0;
     this.dataDir='../appdata/';
+    this.companyDoneFile="58cmpout.txt";
+    this.cityFile = "58.city.txt";
+    this.cities=[];
+    this.gotCompanys=[];
 }
 /*
 { name: '酒店诚聘男女服务员包食宿',
@@ -44,6 +48,21 @@ Company.prototype.init=function(){
     }else{
 	console.log("Company File not found");
     }
+
+    //load done company file
+    var cmps = this.doneCompanys={};
+    fs.readFileSync(this.dataDir+this.companyDoneFile).toString().split("\r\n").forEach(function(line){
+	if(!line) return;
+	var vals = line.split(',');
+	cmps[vals[0]]={id:vals[0],name:vals[1],member:vals[2],ind:vals[3]};
+    });
+
+    //load cities from file
+    this.cities = fs.readFileSync(this.dataDir+this.cityFile).toString().split('\n').map(function(line){
+	if(!line) return;
+	var vals=line.split(',');
+	return {cname:vals[0],cen:vals[1]};
+    });
 }
 Company.prototype.preProcess=function(){
     this.todoCount = this.records.length;
@@ -249,7 +268,7 @@ Company.prototype.processList=function(fileName){
 //    this.records=null;
 //    var records = [];
     var that=this;
-    $('#infolist dl')p.each(function(i,e){
+    $('#infolist dl').each(function(i,e){
 	var record={};
 	record.top=$('a.ding1',this).length==1?"是":"否";
 	record.jing=$('a.jingpin',this).length==1?"是":"否";
@@ -303,6 +322,68 @@ Company.prototype.start=function(){
     console.log("Total count: "+this.records.length);
     this.preProcess();
 }
+Company.prototype.wgetCompanyList=function(city){
+    var that = this;
+    var url = 'http://qy.58.com/'+city.cen+'/pn'+city.pn;
+    console.log("GET "+url);
+    helper.request_data(url,null,function(data,args){
+	that.processCompanyList(data);
+	if(args[0].mp==undefined){
+	    var match = data.match(/mp=(\d+)/);
+	    args[0].mp = match && Number(match[1]);
+	}
+	if(args[0].pn<args[0].mp){
+	    data=null;
+	    args[0].pn++;
+	    setTimeout(function(){
+		that.wgetCompanyList(args[0]);
+	    },(Math.random()*10+1)*1000);
+	}else{
+	    console.log("City done: "+args[0].cname);
+	    that.startFetchCompanys();
+	}
+    },city);
+}
+
+Company.prototype.processCompanyList=function(data){
+    if(!data) {
+	console.log('data empty.');
+	return;
+    }
+    var $=cheerio.load(data);
+    var cmps = this.gotCompanys;
+    $('div.compList ul li span a').each(function(){
+	var href = $(this).attr('href');
+	var name = $(this).text();
+	var match = href.match(/\/(\d+)\//);
+	if(match){
+	    var id = match[1];
+//	    cmps.push({id:id,name:name});
+	    fs.appendFile('../result/58tmp.cmp.txt',id+","+name+"\r\n",function(err){
+		if(err) console.log(err.message);
+	    });
+	}
+    });
+    return $("#pager a:last-child").attr('class')=='next';
+}
+Company.prototype.processOneCompany=function(data){
+    
+}
+Company.prototype.startFetchCompanys=function(){
+    if(this.cities.length==0){
+	console.log("All cities done.");
+	return;
+    }
+    var city = this.cities.pop();
+    if(!city) city = this.cities.pop();
+    city.pn=1;
+    this.wgetCompanyList(city);
+}
+
+Company.prototype.wgetOneCompany=function(){
+    
+}
 var worker = new Company();
 worker.init();
-worker.start();
+//worker.start();
+worker.startFetchCompanys();

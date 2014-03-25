@@ -252,7 +252,7 @@ exports.get_cities = function(filename){
         return;
     }
     
-    var lines = fs.readFileSync(filename).toString().split('\r\n');
+    var lines = fs.readFileSync(filename).toString().split('\n');
     if(!lines){
         console.log("there are no cities in file: "+lines);
         return;
