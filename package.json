@@ -5,12 +5,9 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "jQuery"  :"*",
-    "jsdom"   : "*",
     "xmlhttprequest" : "*",
     "request" : "*",
-    "htmlparser" : "*",
-	"sprintf-js":"*",
+    	"sprintf-js":"*",
 	"iconv":"*",
 "cheerio":"*",
 "mongodb":"*"
