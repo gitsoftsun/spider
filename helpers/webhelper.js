@@ -1,7 +1,6 @@
 var http = require('http')
 var zlib = require('zlib')
 var fs = require('fs')
-///var $ = require('jQuery')
 var Iconv = require('iconv').Iconv
 var url = require('url')
 exports.toQuery = function(obj){

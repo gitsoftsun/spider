@@ -1,6 +1,5 @@
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
-var jsdom = require('jsdom').jsdom
 var cheerio = require('cheerio')
 function Company(){
     console.log('Company worker starting');
@@ -331,6 +330,7 @@ Company.prototype.wgetCompanyList=function(city){
 	if(args[0].mp==undefined){
 	    var match = data.match(/mp=(\d+)/);
 	    args[0].mp = match && Number(match[1]);
+	    console.log(args[0].cname+" : "+args[0].mp);
 	}
 	if(args[0].pn<args[0].mp){
 	    data=null;
