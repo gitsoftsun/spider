@@ -40,6 +40,8 @@ exports.hotel.prototype.toString=function(site){
             for(var j=0;j<this.rooms[i].book.length;j++){
                 sb.append(this.city);
                 sb.append(',');
+		sb.append(this.id);
+		sb.append(',');
                 sb.append(this.name);
                 sb.append(',');
                 sb.append(this.rooms[i].name);
@@ -57,9 +59,9 @@ exports.hotel.prototype.toString=function(site){
     else if(site=="ctrip_pc"){
         var sb = new helper.StringBuffer();
         for(var i = 0;i<this.rooms.length;i++){
-            sb.append(this.id);
-            sb.append(',');
             sb.append(this.city);
+            sb.append(',');
+	    sb.append(this.id);
             sb.append(',');
             sb.append(this.name);
             sb.append(',');
@@ -156,6 +158,8 @@ exports.hotel.prototype.toString=function(site){
             for(var j=0;j<r.plans.length;j++){
                 sb.append(this.city);
                 sb.append(',');
+		sb.append(this.id);
+		sb.append(',');
                 sb.append(this.name);
                 sb.append(',');
                 sb.append(this.zoneName);

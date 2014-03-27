@@ -1,6 +1,6 @@
 ﻿taiyuan0601 太原
-beijing0101 北京
 shanghai0201 上海
+beijing0101 北京
 guangzhou2001 广州
 wuhan1801 武汉
 chengdu2301 成都

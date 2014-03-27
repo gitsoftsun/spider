@@ -202,6 +202,7 @@ function process_hotel_list(data,args){
     h.star = $("ul.searchresult_info li.searchresult_info_name p.medal_list span",item).attr("title");
     h.points = $("ul.searchresult_info li.searchresult_info_judge div.searchresult_judge_box a.hotel_judge span.hotel_value",item).text();
     h.commentCount = $("ul.searchresult_info li.searchresult_info_judge div.searchresult_judge_box a.hotel_judge span.hotel_judgement",item).text();
+    h.commentCount = h.commentCount && h.commentCount.match(/\d+/)[0];
     url="http://hotels.ctrip.com"+url+'hotel='+h.id+'&startDate=2014-05-01&depDate=2014-05-02&OrderBy=ctrip&OrderType=ASC&index=1&page=1&rs=1';
     helper.request_data(url,null,process_one,[h,c,cssLinkResult]);
     // $(item).find("div.room_list2 table.hotel_datelist tr").each(function(i,r){
