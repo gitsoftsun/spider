@@ -25,10 +25,14 @@ QunarHotel.prototype.filterData=function(){
 	var hotel = new entity.hotel();
 	var names = this.files[i].split(',');
 	hotel.city = names[0];
-	hotel.name = names[1];
+	//hotel.name = names[1];
 	var f = this.resultDir+this.htmlDir+this.files[i];
 	
 	var $ = cheerio.load(fs.readFileSync(f).toString());
+	hotel.name = $("div.htl-info h2 span").text().trim();
+	hotel.star = $("div.htl-info h2 em").attr("title").trim();
+	var m = $("link[rel$='canonical']").attr('href').match(/([a-zA-Z\-\d]+)\/$/);
+	hotel.id = m && m[1];
 	if($("ul.e_prcDetail_ulist li").length>0){
 	    $("ul.e_prcDetail_ulist li").each(function(){
 		var r = new entity.room();

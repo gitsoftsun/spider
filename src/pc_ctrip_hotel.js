@@ -27,7 +27,9 @@ if(fs.existsSync(doneFile)){
 
 var doneHotelsDic = {};
 for(var x = 0;x<doneHotelsCn.length;x++){
-	doneHotelsDic[doneHotelsCn[x]]=true;
+    if(!doneHotelsCn[x]) continue;
+    var name = doneHotelsCn[x].split(',')[2];
+    doneHotelsDic[name]=true;
 }
 var pageSize=30;
 if(useproxy){
@@ -58,20 +60,20 @@ for(var i=0;i<cities.length;i++){
 	//var query = {'getHotelListReq':req};
 }
 function start(){
-	var lines = fs.readFileSync("../appdata/elonghotels.txt").toString().split('\r\n');
-	for(var i=0;i<lines.length;i++){
-	    if(!lines[i]) continue;
-		var l = lines[i];
-		var kvs = l.split(',');
-		var cityName = kvs[0];
-	    var elongId = kvs[1];
-		var hotelName = kvs[2];
-	    var elongStar = kvs[3];
-		if(doneHotelsDic[l]) continue;
-	    todoHotels.push({'cityName':cityName,'hotelName':hotelName,elongId:elongId,elongStar:elongStar});
-	}
+    var lines = fs.readFileSync("../appdata/elonghotels.txt").toString().split('\r\n');
+    for(var i=0;i<lines.length;i++){
+	if(!lines[i]) continue;
+	var l = lines[i];
+	var kvs = l.split(',');
+	var cityName = kvs[0];
+	var elongId = kvs[1];
+	var hotelName = kvs[2];
+	var elongStar = kvs[3];
+	if(doneHotelsDic[hotelName]) continue;
+	todoHotels.push({'cityName':cityName,'hotelName':hotelName,elongId:elongId,elongStar:elongStar});
+    }
     console.log(todoHotels.length + " hotels.");
-		gonext();
+    gonext();
 	
 	
 	//query["hsr.PageIndex"]=1;
