@@ -58,15 +58,19 @@ for(var i=0;i<cities.length;i++){
 	//var query = {'getHotelListReq':req};
 }
 function start(){
-	var lines = fs.readFileSync("../appdata/ctriphotels.txt").toString().split('\n');
+	var lines = fs.readFileSync("../appdata/elonghotels.txt").toString().split('\r\n');
 	for(var i=0;i<lines.length;i++){
+	    if(!lines[i]) continue;
 		var l = lines[i];
 		var kvs = l.split(',');
 		var cityName = kvs[0];
-		var hotelName = kvs[1];
+	    var elongId = kvs[1];
+		var hotelName = kvs[2];
+	    var elongStar = kvs[3];
 		if(doneHotelsDic[l]) continue;
-		todoHotels.push({'cityName':cityName,'hotelName':hotelName});
+	    todoHotels.push({'cityName':cityName,'hotelName':hotelName,elongId:elongId,elongStar:elongStar});
 	}
+    console.log(todoHotels.length + " hotels.");
 		gonext();
 	
 	
@@ -185,7 +189,7 @@ function process_hotel_list(data,args){
     //var item = hotelList[args[1].idxOfPage];
 
     
-    var cssLinkResult = '';
+    var cssLinkResult = '';/*
     $("link[rel|=stylesheet]").each(function(){
 	var href = $(this).attr("href");
 	if(!href || href.search(/h57/i)==-1)
@@ -193,7 +197,7 @@ function process_hotel_list(data,args){
 	else{
 	    cssLinkResult = href;
 	}
-    });
+    });*/
 
     var h = new entity.hotel();
     h.name = $("ul.searchresult_info li.searchresult_info_name h2.searchresult_name a",item).attr("title");
@@ -204,7 +208,7 @@ function process_hotel_list(data,args){
     h.commentCount = $("ul.searchresult_info li.searchresult_info_judge div.searchresult_judge_box a.hotel_judge span.hotel_judgement",item).text();
     h.commentCount = h.commentCount && h.commentCount.match(/\d+/)[0];
     url="http://hotels.ctrip.com"+url+'hotel='+h.id+'&startDate=2014-05-01&depDate=2014-05-02&OrderBy=ctrip&OrderType=ASC&index=1&page=1&rs=1';
-    helper.request_data(url,null,process_one,[h,c,cssLinkResult]);
+    helper.request_data(url,null,process_one,[h,c,args[1]]);
     // $(item).find("div.room_list2 table.hotel_datelist tr").each(function(i,r){
     // 	var room = new entity.room();
     // 	var tds = $(r).find("td");
@@ -368,6 +372,7 @@ function process_one(data,args){
 	    h.rooms.push(room);
 	}
     });
+    fs.appendFileSync(doneFile,c.cname+","+args[2].elongId+','+args[2].hotelName+','+args[2].elongStar+','+h.id+','+h.name+','+h.star+"\r\n");
     fs.appendFile(resultFile,h.toString("ctrip_pc"),function(e){
 	if(e)
 	    console.log(e.message);
@@ -375,7 +380,7 @@ function process_one(data,args){
 	    c.curHotelIdx++;
 	    console.log("done "+c.cname+" : "+c.curHotelIdx);
 	    //fs.writeFileSync("htmlfiles/"+h.id+".html",args[2]);
-	    fs.appendFileSync(doneFile,c.cname+","+h.name+"\r\n");
+
 	    setTimeout(function(){
 		gonext();
 	    },(Math.random()*9+2)*1000);

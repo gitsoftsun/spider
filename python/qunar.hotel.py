@@ -19,8 +19,8 @@ from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 import time
 from selenium.webdriver.common.by import By
 
-fromDate = '2014-04-01'
-toDate = '2014-04-02'
+fromDate = '2014-05-01'
+toDate = '2014-05-02'
 
 
 # city_map = {
@@ -91,14 +91,16 @@ reverse_city_map = dict((v, k) for k, v in city_map.iteritems())
 def get_city_hotel_tuple_list():
     city_hotel_tuple_list = []
 
-    fp = codecs.open('hotel.sample.txt', 'r', 'utf8')
+    fp = codecs.open('../appdata/elonghotels.txt', 'r', 'utf8')
     lines = fp.readlines()
     for l in lines:
         l = l.replace('\r', '').replace('\n', '')
         # city = city_map[l.split(',')[0]]
         city = l.split(',')[0]
-        hotel = l.split(',')[1]
-        city_hotel_tuple_list.append((city, hotel))
+        elongId = l.split(',')[1]
+        hotel = l.split(',')[2]
+        
+        city_hotel_tuple_list.append((city, hotel,elongId))
         pass
 
     return city_hotel_tuple_list
@@ -115,16 +117,17 @@ def one_driver_all_hotel():
     for i in range(num):
         city = city_hotel_tuple_list[i][0]
         hotel = city_hotel_tuple_list[i][1]
+        elongId = city_hotel_tuple_list[i][2]
         # city = city.encode('utf8')
         # hotel = hotel.encode('utf8')
         print "city: %s, hotel: %s" % (city, hotel)
-        one_driver_hotel(driver, city, hotel)
+        one_driver_hotel(driver, city, hotel,elongId)
         pass
     driver.close()
     pass
 
 
-def one_driver_hotel(driver, city, hotel):
+def one_driver_hotel(driver, city, hotel,elongId):
     site = 'http://hotel.qunar.com'
     # site = site.replace('%(city)', city).replace('%(hotel)', hotel)     # urllib.quote(hotel))
     # print site
@@ -153,10 +156,11 @@ def one_driver_hotel(driver, city, hotel):
             pass
 
         try:
-            time.sleep(6)
-            parentTR = driver.find_element_by_xpath("//span[@class='namered']//..")
+            time.sleep(2)
+            #parentTR = driver.find_element_by_xpath("//span[@class='namered']//..")
+            parentTR=driver.find_element_by_xpath("//div[@class='b_hlistPanel']/div[@class='e_hlist_item js_list_block'][1]/div[@class='position_r']/div[@class='c2']/h2/a[1]")
             new_url = parentTR.get_attribute('href')
-            print new_url
+            #print new_url
             driver.get(new_url)
             time.sleep(6)
             pass
@@ -184,7 +188,7 @@ def one_driver_hotel(driver, city, hotel):
                 elem.click()
 
             elems = driver.find_elements_by_css_selector('a.btn_openPrc')
-            print len(elems)
+            print "Rooms: %d" % len(elems)
             for elem in elems:
                 elem.click()
             elems = driver.find_elements_by_css_selector('a.icoR_open')
@@ -205,7 +209,7 @@ def one_driver_hotel(driver, city, hotel):
         elem = driver.find_element_by_xpath("//*")
         source_code = elem.get_attribute("outerHTML")
         # print type(source_code)
-        f = codecs.open('../result/qunar_hotel/' + city + ',' + hotel + ',2014-04-01' + '.html',
+        f = codecs.open('../result/qunar_hotel/' + city + ','+elongId+',' + hotel.replace(',','')  + '.html',
                         'w+',
                         'utf8')
         f.write(source_code)

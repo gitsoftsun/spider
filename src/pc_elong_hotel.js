@@ -255,6 +255,7 @@ elongHotel.prototype.processHotelList=function(data,args){
 	    h.id = item.HotelId+'';
 	    h.name = item.HotelNameCn;
 	    h.name = h.name && h.name.replace(/,/g,';');
+	    h.name = h.name && h.name.replace(/[\s]/g,'');
 	    h.city = args[0].cname;
 	    h.star = item.Star;
 	    h.prate = item.CommentGoodRate;
