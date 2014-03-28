@@ -370,6 +370,7 @@ function process_one(data,args){
 	    // });
 	    room.fan = $("span",tds.eq(6)).text();
 	    h.rooms.push(room);
+	    tds=null;
 	}
     });
     fs.appendFileSync(doneFile,c.cname+","+args[2].elongId+','+args[2].hotelName+','+args[2].elongStar+','+h.id+','+h.name+','+h.star+"\r\n");
@@ -380,7 +381,8 @@ function process_one(data,args){
 	    c.curHotelIdx++;
 	    console.log("done "+c.cname+" : "+c.curHotelIdx);
 	    //fs.writeFileSync("htmlfiles/"+h.id+".html",args[2]);
-
+	    $=null;
+	    data=null;
 	    setTimeout(function(){
 		gonext();
 	    },(Math.random()*9+2)*1000);

@@ -192,10 +192,11 @@ function elongHotel(){
 }
 
 elongHotel.prototype.init = function(){
-    this.cities=helper.get_cities(this.dataDir+this.cityFile);
+    //this.cities=helper.get_cities(this.dataDir+this.cityFile);
+    this.cities=[{pinyin:"taiyuan",id:"0601",cname:"太原"}];
 }
 elongHotel.prototype.wgetList = function(){
-    if(this.cities.length==0) {
+    if(this.cities.length==0 && this.curLevels && this.curLevels.length==0) {
 	console.log("All cities done.");
 	return;
     }
@@ -376,7 +377,7 @@ elongHotel.prototype.processDetail=function(data,args){
 	}
 	args[0].rooms.push(r);
     }
-    fs.appendFileSync(this.dataDir+this.hotelInfoFile,args[0].city+','+args[0].id+','+args[0].name+','+args[0].star+'\r\n');
+    fs.appendFileSync(this.resultDir+this.hotelInfoFile,args[0].city+','+args[0].id+','+args[0].name+','+args[0].star+'\r\n');
     fs.appendFile(this.resultDir+this.resultFile,args[0].toString("elong_pc"),function(err){
 	if(err){
 	    console.log();
