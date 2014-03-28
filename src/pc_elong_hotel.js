@@ -376,7 +376,7 @@ elongHotel.prototype.processDetail=function(data,args){
 	}
 	args[0].rooms.push(r);
     }
-    fs.appendFileSync(this.dataDir+this.hotelInfoFile,args[0].city+','+args[0].id+','+args[0].name+'\r\n');
+    fs.appendFileSync(this.dataDir+this.hotelInfoFile,args[0].city+','+args[0].id+','+args[0].name+','+args[0].star+'\r\n');
     fs.appendFile(this.resultDir+this.resultFile,args[0].toString("elong_pc"),function(err){
 	if(err){
 	    console.log();
