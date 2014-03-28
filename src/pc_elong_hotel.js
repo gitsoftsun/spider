@@ -192,8 +192,8 @@ function elongHotel(){
 }
 
 elongHotel.prototype.init = function(){
-    //this.cities=helper.get_cities(this.dataDir+this.cityFile);
-    this.cities=[{pinyin:"taiyuan",id:"0601",cname:"太原"}];
+    this.cities=helper.get_cities(this.dataDir+this.cityFile);
+    //this.cities=[{pinyin:"taiyuan",id:"0601",cname:"太原"}];
 }
 elongHotel.prototype.wgetList = function(){
     if(this.cities.length==0 && this.curLevels && this.curLevels.length==0) {
