@@ -1,8 +1,128 @@
 var fs = require('fs')
+
+function FilterMerge(){
+    this.resultDir = "../result/";
+    this.elonghFile = "elonghotels.txt";
+    this.ctriphFile = "pc_ctrip_done_hotel.txt";
+    this.qunarhFile = "pc_qunar_done_hotel.txt";
+    this.elongrFile = "pc_elong_hotel.txt";
+    this.ctriprFile = "pc_ctrip_hotel.txt";
+    this.qunarrFile = "pc_qunar_hotel.txt";
+    this.elongHotels=[];
+    this.ctripHotels=[];
+    this.qunarHotels=[];
+    this.elongRecords=[];
+    this.ctripRecords=[];
+    this.qunarRecords=[];
+    this.dictCtHotel = {};
+    this.dictQuHotel={};
+    this.dictElHotel={};
+}
+
+FilterMerge.prototype.init=function(){
+    if(!fs.existsSync(this.resultDir+this.elonghFile)
+       ||!fs.existsSync(this.resultDir+this.ctriphFile)
+       ||!fs.existsSync(this.resultDir+this.qunarhFile))
+	throw "Data file not found.";
+
+    this.load();
+}
+
+FilterMerge.prototype.load=function(){
+    this.elongHotels = fs.readFileSync(this.resultDir+this.elonghFile).toString().split('\r\n');
+    this.ctripHotels = fs.readFileSync(this.resultDir+this.ctriphFile).toString().split('\r\n');
+    this.qunarHotels = fs.readFileSync(this.resultDir+this.qunarhFile).toString().split('\r\n');
+    console.log("Before preprocessing, elong: "	+this.elongHotels.length
+		+", ctrip: "+this.ctripHotels.length
+		+", qunar: "+this.qunarHotels.length);
+    this.elongRecords = fs.readFileSync(this.resultDir+this.elongrFile).toString().split('\r\n').map(function(line){
+	if(!line) return;
+	var vals = line.split(',');
+	var room = vals[5].replace(/[\(\（\[].*/g,'').replace(/[\.\s\-]/g,'');
+	if(room.search("升级至")>-1){
+	    room = room.replace(/[^升级至]/,'').replace(/[升级至]/g,'');
+	}
+	room = room && room.replace(/[房间][A-Z]?$/,'');
+	return {city:vals[0],
+		id:vals[1],
+		name:vals[2],
+		star:vals[4],
+		room:room,
+		price:vals[13],
+		fan:vals[14]};
+    });
+    this.ctripRecords = fs.readFileSync(this.resultDir+this.ctriprFile).toString().split('\r\n').map(function(line){
+	if(!line) return;
+	var vals = line.split(',');
+	return {city:vals[0],
+		id:vals[1],
+		name:vals[2],
+		star:vals[3],
+		room:vals[4].replace(/[房间]/g,'').replace(/[\(\（].*/g,''),
+		price:vals[6].trim()=="专享价"?"¥100000":vals[6].trim(),
+		fan:vals[7]?vals[7]:"返0元"
+	       };
+    });
+
+    this.qunarRecords=fs.readFileSync(this.resultDir+this.qunarrFile).toString().split('\r\n').map(function(line){
+	if(!line) return;
+	var vals = line.split(',');
+	return {city:vals[0],
+		id:vals[1],
+		name:vals[2],
+		room:vals[3],
+		bookSite:vals[4],
+		price:vals[5],
+		fan:vals[6]?vals[6]:"¥0"
+	       };
+    });
+    console.log("Total records, elong: "+this.elongRecords.length+", ctrip: "+this.ctripRecords.length+", qunar: "+this.qunarRecords.length);
+}
+
+FilterMerge.prototype.preProcess=function(){
+    var dictHotel={},i,j,k;
+    var total=0;
+    for(i=0;i<this.elongHotels.length;i++){
+	if(!this.elongHotels[i]) continue;
+	var vals = this.elongHotels[i].split(',');
+	this.dictElHotel[vals[1]]={city:vals[0],eid:vals[1],ename:vals[2]};
+    }
+    for(j=0;j<this.ctripHotels.length;j++){
+	if(!this.ctripHotels[j]) continue;
+	var vals = this.ctripHotels[j].split(',');
+	var ctripId = vals[4];
+	if(!this.dictCtHotel[ctripId]){
+	    var obj = this.dictElHotel[vals[1]];
+	    obj.cid = vals[4];
+	    obj.cname = vals[5];
+	    this.dictCtHotel[ctripId]=obj;
+	    total++;
+	}
+    }
+    for(k=0;k<this.qunarHotels.length;k++){
+	if(!this.qunarHotels[k]) continue;
+	var vals = this.qunarHotels[k].split(',');
+	var obj = this.dictElHotel[vals[1]];
+	obj.qid=vals[3];
+	obj.qname=vals[4];
+	this.dictQuHotel[vals[3]]=obj;
+    }
+    console.log("After preProcessing, elong: "+i+", ctrip: "+total+", qunar: "+k);
+}
+
+FilterMerge.prototype.start=function(){
+    
+}
+
+var fm = new FilterMerge();
+fm.init();
+fm.preProcess();
+fm.start();
+
 var hotels;
 function start(){
     hotels={'0':{},'1':{},'2':{}};
-    var lines = fs.readFileSync("hcf.txt").toString().split('\r\n');
+    var lines = fs.readFileSync("../result/pc_ctrip_done_hotel.txt").toString().split('\r\n');
     console.log("total hotels: "+lines.length);
     
     for(var i=2;i<lines.length-1;i++){
@@ -191,9 +311,9 @@ function output(){
     // 	}
     // }
 }
-start();
+//start();
 //elong();
-ctrip();
+//ctrip();
 //qunar();
 
-output();
+//output();

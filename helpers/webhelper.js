@@ -132,94 +132,94 @@ exports.request_data=function(opts,data,fn,args){
     });
     res.on('end',function(){
 	if(res.statusCode>300&&res.statusCode<400) return;
-            if(res.headers['content-encoding']=='gzip'){
-        var buffer = Buffer.concat(chunks);
-		if(buffer.length==157){
-			console.log("current ip has been forbidden.");
-            
-            //process.exit();
-		}
-        zlib.gunzip(buffer,function(err,decoded){
-            if(decoded){
-            try{
-                var obj = decoded.toString();
-                if(res.headers['content-type'].indexOf('application/json')!=-1)
-                    obj =JSON.parse(decoded.toString());
-                if(args==undefined){
-                    fn(obj,[data]);
-                }
-				else if(Array.isArray(args)){
-					args.push(opts.data||data);
-					fn(obj,args);
-				}else{
-					fn(obj,[args,opts.data||data]);
-				}
-                
-            }
-            catch(e){
-                console.log(e.message);
-                
-            }
-            }
-        });
-            }
-            else if(res.headers['content-encoding']=='deflate'){
-      var buffer = Buffer.concat(chunks);
-      zlib.inflate(buffer,function(err,decoded){
+        if(res.headers['content-encoding']=='gzip'){
+            var buffer = Buffer.concat(chunks);
+	    if(buffer.length==157){
+		console.log("current ip has been forbidden.");
+		
+		//process.exit();
+	    }
+            zlib.gunzip(buffer,function(err,decoded){
 		if(decoded){
-			try{
-				var obj = decoded.toString();
-                if(res.headers['content-type'].indexOf('application/json')!=-1)
-                    obj =JSON.parse(decoded.toString());
-                if(args==undefined){
-                    fn(obj,[data]);
-                }
-				else if(Array.isArray(args)){
-					args.push(opts.data||data);
-					fn(obj,args);
-				}else{
-					fn(obj,[args,opts.data||data]);
-				}
+		    try{
+			var obj = decoded.toString();
+			if(res.headers['content-type'].indexOf('application/json')!=-1)
+			    obj =JSON.parse(decoded.toString());
+			if(args==undefined){
+			    fn(obj,[data]);
 			}
-			catch(e){
+			else if(Array.isArray(args)){
+			    args.push(opts.data||data);
+			    fn(obj,args);
+			}else{
+			    fn(obj,[args,opts.data||data]);
+			}
 			
-			}
+		    }
+		    catch(e){
+			console.log(e.message);
+			
+		    }
 		}
-        //console.log(decoded&&decoded.toString());
-      });
-    }else{
-        var encode = 'utf8';
-        if(res.headers['content-type']){
-            var cty = res.headers['content-type'].split(';');
-            if(cty.length>1&&cty[0].trim().toLowerCase()=="text/html"){
-                if(cty[1].trim()!=''){
-                    encode = cty[1].trim().split('=')[1];
-                    //if(encode=="gb2312") encode="ascii";
-                }
+            });
+        }
+        else if(res.headers['content-encoding']=='deflate'){
+	    var buffer = Buffer.concat(chunks);
+	    zlib.inflate(buffer,function(err,decoded){
+		if(decoded){
+		    try{
+			var obj = decoded.toString();
+			if(res.headers['content-type'].indexOf('application/json')!=-1)
+			    obj =JSON.parse(decoded.toString());
+			if(args==undefined){
+			    fn(obj,[data]);
+			}
+			else if(Array.isArray(args)){
+			    args.push(opts.data||data);
+			    fn(obj,args);
+			}else{
+			    fn(obj,[args,opts.data||data]);
+			}
+		    }
+		    catch(e){
+			
+		    }
+		}
+		//console.log(decoded&&decoded.toString());
+	    });
+	}else{
+            var encode = 'utf8';
+            if(res.headers['content-type']){
+		var cty = res.headers['content-type'].split(';');
+		if(cty.length>1&&cty[0].trim().toLowerCase()=="text/html"){
+                    if(cty[1].trim()!=''){
+			encode = cty[1].trim().split('=')[1];
+			//if(encode=="gb2312") encode="ascii";
+                    }
+		}
             }
-        }
-        var buffer = Buffer.concat(chunks);
-        var obj=null;
-        if(encode=="gb2312"){
-            //obj = decodeFromGb2312(obj);
-			var gbk_to_utf8_iconv = new Iconv('GBK', 'UTF-8//TRANSLIT//IGNORE');
-			obj = gbk_to_utf8_iconv.convert(buffer).toString();
-        }
-		if(!obj)
-			obj = buffer.toString();
-        if(res.headers['content-type']&&res.headers['content-type'].indexOf('application/json')!=-1){
-            obj =JSON.parse(obj.toString());
-        }
-        if(args==undefined){
-            fn(obj,[opts.data]);
-        }
-        else if(Array.isArray(args)){
-            args.push(opts.data||data);
-            fn(obj,args);
-        }else{
-            fn(obj,[args,opts.data||data]);
-        }
-    }
+            var buffer = Buffer.concat(chunks);
+            var obj=null;
+            if(encode=="gb2312"){
+		//obj = decodeFromGb2312(obj);
+		var gbk_to_utf8_iconv = new Iconv('GBK', 'UTF-8//TRANSLIT//IGNORE');
+		obj = gbk_to_utf8_iconv.convert(buffer).toString();
+            }
+	    if(!obj)
+		obj = buffer.toString();
+            if(res.headers['content-type']&&res.headers['content-type'].indexOf('application/json')!=-1){
+		obj =JSON.parse(obj.toString());
+            }
+            if(args==undefined){
+		fn(obj,[opts.data]);
+            }
+            else if(Array.isArray(args)){
+		args.push(opts.data||data);
+		fn(obj,args);
+            }else{
+		fn(obj,[args,opts.data||data]);
+            }
+	}
     });
     });
     req.on('error', function(e) {
@@ -260,7 +260,7 @@ exports.get_cities = function(filename){
     var cities = [];
     for(var i=0;i<lines.length;i++){
 	if(!lines[i]) continue;
-      var c = lines[i].split(' ');
+	var c = lines[i].replace('\r','').split(' ');
 
       var city = {};
       city["code"] = c[2];
@@ -561,13 +561,13 @@ exports.getrandoms = function(l,countOfHotelsPerCity,PageSize){
 
 exports.syncDoneCities = function(filename){
     var doneCities={};
-
-    if(!fs.existsSync(filename)) return doneCities;
-
-    var lines = fs.readFileSync(filename).toString().split('\r\n');
-    for(var i=0;i<lines.length;i++){
-    doneCities[lines[i]] = {};
+    var i=0;
+    if(fs.existsSync(filename)) {
+	var lines = fs.readFileSync(filename).toString().split('\r\n');
+	for(i=0;i<lines.length;i++){
+	    doneCities[lines[i]] = {};
+	}
     }
-    console.log(lines.length+" cities' flights has been done.");
+    console.log(i+" cities' flights has been done.");
     return doneCities;
 }

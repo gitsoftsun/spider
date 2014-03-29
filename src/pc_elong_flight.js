@@ -1,18 +1,17 @@
 var http = require('http')
 var zlib = require('zlib')
 var fs = require('fs')
-var helper = require('./helpers/webhelper.js')
-var $ = require('jquery')
-var entity = require('./models/entity.js')
+var helper = require('../helpers/webhelper.js')
+var entity = require('../models/entity.js')
 
 //command args: date,useproxy
 var arguments = process.argv.splice(2);
-var departDate = arguments[0] || '2014-04-01';
+var departDate = arguments[0] || '2014-05-01';
 var useproxy = arguments[1]!=undefined;//flag to define if use proxy.
-var resultFile = "pc_elong_flight.txt";
-var cityFile = 'pc_elong_flight_city.txt';
-var logFile = "pc_elong_flight_log.txt";
-var doneFile = "pc_elong_flight_done.txt";
+var resultFile = "../result/pc_elong_flight.txt";
+var cityFile = '../appdata/qunar_flight_hot_city.txt';
+var logFile = "../result/pc_elong_flight_log.txt";
+var doneFile = "../result/pc_elong_flight_done.txt";
 var cities = helper.get_cities(cityFile);
 var doneCities={};
 if(useproxy){
@@ -32,16 +31,17 @@ function getProxy(){
   }
 }
 var elong_query = function(dcity,acity){
-  this.DepartCityNameEn = dcity.pinyin;
-  this.ArriveCityNameEn = acity.pinyin;
-  this.DepartCityName=dcity.cname;
-  this.ArrivalCityName=acity.cname;
-  this.DepartCity = dcity.code;
-  this.ArriveCity = acity.code;
-  this.DepartDate=departDate;
-  this.IsReturn="false";
-  this.PageIndex = 0;
-  this.FlightType='OneWay';
+    this.DepartCityNameEn = dcity.pinyin;
+    this.ArriveCityNameEn = acity.pinyin;
+    this.DepartCityName=dcity.cname;
+    this.ArrivalCityName=acity.cname;
+    this.DepartCity = dcity.code;
+    this.ArriveCity = acity.code;
+    this.DepartDate=departDate;
+    this.IsReturn="false";
+    this.PageIndex = 0;
+    this.FlightType='OneWay';
+    this.PageName="list";
 };
 
 
@@ -59,7 +59,7 @@ function start(){
     var dep = cities[j];
     for(var k=0;k<cities.length;k++){
         var arr = cities[k];
-        if(k==j || doneCities[dep.cname+"-"+arr.cname]) continue;
+        if(k==j || doneCities[dep.cname+"-"+arr.cname] || citySkip[dep.cname+'-'+arr.cname]) continue;
         
         
         var eq = new elong_query(dep,arr);
@@ -144,7 +144,7 @@ function elong_fls(data,args){
     var info = "there is no data of: "+id;
     console.log(info);
     fs.appendFile(logFile,info+"\r\n",function(err){});
-    return;
+    return;nnn
   }
 
   var AirCorpList = data.value.AirCorpList;
@@ -190,7 +190,7 @@ function getRule(data,args){
   });
 }
 
-start();
+
 
 function request_data(opt,data,fn,args){
   var url = "http://"+opt.host+opt.path;
@@ -219,3 +219,65 @@ function request_data(opt,data,fn,args){
   request_data(opt,data,fn,args);
 });
 }
+var citySkip = {
+    "南京-杭州":true,
+    "杭州-南京":true,
+    "北京-天津":true,
+    "上海-杭州":true,
+    "杭州-上海":true,
+    "哈尔滨-沈阳":true,
+    "长沙-南昌":true,
+    "沈阳-哈尔滨":true,
+    "福州-南昌":true,
+    "天津-北京":true,
+    "南昌-长沙":true,
+    "南昌-福州":true,
+    "青岛-丽江":true,
+    "哈尔滨-丽江":true,
+    "福州-丽江":true,
+    "南昌-丽江":true,
+    "太原-丽江":true,
+    "丽江-青岛":true,
+    "丽江-哈尔滨":true,
+    "丽江-福州":true,
+    "丽江-南昌":true,
+    "丽江-太原":true,
+    "青岛-济南":true,
+    "哈尔滨-长春":true,
+    "长沙-武汉":true,
+    "沈阳-长春":true,
+    "天津-济南":true,
+    "丽江-长春":true,
+    "丽江-三亚":true,
+    "长春-哈尔滨":true,
+    "长春-沈阳":true,
+    "长春-丽江":true,
+    "济南-青岛":true,
+    "济南-天津":true,
+    "三亚-丽江":true,
+    "武汉-长沙":true,
+    "丽江-海口":true,
+    "三亚-海口":true,
+    "海口-丽江":true,
+    "海口-三亚":true,
+    "丽江-贵阳":true,
+    "贵阳-丽江":true,
+    "长沙-郑州":true,
+    "太原-郑州":true,
+    "武汉-郑州":true,
+    "郑州-长沙":true,
+    "郑州-太原":true,
+    "郑州-武汉":true,
+    "大连-沈阳":true,
+    "沈阳-大连":true,
+    "厦门-福州":true,
+    "福州-厦门":true,
+    "南京-天津":true,
+    "深圳-广州":true,
+    "广州-深圳":true,
+    "天津-南京":true,
+    "杭州-南昌":true,
+    "南昌-杭州":true,
+};
+
+start();

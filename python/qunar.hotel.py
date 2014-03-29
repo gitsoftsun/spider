@@ -3,7 +3,7 @@
 
 __author__ = 'xiaoghu@cisco.com'
 
-
+import os
 import re
 import urllib
 import multiprocessing as mp
@@ -90,7 +90,12 @@ reverse_city_map = dict((v, k) for k, v in city_map.iteritems())
 
 def get_city_hotel_tuple_list():
     city_hotel_tuple_list = []
-
+    doneFiles = os.listdir('../result/qunar_hotel/')
+    doneHotels = {}
+    for f in doneFiles:
+        doneHotels[f.split(',')[1]]=True
+        pass
+    
     fp = codecs.open('../appdata/elonghotels.txt', 'r', 'utf8')
     lines = fp.readlines()
     for l in lines:
@@ -99,6 +104,8 @@ def get_city_hotel_tuple_list():
         city = l.split(',')[0]
         elongId = l.split(',')[1]
         hotel = l.split(',')[2]
+        if doneHotels.has_key(elongId):
+            continue
         
         city_hotel_tuple_list.append((city, hotel,elongId))
         pass
@@ -132,7 +139,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
     # site = site.replace('%(city)', city).replace('%(hotel)', hotel)     # urllib.quote(hotel))
     # print site
     driver.get(site)
-    time.sleep(6)
+    time.sleep(3)
 
     driver.find_element_by_name('toCity').clear()
     driver.find_element_by_name('toCity').send_keys(city)
@@ -156,17 +163,17 @@ def one_driver_hotel(driver, city, hotel,elongId):
             pass
 
         try:
-            time.sleep(2)
+            time.sleep(1)
             #parentTR = driver.find_element_by_xpath("//span[@class='namered']//..")
             parentTR=driver.find_element_by_xpath("//div[@class='b_hlistPanel']/div[@class='e_hlist_item js_list_block'][1]/div[@class='position_r']/div[@class='c2']/h2/a[1]")
             new_url = parentTR.get_attribute('href')
-            #print new_url
             driver.get(new_url)
             time.sleep(6)
             pass
         except Exception,e:
             print u'failed: ' + city + hotel
             print e
+            flag=False
             continue
             pass
 
@@ -183,19 +190,27 @@ def one_driver_hotel(driver, city, hotel,elongId):
             # elems = driver.find_elements_by_xpath("//li[@class='defaultpricetype']")
 
             elems = driver.find_elements_by_css_selector('li.e_prcDetail_on a.btn_openPrc')
-            print len(elems)
+            #print len(elems)
             for elem in elems:
                 elem.click()
 
-            elems = driver.find_elements_by_css_selector('a.btn_openPrc')
-            print "Rooms: %d" % len(elems)
-            for elem in elems:
-                elem.click()
+            ul = driver.find_element_by_css_selector("ul.htl-type-list")
+            lis = ul.find_elements_by_tag_name('li')
+            print "Rooms: %d" % len(lis)
+            for li in lis:
+                if li.get_attribute('class').find("similar-expand")<0:
+                    li.find_elements_by_css_selector('a.btn_openPrc')[0].click()
+                pass
+            #elems = driver.find_elements_by_css_selector('a.btn_openPrc')
+            
+            #for elem in elems:
+            #    elem.find_element_by_tag_name('b')
+            #    elem.click()
             elems = driver.find_elements_by_css_selector('a.icoR_open')
-            time.sleep(1)
+            #time.sleep(1)
             for e in elems:
                 e.click();
-            time.sleep(1);
+            #time.sleep(1);
                 # classes = elem.get_attribute('class')
                 # print classes
                 # if not 'e_prcDetail_on' in classes:

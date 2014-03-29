@@ -361,7 +361,7 @@ elongHotel.prototype.processDetail=function(data,args){
 	    var plan = room.RatePlanList[j];
 	    var p={};
 	    p.name = plan.RatePlanName;
-	    p.name = p.name && p.name.replace(/,，/g,';');
+	    p.name = p.name && p.name.replace(/[,，]/g,';');
 	    p.price = plan.FavorablePrice;
 	    p.timeLimit = plan.ProductType==16?'Y':'N';
 	    p.breakfast = plan.Brkfast;

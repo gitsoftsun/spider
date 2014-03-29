@@ -9,6 +9,7 @@ function QunarHotel(){
     this.resultFile="pc_qunar_hotel.txt";
     this.resultDir="../result/";
     this.htmlDir = 'qunar_hotel/';
+    this.doneFile = "pc_qunar_done_hotel.txt";
 }
 
 QunarHotel.prototype.load=function(){
@@ -16,7 +17,7 @@ QunarHotel.prototype.load=function(){
 	console.log("qunar_hotel dir not found");
 	return;
     }
-    this.files = fs.readdirSync(this.resultDir+this.htmlDir);
+    this.files = fs.readdirSync(this.resultDir+this.htmlDir); 
 }
 QunarHotel.prototype.filterData=function(){
     if(this.files.length==0) return;
@@ -30,10 +31,28 @@ QunarHotel.prototype.filterData=function(){
 	
 	var $ = cheerio.load(fs.readFileSync(f).toString());
 	hotel.name = $("div.htl-info h2 span").text().trim();
-	hotel.star = $("div.htl-info h2 em").attr("title").trim();
-	var m = $("link[rel$='canonical']").attr('href').match(/([a-zA-Z\-\d]+)\/$/);
+	hotel.star = $("div.htl-info h2 em").attr("title");
+	var m = $("link[rel$='canonical']").attr('href').match(/([^\/]+\/[a-zA-Z\-\d]+)\/$/);
 	hotel.id = m && m[1];
-	if($("ul.e_prcDetail_ulist li").length>0){
+	console.log(hotel.id);
+	if($(".htl-type-list li").length>0){
+	    $(".htl-type-list li").each(function(){
+		var r = new entity.room();
+		r.name = $("div.type-title table tr td span.type-name",this).text();
+		r.name = r.name && r.name.trim().replace(/[,]/g,';');
+		r.book=[];
+		$(".similar-type-agent-list .similar-type-agent-item table:first-child tr",this).each(function(){
+		    var s = {};
+		    s.name = $("td.c1 div.profile-tit",this).text();
+		    s.name = s.name && s.name.replace(/[,]/g,';');
+		    s.price = "¥"+$("td.c6 p.final-price b.pr",this).text();
+		    s.fan = $("td.c6 span.fan",this).text();
+		    r.book.push(s);
+		});
+		hotel.rooms.push(r);
+	    });
+	}
+	else if($("ul.e_prcDetail_ulist li").length>0){
 	    $("ul.e_prcDetail_ulist li").each(function(){
 		var r = new entity.room();
 		r.name = $("span.enc2",this).text();
@@ -68,6 +87,7 @@ QunarHotel.prototype.filterData=function(){
 		hotel.rooms.push(r);
 	    });
 	}
+	fs.appendFileSync(this.resultDir+this.doneFile,hotel.city+','+names[1]+','+names[2].replace(/\.html/,'')+','+hotel.id+','+hotel.name+"\r\n");
 	fs.appendFileSync(this.resultDir+this.resultFile,hotel.toString("qunar_pc"));
 	console.log("["+(i+1)+"]."+hotel.name);
     }
