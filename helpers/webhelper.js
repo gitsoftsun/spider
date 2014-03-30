@@ -563,8 +563,10 @@ exports.syncDoneCities = function(filename){
     var doneCities={};
     var i=0;
     if(fs.existsSync(filename)) {
-	var lines = fs.readFileSync(filename).toString().split('\r\n');
+	var lines = fs.readFileSync(filename).toString().split('\n');
 	for(i=0;i<lines.length;i++){
+	    if(!lines[i]) continue;
+	    lines[i] = lines[i].replace('\r','');
 	    doneCities[lines[i]] = {};
 	}
     }

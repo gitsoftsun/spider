@@ -36,7 +36,7 @@ hotel_type_list = [u'经济型', u'二星级', u'三星级', u'四星级', u'五
 
 site = 'http://flight.qunar.com/site/oneway_list.htm?searchDepartureAirport=%E5%8C%97%E4%BA%AC&searchArrivalAirport=%E4%B8%8A%E6%B5%B7&searchDepartureTime=2014-04-01&searchArrivalTime=2014-04-05&nextNDays=0&startSearch=true&from=fi_ont_search'
 
-date = '2014-04-01'
+date = '2014-05-01'
 
 
 def one_driver_all_ticket():
@@ -100,7 +100,7 @@ def one_driver_ticket(driver, from_city, to_city):
         elem = driver.find_element_by_xpath("//*")
         source_code = elem.get_attribute("outerHTML")
         # print type(source_code)
-        f = codecs.open(u'./data/ticket/' + from_city + u',' + to_city + unicode(date) + u',' + unicode(str(page_num+1)) + u'.html',
+        f = codecs.open(u'../result/qunar_flight/' + from_city + u',' + to_city + unicode(date) + u',' + unicode(str(page_num+1)) + u'.html',
                         'w+',
                         'utf8')
         f.write(source_code)

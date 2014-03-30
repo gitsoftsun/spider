@@ -278,6 +278,20 @@ var citySkip = {
     "天津-南京":true,
     "杭州-南昌":true,
     "南昌-杭州":true,
+    "大连-丽江":true,
+    "丽江-大连":true,
+    "青岛-三亚":true,
+    "三亚-青岛":true,
+    "成都-重庆":true,
+    "重庆-成都":true,
+    "南京-武汉":true,
+    "武汉-南京":true,
+    "郑州-西安":true,
+    "西安-郑州":true,
+    "济南-南京":true,
+    "南京-济南":true,
+    "南昌-郑州":true,
+    "郑州-南昌":true
 };
 
 start();

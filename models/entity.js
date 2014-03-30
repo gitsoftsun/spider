@@ -313,6 +313,10 @@ exports.flight.prototype.toString=function(site,cabin){
             sb.append(c.ctype);
             sb.append(',');
             sb.append(c.fan);
+	    sb.append(',');
+	    sb.append(this.tax);
+	    sb.append(',');
+	    sb.append(this.oilFee)
             sb.append(',');
             sb.append(c.tCount);
             sb.append(',');
