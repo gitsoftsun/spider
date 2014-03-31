@@ -322,9 +322,9 @@ CtripFlight.prototype.wgetFlights=function(){
     }else{
         opt = new helper.basic_options('flights.ctrip.com','/domesticsearch/search/SearchFirstRouteFlights','GET',false,false,ctripQuery);
     }
-//    var myAgent = new http.Agent();
-//    myAgent.maxSockets=1;
-//    opt.agent=myAgent;
+    var myAgent = new http.Agent();
+    myAgent.maxSockets=1;
+    opt.agent=myAgent;
     console.log("GET "+cur.dep.cname+"-"+cur.arr.cname);
     helper.request_data(opt,null,function(data,args){
 	that.processFlights(data,args);
@@ -340,7 +340,7 @@ CtripFlight.prototype.processFlights=function(data,args){
 	    this.todoFlights.push(args[0]);
 	    setTimeout(function(){
 		that.wgetFlights();
-	    },(Math.random()*15+5)*1000);
+	    },(Math.random()*30+15)*1000);
 	    return;
 	}
     }
@@ -351,7 +351,7 @@ CtripFlight.prototype.processFlights=function(data,args){
 	this.todoFlights.push(args[0]);
 	setTimeout(function(){
 	    that.wgetFlights();
-	},(Math.random()*15+5)*1000);
+	},(Math.random()*30+15)*1000);
 	return;
     }
     
@@ -412,7 +412,7 @@ CtripFlight.prototype.processFlights=function(data,args){
     console.log("DONE "+t+": "+data.fis.length);
     setTimeout(function(){
 	that.wgetFlights();
-    },(Math.random()*15+5)*1000);
+    },(Math.random()*30+15)*1000);
 }
 
 var ct = new CtripFlight();
