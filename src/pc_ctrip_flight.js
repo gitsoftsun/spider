@@ -332,12 +332,13 @@ CtripFlight.prototype.wgetFlights=function(){
 }
 
 CtripFlight.prototype.processFlights=function(data,args){
+    var t = args[0].dep.cname+'-'+args[0].arr.cname;
     if(typeof data == 'string'){
 	try{
 	    data = JSON.parse(data);
 	}catch(e){
 	    console.log("Failed "+e.message);
-	    this.todoFlights.push(args[0]);
+	    this.todoFlights.unshift(args[0]);
 	    setTimeout(function(){
 		that.wgetFlights();
 	    },(Math.random()*30+15)*1000);
@@ -348,7 +349,14 @@ CtripFlight.prototype.processFlights=function(data,args){
     if(data.Error){
 	console.log("Error occured: ");
 	console.log(data.Error);
-	this.todoFlights.push(args[0]);
+	/*if(!this.retry) this.retry=1;
+	else this.retry++;
+	if(this.retry>=5){
+	    console.log("Failed "+t);
+	}
+	if(this.retry)
+	    console.log("Retry "+this.retry+": "+t);*/
+	this.todoFlights.unshift(args[0]);
 	setTimeout(function(){
 	    that.wgetFlights();
 	},(Math.random()*30+15)*1000);
@@ -407,7 +415,7 @@ CtripFlight.prototype.processFlights=function(data,args){
 	    }
 	});
     }
-    var t = args[0].dep.cname+'-'+args[0].arr.cname;
+
     fs.appendFileSync(this.resultDir+this.doneFile,t+'\n');
     console.log("DONE "+t+": "+data.fis.length);
     setTimeout(function(){
