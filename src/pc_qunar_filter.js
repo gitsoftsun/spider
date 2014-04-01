@@ -38,14 +38,6 @@ function start(){
 		if(err)
 		    console.log(err.message);
 	    });
-	    // fs.appendFile(resultFile,result,function(err){
-	    // 	if(err) console.log(err.message);
-	    // 	else{
-	    // 		console.log(args[0]+"-"+args[1]);
-	    // 		delete fl;
-	    // 		delete result;
-	    // 	}
-	    // });
 	});
     }
 }

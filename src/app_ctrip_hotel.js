@@ -1,18 +1,16 @@
 var http = require('http')
 var zlib = require('zlib')
 var fs = require('fs')
-
-var sys = require('sys')
-var entity = require('./models/entity.js')
-var helper = require('./helpers/webhelper.js')
+var entity = require('../models/entity.js')
+var helper = require('../helpers/webhelper.js')
 
 var hotel_list_options = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true);
 var hotel_detail_options= new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelDetail',"POST",true,true);
-var checkindate = "2014-04-01";
-var checkoutdate = "2014-04-02";
-var doneFile = "app_ctrip_done_hotels.txt";
-var resultFile = "app_ctrip_hotel.txt";
-var cityFile = "qunar_hot_city.txt";
+var checkindate = "2014-05-01";
+var checkoutdate = "2014-05-02";
+var doneFile = "../result/app_ctrip_done_hotels.txt";
+var resultFile = "../result/app_ctrip_hotel.txt";
+var cityFile = "../appdata/qunar_hot_city.txt";
 
 var hotelListData = {
     "CheckInCityID":"2",
@@ -64,7 +62,6 @@ var requestDetailData = function(cityId,hotelId){
     this.IsMorning= "0";
 };
 entity.hotel.prototype.appendToFile=function(){
-    
     var id=this.id;
     fs.appendFile(resultFile,this.toString(),function(e){
         if(e) console.log(e);
@@ -112,8 +109,7 @@ for(var k in cities){
     c["rd"]["CheckInCityID"]=k;
     c["rd"]["CheckinCity"]=c.name;
     c["rd"]["PageNumber"]=1;
-    console.log("getting "+c.name+"...")
-    //get_res_data(c["rd"],one_page_data);
+    console.log("GET "+c.name);
     helper.request_data(hotel_list_options,c["rd"],one_page_data,k);
     
 }
@@ -169,7 +165,7 @@ function one_page_data(obj,args){
             for(var i=0;i<a[0].HotelLists.length;i++){
                 var h = new entity.hotel();
                 var h_obj = a[0].HotelLists[i];
-				if(doneHotels[h_obj.HotelID]) continue;
+		if(doneHotels[h_obj.HotelID]) continue;
                 h.city=cities[cityId]&&cities[cityId].name;
                 h.id=h_obj.HotelID;
                 h.name=h_obj.HotelName;
@@ -207,42 +203,3 @@ function one_page_data(obj,args){
         helper.request_data(hotel_list_options,cities[cityId]["rd"],one_page_data,cityId);
     }
 }
-
-function get_res_data(json_data,fn,type){
-    var strData = JSON.stringify(json_data);
-    var opts=null;
-    if(type=="detail"){
-        hotel_detail_options.headers['Content-Length'] = Buffer.byteLength(strData,'utf8');
-        opts=hotel_detail_options;
-        
-    }
-    else{
-        hotel_list_options.headers['Content-Length'] = Buffer.byteLength(strData,'utf8');
-        opts=hotel_list_options;
-    }
-        
-    var req = http.request(opts, function(res) {
-    //res.setEncoding('utf8');
-    var chunks=[];
-    res.on('data', function (chunk) {
-        chunks.push(chunk);
-    });
-    res.on('end',function(){
-        if(res.headers['content-encoding']=='gzip'){
-        var buffer = Buffer.concat(chunks);
-        zlib.gunzip(buffer,function(err,decoded){
-            if(decoded){
-            fn(JSON.parse(decoded.toString()),json_data['CheckInCityID']);
-            }
-        });
-        }
-    });
-    });
-    req.on('error', function(e) {
-    console.log('problem with request: ' + e.message);
-
-    });
-    req.write(strData);
-    req.end();
-}
-
