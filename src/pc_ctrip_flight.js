@@ -2,11 +2,8 @@ var http = require('http')
 var zlib = require('zlib')
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
-//var $ = require('jquery')
 var cheerio = require("cheerio")
 var entity = require('../models/entity.js')
-var Iconv = require('iconv').Iconv
-
 
 //command args: date,useproxy
 var arguments = process.argv.splice(2);
@@ -253,7 +250,6 @@ var citySkip = {
     "天津-南京":true,
     "杭州-南昌":true,
     "南昌-杭州":true,
-
     "大连-丽江":true,
     "丽江-大连":true,
     "青岛-三亚":true,
@@ -267,7 +263,9 @@ var citySkip = {
     "济南-南京":true,
     "南京-济南":true,
     "南昌-郑州":true,
-    "郑州-南昌":true
+    "郑州-南昌":true,
+    "丽江-乌鲁木齐":true,
+    "乌鲁木齐-丽江":true
 };
 
 //start();

@@ -291,7 +291,10 @@ var citySkip = {
     "济南-南京":true,
     "南京-济南":true,
     "南昌-郑州":true,
-    "郑州-南昌":true
+    "郑州-南昌":true,
+   
+    "丽江-乌鲁木齐":true,
+    "乌鲁木齐-丽江":true 
 };
 
 start();
