@@ -63,15 +63,11 @@ var requestDetailData = function(cityId,hotelId){
 };
 entity.hotel.prototype.appendToFile=function(){
     var id=this.id;
-    fs.appendFile(resultFile,this.toString(),function(e){
-        if(e) console.log(e);
-        else{
-            fs.appendFile(doneFile,id+"\r\n");
-            doneHotels[id]=true;
-        }
-        console.log(++doneHotelCount+"/"+hotelCount);
-        if(doneHotelCount==hotelCount) console.log("job complete.\r\n");
-    });
+    fs.appendFile(resultFile,this.toString());
+    fs.appendFile(doneFile,id+"\r\n");
+    doneHotels[id]=true;
+    console.log(++doneHotelCount+"/"+hotelCount);
+    if(doneHotelCount==hotelCount) console.log("job complete.\r\n");
 }
 
 //get cities from file
@@ -96,13 +92,13 @@ if(fs.existsSync(doneFile)){
     var id = line&&Number(line);
     if(id)
         doneHotels[id]=true;
-});    
+});
 }
 
 var pageCount=1;
 var curPageIdx=1;
 var hotels={};
-
+/*
 for(var k in cities){
     var c = cities[k];
     c["rd"] = hotelListData.clone();
@@ -111,8 +107,9 @@ for(var k in cities){
     c["rd"]["PageNumber"]=1;
     console.log("GET "+c.name);
     helper.request_data(hotel_list_options,c["rd"],one_page_data,k);
-    
-}
+}*/
+
+helper.request_data(hotel_list_options,c["rd"],one_page_data,k);
 
 function hotel_page_data(obj){
     var data=null;

@@ -13,52 +13,55 @@ var checkoutdate = "2014-05-02";
 //get cities
 var cities = helper.get_cities('../appdata/qunar_hot_city.txt');
 var resultFile = "../result/app_elong_hotel.txt";
+var doneFile = "../result/app_elong_done_hotel.txt";
 //request data
 for(var i=0;i<cities.length;i++){
-	var c = cities[i];
-	var req = sprintf('{"cityname":"%1$s","checkindate":"%2$s","checkoutdate":"%3$s","pageindex":%4$d}', c.cname, checkindate, checkoutdate,0);
-	var query = {'getHotelListReq':req};
-	var opt = new helper.basic_options('m.elong.com','/hotel/HotelListData','GET',true,false,query);
-	helper.request_data(opt,null,process_hotel_list,c);
+    var c = cities[i];
+    var req = sprintf('{"cityname":"%1$s","checkindate":"%2$s","checkoutdate":"%3$s","pageindex":%4$d}', c.cname, checkindate, checkoutdate,0);
+    var query = {'getHotelListReq':req};
+    var opt = new helper.basic_options('m.elong.com','/hotel/HotelListData','GET',true,false,query);
+    helper.request_data(opt,null,process_hotel_list,c);
 }
 
 //process response
 var hotels={};
 function process_hotel_list(data,args){
+    if(!data || data.IsError || !data.Items){
+	console.log("error occured.");
+	return;	
+    }
 
-	if(!data || data.IsError)
-		return;
-	//get hotel list data
-	for(var i=0;i<data.Items.length;i++){
-		var item = data.Items[i];
-		var h = new entity.hotel();
-		h.id = item.HotelId;
-		h.name = item.HotelName;
-		h.city = data.CityName;
-		h.star = item.StarCode;
-		h.prate = item.GoodCommentPercent;
-		h.zoneName = item.BusinessAreaName;
-		h.commentCount = item.CommentCount;
-		helper.request_data(
-		new helper.basic_options('m.elong.com','/hotel/'+args[0].pinyin+'/'+h.id+'/','GET',true,false,{'checkindate':checkindate,'checkoutdate':checkoutdate}),
-		null,
-		process_one_hotel,
-		[h,args[0]]
-		);
-	}
-	//get next page.
-	var c = args[0];
-	if(!c.pageCount) c.pageCount = data.PageCount;
-	if(!c.curPageIdx) c.curPageIdx = 0;
-	if(!c.hotelCount) c.hotelCount=data.HotelCount;
-	if(c.curHotelIdx==undefined) c.curHotelIdx=0;
-	while(c.curPageIdx<c.pageCount-1){
-		c.curPageIdx++;
-		var req = sprintf('{"cityname":"%1$s","checkindate":"%2$s","checkoutdate":"%3$s","pageindex":%4$d}', c.cname, checkindate, checkoutdate,c.curPageIdx);
-		var query = {'getHotelListReq':req};
-		var opt = new helper.basic_options('m.elong.com','/hotel/HotelListData','GET',true,false,query);
-		helper.request_data(opt,null,process_hotel_list,c);
-	}
+    //get hotel list data
+    for(var i=0;i<data.Items.length;i++){
+	var item = data.Items[i];
+	var h = new entity.hotel();
+	h.id = item.HotelId;
+	h.name = item.HotelName;
+	h.city = data.CityName;
+	h.star = item.StarCode;
+	h.prate = item.GoodCommentPercent;
+	h.zoneName = item.BusinessAreaName;
+	h.commentCount = item.CommentCount;
+	helper.request_data(
+	    new helper.basic_options('m.elong.com','/hotel/'+args[0].pinyin+'/'+h.id+'/','GET',true,false,{'checkindate':checkindate,'checkoutdate':checkoutdate}),
+	    null,
+	    process_one_hotel,
+	    [h,args[0]]
+	);
+    }
+    //get next page.
+    var c = args[0];
+    if(!c.pageCount) c.pageCount = data.PageCount;
+    if(!c.curPageIdx) c.curPageIdx = 0;
+    if(!c.hotelCount) c.hotelCount=data.HotelCount;
+    if(c.curHotelIdx==undefined) c.curHotelIdx=0;
+    while(c.curPageIdx<c.pageCount-1){
+	c.curPageIdx++;
+	var req = sprintf('{"cityname":"%1$s","checkindate":"%2$s","checkoutdate":"%3$s","pageindex":%4$d}', c.cname, checkindate, checkoutdate,c.curPageIdx);
+	var query = {'getHotelListReq':req};
+	var opt = new helper.basic_options('m.elong.com','/hotel/HotelListData','GET',true,false,query);
+	helper.request_data(opt,null,process_hotel_list,c);
+    }
 }
 
 function process_one_hotel(data,args){

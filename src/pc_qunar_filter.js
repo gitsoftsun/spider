@@ -34,10 +34,7 @@ function start(){
 	    fl.dTime = $(" div.c2 div.a_tm_dep",this).text();
 	    fl.aTime = $(" div.c2 div.a_tm_arv",this).text();
 
-	    fs.appendFile(resultFile,fl.toString("qunar_pc"),function(err){
-		if(err)
-		    console.log(err.message);
-	    });
+	    fs.appendFileSync(resultFile,fl.toString("qunar_pc"));
 	});
     }
 }
