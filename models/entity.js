@@ -204,33 +204,33 @@ exports.hotel.prototype.toString=function(site){
         }
         return sb.toString();
     }
-    var sb="";
+    var sb = new helper.StringBuffer();
     for(var i=0;i<this.rooms.length;i++){
-        sb+=this.city+",";
-        
-        sb+=this.name+",";
-        
-        sb+=(this.zoneName==null?"":this.zoneName)+",";
-        
-        sb+=this.star+',';
-        
-        sb+=this.rooms[i].name+',';
-        
-        sb+=this.rooms[i].price+',';
-        
-        sb+=this.commentCount+',';
-        
-        sb+=this.picCount+',';
-        
-        sb+=this.points+',';
-        
-        sb+=this.faclPoints+',';
-        
-        sb+=this.raAtPoints+',';
-        
-        sb+=this.servPoints+',';
-        
-        sb+=this.ratPoints+',';
+        sb.append(this.city);
+        sb.append(',');
+        sb.append(this.name);
+        sb.append(',');
+        sb.append(this.zoneName==null?"":this.zoneName);
+	sb.append(',');
+        sb.append(this.star);
+        sb.append(',');
+        sb.append(this.rooms[i].name);
+        sb.append(',');
+        sb.append(this.rooms[i].price);
+        sb.append(',');
+        sb.append(this.commentCount);
+        sb.append(',');
+        sb.append(this.picCount);
+        sb.append(',');
+        sb.append(this.points);
+        sb.append(',');
+        sb.append(this.faclPoints);
+        sb.append(',');
+        sb.append(this.raAtPoints);
+        sb.append(',');
+        sb.append(this.servPoints);
+        sb.append(',');
+        sb.append(this.ratPoints);
         
         var b;
         if(this.rooms[i].breakfast=="单早")
@@ -238,22 +238,26 @@ exports.hotel.prototype.toString=function(site){
         else if(this.rooms[i].breakfast=="双早")
             b=2;
         else b=0;
-        sb+=b+',';
-        
-        if(this.rooms[i].gift)
-            sb+=this.rooms[i].gift+',';
-        else sb+=',';
-        
-        sb+=(this.isCu==0?"N":"Y")+',';
-        
+        sb.append(b);
+        sb.append(',');
+        if(this.rooms[i].gift){
+            sb.append(this.rooms[i].gift);
+	}else{
+	    sb.append("N");
+	}
+	sb.append(',');
+        sb.append((this.isCu==0?"N":"Y"));
+        sb.append(',');
         if(this.rooms[i].fanPrice)
-            sb+=this.rooms[i].fanPrice+',';
-        else sb+=",";
-        
-        sb+=(this.rooms[i].payType==0?"Y":"N");
-        sb+='\r\n';
+            sb.append(this.rooms[i].fanPrice);
+	else{
+	    sb.append("￥0");
+	}
+        sb.append(',');
+        sb.append(this.rooms[i].payType==0?"Y":"N");
+        sb.append('\r\n');
     }
-    return sb;
+    return sb.toString();
 }
 
 exports.room = function(){

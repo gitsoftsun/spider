@@ -245,6 +245,16 @@ exports.request_data=function(opts,data,fn,args){
     req.end();
 }
 
+exports.getCitiesDict = function(filename){
+    var cities = exports.get_cities(filename);
+    var cs = {};
+    for(var i=0;i<cities.length;i++){
+	var c = cities[i];
+	cs[c.cname]=c;
+    }
+    return cs;
+}
+
 exports.get_cities = function(filename){
     if(!fs.existsSync(filename)) {
         console.log("file not found: "+filename);
