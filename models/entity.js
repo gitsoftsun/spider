@@ -85,10 +85,12 @@ exports.hotel.prototype.toString=function(site){
         return sb.toString();
     }
     else if(site=='elong'){
-        var sb = new helper.StringBuffer();
+        var sb = new helper.StrinpgBuffer();
         for(var i=0;i<this.rooms.length;i++){
             sb.append(this.city);
             sb.append(',');
+	    sb.append(this.id);
+	    sb.append(',');
             sb.append(this.name);
             sb.append(',');
             sb.append(this.star);
@@ -131,6 +133,8 @@ exports.hotel.prototype.toString=function(site){
             for(var j=0;j<r.sites.length;j++){
                 sb.append(this.city);
                 sb.append(',');
+		sb.append(this.id);
+		sb.append(',');
                 sb.append(this.name);
                 sb.append(',');
                 sb.append(this.star);
@@ -208,6 +212,8 @@ exports.hotel.prototype.toString=function(site){
     for(var i=0;i<this.rooms.length;i++){
         sb.append(this.city);
         sb.append(',');
+	sb.append(this.id);
+	sb.append(',');
         sb.append(this.name);
         sb.append(',');
         sb.append(this.zoneName==null?"":this.zoneName);
