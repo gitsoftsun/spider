@@ -1,11 +1,7 @@
-﻿var http = require('http')
-var zlib = require('zlib')
-var fs = require('fs')
-var helper = require('./helpers/webhelper.js')
-//var $ = require('jquery')
+﻿var fs = require('fs')
+var helper = require('../helpers/webhelper.js')
 var cheerio = require('cheerio')
-var entity = require('./models/entity.js')
-var sprintf = require("sprintf-js").sprintf
+var entity = require('../models/entity.js')
 
 //basic settings.
 var checkindate = "2014-05-01";
@@ -80,14 +76,14 @@ function start(){
 //start();
 //count request count.
 function getProxy(){
+    requestCount++;
+    if(requestCount==1){
+	requestCount=0;
+	return proxy.getNext();
+    }else{
 	requestCount++;
-	if(requestCount==1){
-		requestCount=0;
-		return proxy.getNext();
-	}else{
-		requestCount++;
-		return proxy.cur();
-	}
+	return proxy.cur();
+    }
 }
 
 //count hotels done of page
@@ -213,36 +209,46 @@ function process_one_hotel(data,args){
     console.log("got hotel page.");
     var $ = cheerio.load(data);
 
-    var starNode = $("div.ct1 table tr td:last-child");
-    if(starNode.length>0){
-	args[0].star = starNode[0].childNodes[2].value&&starNode[0].childNodes[2].value.trim();
-    }
-
+    var infoNode = $("div.ct1 table tr td:last-child").contents();
+    args[0].star = infoNode.eq(2).text();
+    args[0].star = args[0].star && args[0].star.replace(/\s/g,'');
     var comm = data.match(/(\d+)条评论/);
     if(comm&&comm[1]){
 	args[0].commentCount = comm[1];
     }
-
     var roomNodes = $("div.room").each(function(i,e){
 	if(i==0) return;
 	var r = new entity.room();
 	r.sites=[];
 	r.name = $("div.t",this).text();
 	r.name = r.name && r.name.replace('房型：','');
-//	r.name = roomNodes[i].children&&roomNodes[i].children[0].innerHTML&&roomNodes[i].children[0].innerHTML.trim().replace('房型：','');
-	var paraNodes = e.getElementsByTagName('p');
-	if(paraNodes.length>0){
-	    for(var j=0;j<paraNodes.length;j++){
-		var site = paraNodes[j].childNodes&&paraNodes[j].childNodes[0]&&paraNodes[j].childNodes[0].value&&paraNodes[j].childNodes[0].value.trim();
-		var tuan='N';
-		if(site && site.indexOf("团购")!=-1)
-		    tuan = 'Y';
+	$('p',this).each(function(i,e){
+	    var contents =$(this).contents();
+	    var site = contents.eq(0).text().replace(/[\s\d\.]/g,'');
+	    if(site.indexOf("报价")>-1)
+		return;
+	    var pName = contents.eq(2).text().replace(/\s/g,'');
+	    pName = pName?pName:r.name;
+	    var tuan = "N";
+	    if(site.indexOf('团购')>-1)
+		tuan = "Y";
+	    var price = $('span.hl',this).text();
+	    price = price && price.replace(/\s/g,'');
+	    r.sites.push({"site":site,"price":price,"tuan":tuan,"pkg":pName});
+	});
+//	var paraNodes = e.getElementsByTagName('p');
+//	if(paraNodes.length>0){
+//	    for(var j=0;j<paraNodes.length;j++){
+//		var site = paraNodes[j].childNodes&&paraNodes[j].childNodes[0]&&paraNodes[j].childNodes[0].value&&paraNodes[j].childNodes[0].value.trim();
+//		var tuan='N';
+//		if(site && site.indexOf("团购")!=-1)
+//		    tuan = 'Y';
 
-		var price = paraNodes[j].childNodes[5]&&paraNodes[j].childNodes[5].innerHTML&&paraNodes[j].childNodes[5].innerHTML.trim().replace(/\s/g,'');
-		if(site&&price)
-		    r.sites.push({"site":site,"price":price,"tuan":tuan});
-	    }
-	}
+//		var price = paraNodes[j].childNodes[5]&&paraNodes[j].childNodes[5].innerHTML&&paraNodes[j].childNodes[5].innerHTML.trim().replace(/\s/g,'');
+//		if(site&&price)
+///		    r.sites.push({"site":site,"price":price,"tuan":tuan});
+//	    }
+//	}
 	args[0].rooms.push(r);
     });
 	/*    
@@ -280,11 +286,15 @@ function process_one_hotel(data,args){
     
     // }
     fs.appendFileSync("../result/app_qunar_hotel.txt",args[0].toString("qunar"));
+    setTimeout(function(){
+	var r = todo.shift();
+	getSpecifyHotel(r.city,r.qunarAppName);
+    },(Math.random()*9+2)*1000);
     //console.log(args[1].cname+": "+(++args[1].curHotelIdx)+"/"+args[1].hotelCount);
-    fs.appendFile(doneHotelFile,args[2].city+','+args[0].name+'\r\n',function(err){
+    fs.appendFile(doneHotelFile,args[0].city+','+args[2]+'\r\n',function(err){
 	if(err) console.log(err.message);
 	else{
-	    console.log(args[2].city+','+args[0].name);
+	    console.log(args[0].city+','+args[2]);
 	}
     });
     // if(args[1].curHotelIdx==args[1].hotelCount){
@@ -298,11 +308,10 @@ function process_one_hotel(data,args){
 }
 
 
-//write file
-
 var doneHotelFile = "../result/app_qunar_hotel_done.txt";
 var doneHotels2 = {};
 var cs={};
+var todo;
 function begin(){
     for(var j=0;j<cities.length;j++){
 	cs[cities[j].cname]=cities[j];
@@ -313,12 +322,20 @@ function begin(){
 	    doneHotels2[dones[k]] = true;
 	}
     }
-    var items = fs.readFileSync("../result/hotel.sample.txt").toString().split("\n");
-    for(var i=0;i<items.length;i++){
-	if(doneHotels2[items[i]]) continue;
-	var kv = items[i].split(',');
-	getSpecifyHotel(kv[0],kv[1]);
-    }
+    todo = fs.readFileSync("../result/pc_qunar_done_hotel.txt").toString().split("\n").filter(function(line){
+	if(!line || line='\r') return false;
+	line = line.replace('\r','');
+	var vals = line.split(',');
+	if(doneHotels2[vals[0]+','+vals[2]])
+	   return false;
+	return true;
+    }).map(function(line){
+	line = line.replace('\r','');
+	var vals = line.split(',');
+	return {city:vals[0],elongId:vals[1],elongName:vals[2],qunarAppId:vals[3],qunarAppName:vals[4]};
+    });
+    var r = todo.shift();
+    getSpecifyHotel(r.city,r.qunarAppName);
 }
 
 function getSpecifyHotel(city,hotelName){
@@ -330,29 +347,33 @@ function getSpecifyHotel(city,hotelName){
     }else{
 	opt = new helper.basic_options("h.qunar.com",'/list.jsp','GET',true,false,query,null);
     }
-    
-    helper.request_data(opt,null,getFirstHotelOfPage,cs[city]);
+    opt.agent = false;
+    helper.request_data(opt,null,getFirstHotelOfPage,[cs[city],hotelName]);
 }
 function getFirstHotelOfPage(data,args){
     //console.log("done got "+args[0].cname+" page:"+ args[1].pageNum);
     if(!data || data.IsError){
 	console.log("Failed");
-	return;	
-    }
+	return;
+   }
     var $ = cheerio.load(data);
+    var h = new entity.hotel();
     $('table.fl tr td:first-child').each(function(i,e){
-	var h = new entity.hotel();
 	h.city = args[0].cname;
 	h.name = $('a',this).text();
 	var href=$('a',this).attr('href');
 	var matches = href&&href.match(/seq=(\w+)/);
 	var id = matches&&matches[1];
 	h.id = id;
-	var pointsAndZone = e.childNodes[4].value&&e.childNodes[4].value.trim();
+	var pointsNode = e.children.filter(function(child){
+	    return child.type=='text' && (typeof child.data=="string") && child.data.indexOf('评分')!=-1;
+	});
+	if(pointsNode.length>0)
+	    var pointsAndZone = pointsNode[0].data.replace(/[\s]/g,'');
 	if(pointsAndZone){
 	    var matches = pointsAndZone.match(/\d*\.\d*/);
 	    h.points = matches&&matches[0];
-	    h.zoneName = pointsAndZone.split(' ')[1];
+	    h.zoneName = pointsAndZone.split('&nbsp;')[1];
 	}
     });
    /* if(items.length==0){
@@ -382,12 +403,13 @@ function getFirstHotelOfPage(data,args){
     h.city = args[0].cname;
     h.id = id;
     h.name = name;
-    var pointsAndZone = td.childNodes[4].value&&td.childNodes[4].value.trim();
-    if(pointsAndZone){
-	var matches = pointsAndZone.match(/\d*\.\d*/);
-	h.points = matches&&matches[0];
-	h.zoneName = pointsAndZone.split(' ')[1];
-    }*/
+    */
+//    var pointsAndZone = td.childNodes[4].value&&td.childNodes[4].value.trim();
+//    if(pointsAndZone){
+//	var matches = pointsAndZone.match(/\d*\.\d*/);
+//	h.points = matches&&matches[0];
+//	h.zoneName = pointsAndZone.split(' ')[1];
+//    }
     var opt = null;
     if(useProxy){
 	var p = getProxy();
@@ -395,8 +417,8 @@ function getFirstHotelOfPage(data,args){
     }else{
 	opt = new helper.basic_options("h.qunar.com",'/preDetail.jsp','GET',true,false,{'seq':h.id,'checkin':checkindate.replace(/\-/g,''),'days':1,"city":args[0].cname,'pageNum':args[1].pageNum},null);
     }
-    
-    helper.request_data(opt,null,process_one_hotel,[h,args[0]]);
+    opt.agent=false;
+    helper.request_data(opt,null,process_one_hotel,[h,args[0],args[1]]);
 }
 
 begin();

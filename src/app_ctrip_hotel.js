@@ -261,13 +261,10 @@ MCtripHotel.prototype.load = function(){
 	return;
     }
     //load done list.
-    this.doneHotels = fs.readFileSync(this.resultDir+this.doneFile)
-	.toString()
-	.split('\r\n')
-	.reduce(function(pre,cur){
-	    var id = cur.split(',')[0];
-	    pre[id]=cur;
-	    return pre;
+    fs.readFileSync(this.resultDir+this.doneFile).toString().split('\r\n').reduce(function(pre,cur){
+	var id = cur.split(',')[0];
+	pre[id]=cur;
+	return pre;
     },this.doneHotels);
 }
 
@@ -361,7 +358,7 @@ MCtripHotel.prototype.processList = function(obj,args){
             for(var i=0;i<a[0].HotelLists.length;i++){
                 var h = new entity.hotel();
                 var h_obj = a[0].HotelLists[i];
-		if(doneHotels[h_obj.HotelID]) continue;
+		if(this.doneHotels[h_obj.HotelID]) continue;
                 h.city=args[0].cname;
                 h.id=h_obj.HotelID;
                 h.name=h_obj.HotelName;

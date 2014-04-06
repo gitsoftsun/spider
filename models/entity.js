@@ -139,7 +139,7 @@ exports.hotel.prototype.toString=function(site){
                 sb.append(',');
                 sb.append(this.star);
                 sb.append(',');
-                sb.append(r.name);
+                sb.append(r.sites[j].pkg);
                 sb.append(',');
                 sb.append(r.sites[j].site)
                 sb.append(',');
