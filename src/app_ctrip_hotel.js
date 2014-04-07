@@ -276,7 +276,9 @@ MCtripHotel.prototype.wgetList = function(){
 		    console.log("Done.");
 		    return;
 		}
-		this.cur = this.cities.shift();
+		do{
+		    this.cur = this.cities.shift();
+		}while(this.doneHotels[this.cur.cname]);
 	    }else{
 		//hotel list done, start detail
 		this.wgetDetail();
@@ -289,7 +291,9 @@ MCtripHotel.prototype.wgetList = function(){
 	    console.log("Done.");
 	    return;
 	}
-	this.cur = this.cities.shift();
+	do{
+	    this.cur = this.cities.shift();
+	}while(this.doneHotels[this.cur.cname]);
     }
     var query = new this.listQuery(this.cur,this.cur.curPageIdx);
     var opt = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true,query);
@@ -313,6 +317,7 @@ MCtripHotel.prototype.wgetList = function(){
 MCtripHotel.prototype.wgetDetail = function(){
     if(this.todoHotels.length==0){
 	console.log("Done: %s",this.cur.cname);
+	fs.appendFileSync(this.resultDir+this.doneFile,this.cur.cname+'\r\n');
 	this.wgetList();
 	return;
     }
