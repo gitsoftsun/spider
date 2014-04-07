@@ -277,7 +277,7 @@ MCtripHotel.prototype.wgetList = function(){
 		    return;
 		}
 		do{
-		    this.cur = this.cities.shift();
+		    this.cur = this.cities.pop();
 		}while(this.doneHotels[this.cur.cname]);
 	    }else{
 		//hotel list done, start detail
@@ -292,7 +292,7 @@ MCtripHotel.prototype.wgetList = function(){
 	    return;
 	}
 	do{
-	    this.cur = this.cities.shift();
+	    this.cur = this.cities.pop();
 	}while(this.doneHotels[this.cur.cname]);
     }
     var query = new this.listQuery(this.cur,this.cur.curPageIdx);

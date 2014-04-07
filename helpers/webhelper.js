@@ -143,8 +143,9 @@ exports.request_data=function(opts,data,fn,args){
 		if(decoded){
 		    try{
 			var obj = decoded.toString();
-			if(res.headers['content-type'].indexOf('application/json')!=-1)
+			if(res.headers['content-type'].indexOf('application/json')!=-1){
 			    obj =JSON.parse(decoded.toString());
+			}
 			if(args==undefined){
 			    fn(obj,[data]);
 			}
@@ -208,7 +209,11 @@ exports.request_data=function(opts,data,fn,args){
 	    if(!obj)
 		obj = buffer.toString();
             if(res.headers['content-type']&&res.headers['content-type'].indexOf('application/json')!=-1){
-		obj =JSON.parse(obj.toString());
+		try{
+		    obj =JSON.parse(obj.toString());
+		}catch(err){
+		    console.log(err.message);
+		}
             }
             if(args==undefined){
 		fn(obj,[opts.data]);
