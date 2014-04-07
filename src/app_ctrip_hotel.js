@@ -261,9 +261,9 @@ MCtripHotel.prototype.load = function(){
 	return;
     }
     //load done list.
-    fs.readFileSync(this.resultDir+this.doneFile).toString().split('\r\n').reduce(function(pre,cur){
-	var id = cur.split(',')[0];
-	pre[id]=cur;
+    fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,cur){
+	if(cur)
+	    pre[cur]=true;
 	return pre;
     },this.doneHotels);
 }
@@ -298,13 +298,14 @@ MCtripHotel.prototype.wgetList = function(){
     var query = new this.listQuery(this.cur,this.cur.curPageIdx);
     var opt = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true,query);
     opt.headers['Content-Type']="application/json";
+    opt.agent=false;
     setTimeout(function(){
-	console.log("GET %d/%d",that.cur.curPageIdx,that.cur.pageCount);
+	console.log("GET %s:%d/%d",that.cur.cname,that.cur.curPageIdx,that.cur.pageCount);
 	helper.request_data(opt,query,function(data,args){
 	    that.processList(data,args);
 	    that.wgetList();
 	},that.cur);
-    },(Math.random()*9+2)*1000);
+    },(Math.random()*1+1)*1000);
     /*
     var query = new this.listQuery(this.cur,this.cur.curPageIdx);
     var opt = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true,query);
@@ -317,7 +318,7 @@ MCtripHotel.prototype.wgetList = function(){
 MCtripHotel.prototype.wgetDetail = function(){
     if(this.todoHotels.length==0){
 	console.log("Done: %s",this.cur.cname);
-	fs.appendFileSync(this.resultDir+this.doneFile,this.cur.cname+'\r\n');
+	fs.appendFileSync(this.resultDir+this.doneFile,this.cur.cname+'\n');
 	this.wgetList();
 	return;
     }
@@ -329,13 +330,14 @@ MCtripHotel.prototype.wgetDetail = function(){
     var query = new this.detailQuery(this.cur.id,curHotel.id);
     var opt = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelDetail',"POST",true,true,query);
     opt.headers['Content-Type']="application/json";
+    opt.agent = false;
     setTimeout(function(){
 	helper.request_data(opt,query,function(data,args){
 	    console.log("GET %s, %s",args[0].cname,args[1].name);
 	    that.processDetail(data,args);
 	    that.wgetDetail();
 	},[that.cur,curHotel]);
-    },(Math.random()*9+2)*1000);
+    },(Math.random()*1+1)*1000);
 }
 
 MCtripHotel.prototype.processList = function(obj,args){
