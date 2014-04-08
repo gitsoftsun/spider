@@ -12,7 +12,6 @@ function MElongFlight(){
     this.cityFile = "qunar_flight_hot_city.txt";
     this.resultFile = "app_elong_flight.txt";
     this.citySkip = {};
-    this.cityFls = {};
     this.cities = [];
     this.doneFlights = {};
     this.todoFlights=[];

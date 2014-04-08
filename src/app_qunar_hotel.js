@@ -222,6 +222,7 @@ function process_one_hotel(data,args){
 	r.sites=[];
 	r.name = $("div.t",this).text();
 	r.name = r.name && r.name.replace('房型：','');
+	r.name = r.name && r.name.replace(/[,，]/g,';');
 	$('p',this).each(function(i,e){
 	    var contents =$(this).contents();
 	    var site = contents.eq(0).text().replace(/[\s\d\.]/g,'');

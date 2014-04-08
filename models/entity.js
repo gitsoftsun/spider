@@ -237,7 +237,7 @@ exports.hotel.prototype.toString=function(site){
         sb.append(this.servPoints);
         sb.append(',');
         sb.append(this.ratPoints);
-        
+        sb.append(',');
         var b;
         if(this.rooms[i].breakfast=="单早")
             b=1;

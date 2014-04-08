@@ -277,7 +277,7 @@ MCtripHotel.prototype.wgetList = function(){
 		    return;
 		}
 		do{
-		    this.cur = this.cities.pop();
+		    this.cur = this.cities.shift();
 		}while(this.doneHotels[this.cur.cname]);
 	    }else{
 		//hotel list done, start detail
@@ -292,7 +292,7 @@ MCtripHotel.prototype.wgetList = function(){
 	    return;
 	}
 	do{
-	    this.cur = this.cities.pop();
+	    this.cur = this.cities.shift();
 	}while(this.doneHotels[this.cur.cname]);
     }
     var query = new this.listQuery(this.cur,this.cur.curPageIdx);
@@ -332,8 +332,8 @@ MCtripHotel.prototype.wgetDetail = function(){
     opt.headers['Content-Type']="application/json";
     opt.agent = false;
     setTimeout(function(){
+	console.log("GET %s, %s",that.cur.cname,curHotel.name);
 	helper.request_data(opt,query,function(data,args){
-	    console.log("GET %s, %s",args[0].cname,args[1].name);
 	    that.processDetail(data,args);
 	    that.wgetDetail();
 	},[that.cur,curHotel]);
@@ -414,6 +414,7 @@ MCtripHotel.prototype.processDetail = function(obj,args){
                     var rm = new entity.room();
                     rm.id=r.RoomID;
                     rm.name=r.RoomName;
+		    rm.name = rm.name && rm.name.replace(/[,，]/g,';');
                     rm.price=r.RoomPrice||r.AvgPrice;
                     rm.breakfast = r.Breakfast;
                     rm.fan = r.FanDesc;

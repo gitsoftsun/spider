@@ -126,45 +126,7 @@ var fn = function(flightsInfo,args){
 	});
     }
 }
-// function request_data(opts,data,fn,args){
-//     if(!opts || !fn) throw "argument null 'opt' or 'data'";
-//     var strData = JSON.stringify(data);
-//     opts.headers['Content-Length']=Buffer.byteLength(strData);
-    
-//     var req = http.request(opts, function(res) {
 
-// 	var chunks=[];
-// 	res.on('data', function (chunk) {
-//             chunks.push(chunk);
-// 	});
-// 	res.on('end',function(){
-//             if(res.headers['content-encoding']=='gzip'){
-// 		var buffer = Buffer.concat(chunks);
-// 		zlib.gunzip(buffer,function(err,decoded){
-// 		    if(decoded){
-// 			try{
-// 			    var obj =JSON.parse(decoded.toString());
-// 			    fn(obj,args);
-// 			}
-// 			catch(e){
-// 			    console.log(e.message);
-// 			    //retry once.
-// 			   // setTimeout(function(){
-// 				//request_data(opts,data,fn,args);		
-// 			  //  },2000);
-// 			}
-// 		    }
-// 		});
-//             }
-// 	});
-//     });
-//     req.on('error', function(e) {
-// 	console.log('problem with request: ' + e.message);
-// 	request_data(opts,data,fn,args);
-//     });
-//     req.write(strData);
-//     req.end();
-// }
 
 var cities = [];
 var progress = {};
@@ -220,4 +182,134 @@ if(lines){
     }
 }
 
-//request_data(flight_list_options,get_flight_data,fn);
+
+function MCtripFlight(){
+    this.resultDir = "../result/";
+    this.dataDir = "../appdata/";
+    this.resultFile = "app_ctrip_flight.txt";
+    this.doneFile = "app_ctrip_done_flight.txt";
+    this.skipFile = "invalidFlights.txt";
+    this.depdate = "2014/05/01";
+    this.cityFile = "qunar_flight_hot_city.txt";
+
+    this.citySkip = {};
+    this.cities = [];
+    this.doneFlights = {};
+    this.todoFlights=[];
+
+    this.ctripQuery = function(dname,aname,pidx){
+	this["tabtype"]= 1,
+	this["ver"]= 0,
+	this["tripType"]= 1,
+	this["ticketIssueCty"]="BJS",
+	this["flag"]=0,
+	this["pageIdx"]= 1,
+	this["items"]= [{
+	    "dCtyCode": "BJS",
+	    "dCtyId": 1,
+	    "dcityName": "北京",
+	    "dkey": 3,
+	    "aCtyCode": "SHA",
+	    "aCtyId": 2,
+	    "acityName": "上海",
+	    "akey": 2,
+	    "date": depdate
+	}],
+	this["_items"]= [{
+	    "dCtyCode": "BJS",
+	    "dCtyId": 1,
+	    "dcityName": "北京",
+	    "dkey": 3,
+	    "aCtyCode": "SHA",
+	    "aCtyId": 2,
+	    "acityName": "上海",
+	    "akey": 2,
+	    "date": depdate
+	}],
+	this["class"]= 0,
+	this["depart-sorttype"]="time",
+	this["depart-orderby"]= "asc",
+	this["arrive-sorttype"]="time",
+	this["arrive-orderby"]="asc",
+	this["calendarendtime"]= "2014/06/3000: 00: 00",
+	this["__tripType"]=1,
+	this["head"]={
+	    "cid": "cd3b6d6c-3f75-1fef-0930-69061427de9f",
+	    "ctok": "351858059049938",
+	    "cver": "1.0",
+	    "lang": "01",
+	    "sid": "8888",
+	    "syscode": "09",
+	    "auth": ""
+	}
+    }
+}
+
+MCtripFlight.prototype.init = function(){
+    this.cities = helper.get_cities(this.dataDir+this.cityFile);
+    for(var i=0;i<this.cities.length;i++){
+	for(var j=0;j<this.cities.length;j++){
+	    if(i==j)
+		continue;
+	    var n = this.cities[i].cname+'-'+this.cities[j].cname;
+	    if(!this.doneFlights[n] && !this.citySkip[n])
+		this.todoFlights.push({
+		    d:this.cities[i].cname,
+		    a:this.cities[j].cname
+		});
+	}
+    }
+}
+
+MCtripFlight.prototype.start = function(){
+    this.load();
+    this.init();
+    console.log("%d flights todo.",this.todoFlights.length);
+    this.todoFlights.forEach(function(f,i,a){
+	this.wgetList(f);
+    },this);
+//    this.wgetList(this.todoFlights[0]);
+}
+
+MCtripFlight.prototype.load = function(){
+    if(fs.existsSync(this.resultDir+this.doneFile)){
+	fs.readFileSync(this.resultDir+this.doneFile)
+	    .toString()
+	    .split('\r\n')
+	    .reduce(function(pre,cur){
+		if(cur)
+		    pre[cur]=true;
+		return pre;
+	    },this.doneFlights);
+    }
+    if(fs.existsSync(this.dataDir+this.skipFile)){
+	fs.readFileSync(this.dataDir+this.skipFile)
+	    .toString()
+	    .split('\n')
+	    .reduce(function(pre,cur){
+		if(cur){
+		    cur = cur.replace('\r','');
+		    pre[cur]=true;
+		}
+		return pre;
+	    },this.citySkip);
+    }
+}
+
+MCtripFlight.prototype.processList = function(data,args){
+    
+}
+
+MCtripFlight.prototype.wgetList = function(f){
+    console.log("GET %s-%s: %d/%d",f.d,f.a,f.pageIdx,f.pageCount);
+    var query = new this.ctripQuery(f.d,f.a,f.pageIdx);
+    var opt = new helper.basic_options("m.ctrip.com",'/restapi/Flight/Domestic/FlightList/Query',"POST",true,true);
+    helper.request_data(opt,query,function(data,args){
+	that.processList(data,args);
+    },f);
+}
+
+
+var instance = new MCtripFlight();
+var that = instance;
+instance.start();
