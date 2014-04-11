@@ -38,11 +38,20 @@ FilterMerge.prototype.load=function(){
     this.elongRecords = fs.readFileSync(this.resultDir+this.elongrFile).toString().split('\r\n').map(function(line){
 	if(!line) return;
 	var vals = line.split(',');
-	var room = vals[5].replace(/[\(\（\[].*/g,'').replace(/[\.\s\-]/g,'');
-	if(room.search("升级至")>-1){
-	    room = room.replace(/[^升级至]/,'').replace(/[升级至]/g,'');
-	}
-	room = room && room.replace(/[房间][A-Z]?$/,'');
+	var room={};
+	room.tags=[];
+	vals[5].match(/[\（|\(]([^\)\）])[\)|\）]/);
+	room.tags.push(vals[10]);
+	
+	room.type  = vals[5].replace(/[\(\（\[].*/g,'').replace(/[\.\s\-]/g,'');
+	var pkg = vals[9].match(/[\(|\（]([^\)\）])[\)|\）]/)[1];
+	if(pkg)
+	    room.tags.push(pkg);
+	
+	//if(room.search("升级至")>-1){
+	//    room = room.replace(/[^升级至]/,'').replace(/[升级至]/g,'');
+	//}
+	room.type = room.type && room.type.replace(/[房间][A-Z]?$/,'');
 	return {city:vals[0],
 		id:vals[1],
 		name:vals[2],
@@ -54,11 +63,19 @@ FilterMerge.prototype.load=function(){
     this.ctripRecords = fs.readFileSync(this.resultDir+this.ctriprFile).toString().split('\r\n').map(function(line){
 	if(!line) return;
 	var vals = line.split(',');
+	var room = {};
+	var pkg = vals[4].match(/[\(|\（]([^\)\）])[\)|\）]/);
+	room.type = vals[4].replace(/[房间]/g,'').replace(/[\(\（].*/g,'').replace("携程标准价",'');
+	room.tags=[];
+	room.tags.push(vals[9]);
+	if(pkg)
+	    roome.tags.push(pkg);
+	
 	return {city:vals[0],
 		id:vals[1],
 		name:vals[2],
 		star:vals[3],
-		room:vals[4].replace(/[房间]/g,'').replace(/[\(\（].*/g,''),
+		room:room,
 		price:vals[6].trim()=="专享价"?"¥100000":vals[6].trim(),
 		fan:vals[7]?vals[7]:"返0元"
 	       };
@@ -67,10 +84,13 @@ FilterMerge.prototype.load=function(){
     this.qunarRecords=fs.readFileSync(this.resultDir+this.qunarrFile).toString().split('\r\n').map(function(line){
 	if(!line) return;
 	var vals = line.split(',');
+	var room = {};
+	room.tags=[];
+	room.type = vals[3];
 	return {city:vals[0],
 		id:vals[1],
 		name:vals[2],
-		room:vals[3],
+		room:room,
 		bookSite:vals[4],
 		price:vals[5],
 		fan:vals[6]?vals[6]:"¥0"
@@ -289,12 +309,11 @@ function isNumber(n) {
 //cityName,fullName,siteName,star,room,book_site,price,fan,url
 //2->ctrip,1->qunar,0->elong
 function output(){
-	
     for(var k in hotels[2]){
-	 	var c = hotels[2][k];
-	 	if(c){
-		 	console.log(c.c+","+c.fname+","+c.sname+","+c.site+","+c.star+","+c.room+","+c.book+","+c.price+","+c.fan+","+c.url);
-		}
+	var c = hotels[2][k];
+	if(c){
+	    console.log(c.c+","+c.fname+","+c.sname+","+c.site+","+c.star+","+c.room+","+c.book+","+c.price+","+c.fan+","+c.url);
+	}
     }
 
     // for(var k in hotels[0]){
