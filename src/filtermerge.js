@@ -5,9 +5,9 @@ function FilterMerge(){
     this.elonghFile = "elonghotels.txt";
     this.ctriphFile = "pc_ctrip_done_hotel.txt";
     this.qunarhFile = "pc_qunar_done_hotel.txt";
-    this.elongrFile = "pc_elong_hotel.txt";
-    this.ctriprFile = "pc_ctrip_hotel.txt";
-    this.qunarrFile = "pc_qunar_hotel.txt";
+    this.elongrFile = "xlsx/pc_elong_hotel.csv";
+    this.ctriprFile = "xlsx/pc_ctrip_hotel.csv";
+    this.qunarrFile = "xlsx/pc_qunar_hotel.csv";
     this.elongHotels=[];
     this.ctripHotels=[];
     this.qunarHotels=[];
@@ -24,79 +24,53 @@ FilterMerge.prototype.init=function(){
        ||!fs.existsSync(this.resultDir+this.ctriphFile)
        ||!fs.existsSync(this.resultDir+this.qunarhFile))
 	throw "Data file not found.";
-
-    this.load();
 }
 
 FilterMerge.prototype.load=function(){
     this.elongHotels = fs.readFileSync(this.resultDir+this.elonghFile).toString().split('\r\n');
     this.ctripHotels = fs.readFileSync(this.resultDir+this.ctriphFile).toString().split('\r\n');
     this.qunarHotels = fs.readFileSync(this.resultDir+this.qunarhFile).toString().split('\r\n');
+    
     console.log("Before preprocessing, elong: "	+this.elongHotels.length
 		+", ctrip: "+this.ctripHotels.length
 		+", qunar: "+this.qunarHotels.length);
-    this.elongRecords = fs.readFileSync(this.resultDir+this.elongrFile).toString().split('\r\n').map(function(line){
-	if(!line) return;
-	var vals = line.split(',');
-	var room={};
-	room.tags=[];
-	vals[5].match(/[\（|\(]([^\)\）])[\)|\）]/);
-	room.tags.push(vals[10]);
-	
-	room.type  = vals[5].replace(/[\(\（\[].*/g,'').replace(/[\.\s\-]/g,'');
-	var pkg = vals[9].match(/[\(|\（]([^\)\）])[\)|\）]/)[1];
-	if(pkg)
-	    room.tags.push(pkg);
-	
-	//if(room.search("升级至")>-1){
-	//    room = room.replace(/[^升级至]/,'').replace(/[升级至]/g,'');
-	//}
-	room.type = room.type && room.type.replace(/[房间][A-Z]?$/,'');
-	return {city:vals[0],
-		id:vals[1],
-		name:vals[2],
-		star:vals[4],
-		room:room,
-		price:vals[13],
-		fan:vals[14]};
-    });
-    this.ctripRecords = fs.readFileSync(this.resultDir+this.ctriprFile).toString().split('\r\n').map(function(line){
-	if(!line) return;
-	var vals = line.split(',');
-	var room = {};
-	var pkg = vals[4].match(/[\(|\（]([^\)\）])[\)|\）]/);
-	room.type = vals[4].replace(/[房间]/g,'').replace(/[\(\（].*/g,'').replace("携程标准价",'');
-	room.tags=[];
-	room.tags.push(vals[9]);
-	if(pkg)
-	    roome.tags.push(pkg);
-	
-	return {city:vals[0],
-		id:vals[1],
-		name:vals[2],
-		star:vals[3],
-		room:room,
-		price:vals[6].trim()=="专享价"?"¥100000":vals[6].trim(),
-		fan:vals[7]?vals[7]:"返0元"
-	       };
-    });
+}
 
-    this.qunarRecords=fs.readFileSync(this.resultDir+this.qunarrFile).toString().split('\r\n').map(function(line){
-	if(!line) return;
-	var vals = line.split(',');
-	var room = {};
-	room.tags=[];
-	room.type = vals[3];
-	return {city:vals[0],
-		id:vals[1],
-		name:vals[2],
-		room:room,
-		bookSite:vals[4],
-		price:vals[5],
-		fan:vals[6]?vals[6]:"¥0"
-	       };
-    });
-    console.log("Total records, elong: "+this.elongRecords.length+", ctrip: "+this.ctripRecords.length+", qunar: "+this.qunarRecords.length);
+FilterMerge.prototype.merge = function(){
+    var result = [];
+    for(var k in this.dictElHotel){
+	var h = this.dictElHotel[k];
+	if(!h.crooms || !h.erooms || !h.qrooms)
+	    continue;
+//	console.log(h);
+	for(var i=0;i<h.erooms.length;i++){
+	    for(var j=0;j<h.crooms.length;j++){
+		for(var k=0;k<h.qrooms.length;k++){
+		    if(h.crooms[j].type==h.erooms[i].type
+		       && this.ItsFactor(h.crooms[j].tags,h.erooms[i].tags)>0.8
+		       && h.qrooms[k].type==h.erooms[i].type){
+			var str = h.city+","+h.ename+','+h.cname+','+h.qname+','+h.crooms[j].type+','+h.star+','+h.crooms[j].price+','+h.crooms[j].fan+','+h.erooms[i].price+','+h.erooms[i].fan+','+h.qrooms[k].price+','+h.qrooms[k].fan+','+h.qrooms[k].book;
+			console.log(str);
+		    }
+		}
+	    }
+	}
+    }
+}
+
+
+FilterMerge.prototype.ItsFactor=function(a,b){
+    var len = a.length>b.length?a.length:b.length;
+    if(len==0)
+	return 1;
+    var equalTag=0;
+    for(var i=0;i<a.length;i++){
+	for(var j=0;j<b.length;j++){
+	    if(a[i]==b[j])
+		equalTag++;
+	}
+    }
+    return equalTag/len;
 }
 
 FilterMerge.prototype.preProcess=function(){
@@ -115,6 +89,7 @@ FilterMerge.prototype.preProcess=function(){
 	    var obj = this.dictElHotel[vals[1]];
 	    obj.cid = vals[4];
 	    obj.cname = vals[5];
+	    obj.star = vals[6];
 	    this.dictCtHotel[ctripId]=obj;
 	    total++;
 	}
@@ -128,16 +103,137 @@ FilterMerge.prototype.preProcess=function(){
 	this.dictQuHotel[vals[3]]=obj;
     }
     console.log("After preProcessing, elong: "+i+", ctrip: "+total+", qunar: "+k);
+
+    //    this.elongRecords =
+	fs.readFileSync(this.resultDir+this.elongrFile).toString().split('\n').forEach(function(line){
+	if(!line) return;
+	var vals = line.replace('\r','').split(',');
+	var room={};
+	room.tags=[];
+	vals[5].match(/[\（|\(]([^\)\）])[\)|\）]/);
+	room.tags.push(vals[10]);
+	
+	    room.type  = vals[5].replace(/[\(\（\[].*/g,'').replace(/[\.\s\-]/g,'').replace(/[房间]/,'');
+//	room.type = room.type && room.type.replace(/[房间][A-Z]?$/,'');
+	
+	var pkg = vals[9].match(/[\【\[\(|\（]([^\)\）\]\】]*)[\]\)\）\】]/);
+	if(pkg && pkg.length>1)
+	    room.tags = room.tags.concat(pkg[1].split(';').map(function(p){return p.replace(/\./g,'');}));
+	room.price = vals[11];
+	room.fan = vals[12];
+	    
+	//if(room.search("升级至")>-1){
+	//    room = room.replace(/[^升级至]/,'').replace(/[升级至]/g,'');
+	//}
+	    var obj = that.dictElHotel[vals[1]];
+
+	if(obj){
+	    if(obj.erooms==undefined)
+		obj.erooms = [];
+	    obj.erooms.push(room);
+//	    console.log(obj.rooms.length+","+obj.eid);
+	}
+	/*	
+	return {city:vals[0],
+		id:vals[1],
+		name:vals[2],
+		star:vals[4],
+		room:room,
+		price:vals[13],
+		fan:vals[14]};*/
+    });
+//    console.log(this.elongRecords[234]);
+//    this.ctripRecords =
+	fs.readFileSync(this.resultDir+this.ctriprFile).toString().split('\n').forEach(function(line){
+	if(!line) return;
+	var vals = line.replace('\r','').split(',');
+	var room = {};
+	var pkg = vals[4].match(/[\(\（]([^\)\）]*)[\)|\）]/);
+	room.type = vals[4].replace(/[房间]/g,'').replace(/[\(\（\[].*/g,'').replace("携程标准价",'');
+	room.tags=[];
+	room.tags.push(vals[9]);
+	if(pkg && pkg.length>1)
+	    room.tags = room.tags.concat(pkg[1].split(';').map(function(p){return p.replace(/\./g,'');}));
+	room.price = vals[6].trim()=="专享价"?"¥100000":vals[6].trim();
+	room.fan = vals[7]?vals[7]:"返0元";
+	
+	var obj = that.dictCtHotel[vals[1]];
+	if(obj){
+	    if(obj.crooms==undefined)
+		obj.crooms = [];
+	    obj.crooms.push(room);
+	}
+	/*
+	return {city:vals[0],
+		id:vals[1],
+		name:vals[2],
+		star:vals[3],
+		room:room,
+		price:vals[6].trim()=="专享价"?"¥100000":vals[6].trim(),
+		fan:vals[7]?vals[7]:"返0元"
+	       };*/
+    });
+//    console.log(this.ctripRecords[234]);
+//    this.qunarRecords=
+	fs.readFileSync(this.resultDir+this.qunarrFile).toString().split('\n').forEach(function(line){
+	    if(!line) return;
+	    var vals = line.replace('\r','').split(',');
+	    var room = {};
+	    room.tags=[];
+	    room.type = vals[3].replace(/[房间]/,'');
+	    
+	    room.price = vals[5];
+	    room.fan = vals[6]?vals[6]:"¥0";
+	    room.finalPrice = eval(room.price.replace(/¥/g,'')-room.fan.replace(/[返¥]/g,''));
+	    room.book = vals[4];
+	    var obj = that.dictQuHotel[vals[1]];
+	    if(obj){
+
+		if(obj.qrooms == undefined){
+		    obj.qrooms=[];
+		    obj.qrooms.push(room);
+		}
+		else{
+		    var exists=false;
+		    for(var z=0;z<obj.qrooms.length;z++){
+			if(obj.qrooms[z].type == room.type) {
+			    exists = true;
+			    if(obj.qrooms[z].finalPrice>room.finalPrice){
+				obj.qrooms[z] = room;
+			    }
+			}
+		    }
+		    if(!exists)
+			obj.qrooms.push(room);
+		}
+		
+	    }
+	    /*
+	      return {city:vals[0],
+	      id:vals[1],
+	      name:vals[2],
+	      room:room,
+	      bookSite:vals[4],
+	      price:vals[5],
+	      fan:vals[6]?vals[6]:"¥0"
+	      };
+	    */
+    });
+//    console.log(this.qunarRecords[234]);
+//    console.log("Total records, elong: "+this.elongRecords.length+", ctrip: "+this.ctripRecords.length+", qunar: "+this.qunarRecords.length);
 }
 
 FilterMerge.prototype.start=function(){
-    
+    this.init();
+    this.load();
+    this.preProcess();
+    this.merge();
 }
 
 var fm = new FilterMerge();
-fm.init();
-fm.preProcess();
+var that = fm;
 fm.start();
+
 
 var hotels;
 function start(){
