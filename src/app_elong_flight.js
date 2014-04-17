@@ -4,7 +4,7 @@ var helper = require('../helpers/webhelper.js')
 var entity = require('../models/entity.js')
 
 function MElongFlight(){
-    this.departDate = '2014-05-01';
+    this.departDate = '2014-06-01';
     this.resultDir = "../result/";
     this.dataDir = "../appdata/";
     this.doneFile = "app_elong_done_flight.txt";

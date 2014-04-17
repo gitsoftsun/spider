@@ -6,8 +6,8 @@ var entity = require('../models/entity.js')
 var sprintf = require("sprintf-js").sprintf
 var cheerio = require("cheerio")
 //basic settings.
-var checkindate = "2014-05-01";
-var checkoutdate = "2014-05-02";
+var checkindate = "2014-06-01";
+var checkoutdate = "2014-06-02";
 
 
 //get cities

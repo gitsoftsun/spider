@@ -6,8 +6,8 @@ var helper = require('../helpers/webhelper.js')
 
 var hotel_list_options = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true);
 var hotel_detail_options= new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelDetail',"POST",true,true);
-var checkindate = "2014-05-01";
-var checkoutdate = "2014-05-02";
+var checkindate = "2014-06-01";
+var checkoutdate = "2014-06-02";
 var doneFile = "../result/app_ctrip_done_hotels.txt";
 var resultFile = "../result/app_ctrip_hotel.txt";
 var cityFile = "../appdata/qunar_hot_city.txt";

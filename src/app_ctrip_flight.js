@@ -10,7 +10,7 @@ function MCtripFlight(){
     this.resultFile = "app_ctrip_flight.txt";
     this.doneFile = "app_ctrip_done_flight.txt";
     this.skipFile = "invalidFlights.txt";
-    this.depdate = "2014/05/01";
+    this.depdate = "2014/06/01";
     this.cityFile = "qunar_flight_hot_city.txt";
 
     this.citySkip = {};
