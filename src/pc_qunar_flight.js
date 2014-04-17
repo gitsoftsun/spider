@@ -58,92 +58,92 @@ var qunar_query = function(dcity,acity){
 var cities = helper.get_cities(cityFile);
 var flights = {};
 function start(){
-	console.log("program start.");
-	for(var i=0;i<cities.length;i++){
-		var dep = cities[i];
-		for(var j=0;j<cities.length;j++){
-			if(i==j) continue;
+    console.log("program start.");
+    for(var i=0;i<cities.length;i++){
+	var dep = cities[i];
+	for(var j=0;j<cities.length;j++){
+	    if(i==j) continue;
 
-			var arr = cities[j];
-			var q = new qunar_query(dep,arr);
-			var flightsOpt = new helper.basic_options("flight.qunar.com","/twell/flight/OneWayFlight_Info.jsp",'GET',false,true,q);
-			var priceOpt = new helper.basic_options("flight.qunar.com","/twell/flight/tags/deduceonewayflight_groupdata.jsp","GET",false,true,q);
-			flightsOpt.headers["referer"]=ref;
-			priceOpt.headers["referer"] = ref;
-			helper.request_data(flightsOpt,null,fls);
-			helper.request_data(priceOpt,null,groupdata);
-		}
+	    var arr = cities[j];
+	    var q = new qunar_query(dep,arr);
+	    var flightsOpt = new helper.basic_options("flight.qunar.com","/twell/flight/OneWayFlight_Info.jsp",'GET',false,true,q);
+	    var priceOpt = new helper.basic_options("flight.qunar.com","/twell/flight/tags/deduceonewayflight_groupdata.jsp","GET",false,true,q);
+	    flightsOpt.headers["referer"]=ref;
+	    priceOpt.headers["referer"] = ref;
+	    helper.request_data(flightsOpt,null,fls);
+	    helper.request_data(priceOpt,null,groupdata);
 	}
+    }
 
 }
 
 function fls(data,args){
-	if(!data || !data.flightInfo) {
-		console.log(args[0].departureCity+"-"+args[0].arrivalCity+" :data of flights invalid.");
-		return;
+    if(!data || !data.flightInfo) {
+	console.log(args[0].departureCity+"-"+args[0].arrivalCity+" :data of flights invalid.");
+	return;
+    }
+    for(var k in data.flightInfo){
+	var f = data.flightInfo[k];
+	var fno = k.split('|')[0];
+	var id = args[0].dname+args[0].aname+fno;
+	var flight;
+	if(!flights[id]){
+	    flight = new entity.flight();
+	    flights[id] = flight;
+	}else{
+	    flight = flights[id];
 	}
-	for(var k in data.flightInfo){
-		var f = data.flightInfo[k];
-		var fno = k.split('|')[0];
-		var id = args[0].dname+args[0].aname+fno;
-		var flight;
-		if(!flights[id]){
-			flight = new entity.flight();
-			flights[id] = flight;
-		}else{
-			flight = flights[id];
-		}
 
-		flight.flightNo = fno;
-		flight.dTime = f.dt;
-		flight.aTime = f.at;
-		flight.dname = args[0].departureCity;
-		flight.aname = args[0].arrivalCity;
+	flight.flightNo = fno;
+	flight.dTime = f.dt;
+	flight.aTime = f.at;
+	flight.dname = args[0].departureCity;
+	flight.aname = args[0].arrivalCity;
 
-		if(flight.price!==''){
-			fs.appendFile(resultFile,flight.toString("qunar_pc"),function(err){
-				if(err) console.log(err.message);
-				else{
-					//TODO:
-					console.log(flight.dname+"-"+flight.aname+" : "+flight.flightNo+" done.");
-				}
-			});
+	if(flight.price!==''){
+	    fs.appendFile(resultFile,flight.toString("qunar_pc"),function(err){
+		if(err) console.log(err.message);
+		else{
+		    //TODO:
+		    console.log(flight.dname+"-"+flight.aname+" : "+flight.flightNo+" done.");
 		}
+	    });
 	}
+    }
 }
 
 function groupdata(data,args){
-	if(!data){
-		console.log(args[0].departureCity+"-"+args[0].arrivalCity+" :price of flights invalid.")
-		return;
+    if(!data){
+	console.log(args[0].departureCity+"-"+args[0].arrivalCity+" :price of flights invalid.")
+	return;
+    }
+    
+    if (data.charAt(0, 1) == "{") {
+	data = "(" + data + ")";
+    }
+    var obj = eval(data);
+    
+    if(obj&&obj.priceInfo){
+	for(var k in obj.priceInfo){
+	    var fno = k.split('|')[0];
+	    var id = args[0].dname+args[0].aname+fno;
+	    var fl = null;
+	    if(!flights[id]){
+		fl = new entity.flight();
+	    }else{
+		fl = flights[id];
+	    }
+	    fl.price = obj.priceInfo[k].lowpr;
+	    if(fl.flightNo!==''){
+		fs.appendFile(resultFile,fl.toString("qunar_pc"),function(err){
+		    if(err) console.log(err.message);
+		    else{
+			console.log(fl.dname+'-'+fl.aname+" : "+fl.flightNo+" done.");
+		    }
+		});
+	    }
 	}
-	
-	if (data.charAt(0, 1) == "{") {
-		data = "(" + data + ")";
-	}
-	var obj = eval(data);
-	
-	if(obj&&obj.priceInfo){
-		for(var k in obj.priceInfo){
-			var fno = k.split('|')[0];
-			var id = args[0].dname+args[0].aname+fno;
-			var fl = null;
-			if(!flights[id]){
-				fl = new entity.flight();
-			}else{
-				fl = flights[id];
-			}
-			fl.price = obj.priceInfo[k].lowpr;
-			if(fl.flightNo!==''){
-				fs.appendFile(resultFile,fl.toString("qunar_pc"),function(err){
-					if(err) console.log(err.message);
-					else{
-						console.log(fl.dname+'-'+fl.aname+" : "+fl.flightNo+" done.");
-					}
-				});
-			}
-		}
-	}
+    }
 }
 
 

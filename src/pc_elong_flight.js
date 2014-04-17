@@ -6,7 +6,7 @@ var entity = require('../models/entity.js')
 
 //command args: date,useproxy
 var arguments = process.argv.splice(2);
-var departDate = arguments[0] || '2014-05-01';
+var departDate = arguments[0] || '2014-06-01';
 var useproxy = arguments[1]!=undefined;//flag to define if use proxy.
 var resultFile = "../result/pc_elong_flight.txt";
 var cityFile = '../appdata/qunar_flight_hot_city.txt';
@@ -219,82 +219,18 @@ function request_data(opt,data,fn,args){
   request_data(opt,data,fn,args);
 });
 }
-var citySkip = {
-    "南京-杭州":true,
-    "杭州-南京":true,
-    "北京-天津":true,
-    "上海-杭州":true,
-    "杭州-上海":true,
-    "哈尔滨-沈阳":true,
-    "长沙-南昌":true,
-    "沈阳-哈尔滨":true,
-    "福州-南昌":true,
-    "天津-北京":true,
-    "南昌-长沙":true,
-    "南昌-福州":true,
-    "青岛-丽江":true,
-    "哈尔滨-丽江":true,
-    "福州-丽江":true,
-    "南昌-丽江":true,
-    "太原-丽江":true,
-    "丽江-青岛":true,
-    "丽江-哈尔滨":true,
-    "丽江-福州":true,
-    "丽江-南昌":true,
-    "丽江-太原":true,
-    "青岛-济南":true,
-    "哈尔滨-长春":true,
-    "长沙-武汉":true,
-    "沈阳-长春":true,
-    "天津-济南":true,
-    "丽江-长春":true,
-    "丽江-三亚":true,
-    "长春-哈尔滨":true,
-    "长春-沈阳":true,
-    "长春-丽江":true,
-    "济南-青岛":true,
-    "济南-天津":true,
-    "三亚-丽江":true,
-    "武汉-长沙":true,
-    "丽江-海口":true,
-    "三亚-海口":true,
-    "海口-丽江":true,
-    "海口-三亚":true,
-    "丽江-贵阳":true,
-    "贵阳-丽江":true,
-    "长沙-郑州":true,
-    "太原-郑州":true,
-    "武汉-郑州":true,
-    "郑州-长沙":true,
-    "郑州-太原":true,
-    "郑州-武汉":true,
-    "大连-沈阳":true,
-    "沈阳-大连":true,
-    "厦门-福州":true,
-    "福州-厦门":true,
-    "南京-天津":true,
-    "深圳-广州":true,
-    "广州-深圳":true,
-    "天津-南京":true,
-    "杭州-南昌":true,
-    "南昌-杭州":true,
-    "大连-丽江":true,
-    "丽江-大连":true,
-    "青岛-三亚":true,
-    "三亚-青岛":true,
-    "成都-重庆":true,
-    "重庆-成都":true,
-    "南京-武汉":true,
-    "武汉-南京":true,
-    "郑州-西安":true,
-    "西安-郑州":true,
-    "济南-南京":true,
-    "南京-济南":true,
-    "南昌-郑州":true,
-    "郑州-南昌":true,
-   
-    "丽江-乌鲁木齐":true,
-    "乌鲁木齐-丽江":true 
-};
+var citySkip = {};
+if(fs.existsSync('../appdata/invalidFlights.txt')){
+    fs.readFileSync('../appdata/invalidFlights.txt')
+	.toString()
+	.split('\n')
+	.reduce(function(pre,cur){
+	    if(cur){
+		cur = cur.replace('\r','');
+		pre[cur]=true;
+	    }
+	    return pre;
+	},citySkip);
+}
 
 start();
