@@ -1,6 +1,8 @@
+var http = require('http')
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
 var cheerio = require('cheerio')
+
 function Company(){
     console.log('Company worker starting');
     this.doneCount=0;
@@ -24,7 +26,10 @@ function Company(){
     this.companyDoneFile="58cmpout.txt";
     this.cityFile = "58.city.txt";
     this.cities=[];
-    this.gotCompanys=[];
+    this.gotCompanys={};
+    this.gotIds = {};
+    this.cmpIdFile = "58cmpId_test.txt";
+    this.ind = ["244","251","276","277","262","253","255","258","261","269","272","278","3527","245","246","247","248","249","250","252","254","256","257","259","260","263","264","265","266","267","268","270","271","273","274","275","279","280","281","282","283","284","285","286","287"];
 }
 /*
 { name: '酒店诚聘男女服务员包食宿',
@@ -37,36 +42,49 @@ function Company(){
 };
 */
 Company.prototype.init=function(){
-    var that = this;
     if(fs.existsSync(this.dataDir+this.companyFile)){
-	fs.readFileSync(this.dataDir+this.companyFile).toString().split('\r\n').forEach(function(line){
+	fs.readFileSync(this.dataDir+this.companyFile).toString().split('\n').forEach(function(line){
 	    if(!line) return;
+	    line = line.replace('\r','');
 	    var vals = line.split(',');
-	    that.company[vals[0]] = {cmpId:vals[0],cmpName:vals[1],member:vals[2],ind:vals[3],site:vals[4]};
+	    that.company[vals[0]] = {cmpId:vals[0],cmpName:vals[1],member:vals[2],ind:vals[3]};
 	});
     }else{
 	console.log("Company File not found");
     }
 
     //load done company file
-    var cmps = this.doneCompanys={};
-    fs.readFileSync(this.dataDir+this.companyDoneFile).toString().split("\r\n").forEach(function(line){
+    /*var cmps = this.doneCompanys={};
+    fs.readFileSync(this.dataDir+this.companyDoneFile).toString().split("\n").forEach(function(line){
 	if(!line) return;
+	line = line.replace('\r','');
 	var vals = line.split(',');
 	cmps[vals[0]]={id:vals[0],name:vals[1],member:vals[2],ind:vals[3]};
-    });
-
+    });*/
+    console.log("company load done.");
     //load cities from file
     this.cities = fs.readFileSync(this.dataDir+this.cityFile).toString().split('\n').map(function(line){
 	if(!line) return;
+	line = line.replace('\r','');
 	var vals=line.split(',');
 	return {cname:vals[0],cen:vals[1]};
     });
+    console.log("city load done.");
+    //load companys that has id and name from cmpIdFile
+    fs.readFileSync(this.resultDir+this.cmpIdFile).toString().split('\n').reduce(function(pre,cur){
+	if(cur){
+	    cur = cur.replace('\r','');
+	    var vals = cur.split(',');
+	    var obj = {id:vals[0],name:vals[1]};
+	    pre[cur.split(',')[0]]=obj;
+	}
+	return pre;
+    },this.gotIds);
+    console.log("init done.");
 }
 Company.prototype.preProcess=function(){
     this.todoCount = this.records.length;
     this.preRecords=[];
-    var that = this;
     this.records.forEach(function(e){
 	if(e.jing=='是'){
 	    that.preRecords.push(e);
@@ -116,12 +134,11 @@ Company.prototype.filterCmpUrl=function(data,args){
 	    return;
 	}
 	var r = this.preRecords.pop();
-	var that = this;
 	helper.request_data(r.cmpUrl,null,function(data,args){
 	    setTimeout(function(){
 		that.filterCmpUrl(data,args);
 	    },(Math.random()*9+2)*1000);
-	},r);	
+	},r);
     }
 }
 Company.prototype.onPreProcessed=function(){
@@ -158,7 +175,6 @@ Company.prototype.wget=function(){
 	this.onCompleted();
 	return;
     }
-    var that = this;
     console.log('GET '+r.cmpUrl);
     helper.request_data(r.cmpUrl,null,function(data,args){
 	that.process(data,args);
@@ -188,7 +204,6 @@ Company.prototype.process = function(data,args){
     });
     this.save(args[0]);
     var wait = (Math.random()*9+2)*1000;
-    var that = this;
     setTimeout(function(){
 	that.wget();
     },wait);
@@ -266,7 +281,6 @@ Company.prototype.processList=function(fileName){
     var $ = cheerio.load(data);
 //    this.records=null;
 //    var records = [];
-    var that=this;
     $('#infolist dl').each(function(i,e){
 	var record={};
 	record.top=$('a.ding1',this).length==1?"是":"否";
@@ -322,10 +336,10 @@ Company.prototype.start=function(){
     this.preProcess();
 }
 Company.prototype.wgetCompanyList=function(city){
-    var that = this;
-    var url = 'http://qy.58.com/'+city.cen+'/pn'+city.pn;
-    console.log("GET "+url);
-    helper.request_data(url,null,function(data,args){
+    console.log("GET %s-%s-%d",city.cen,city.curInd,city.pn);
+    var opt = new helper.basic_options('qy.58.com','/'+city.cen+"_"+city.curInd+'/pn'+city.pn);
+    opt.agent = false;
+    helper.request_data(opt,null,function(data,args){
 	that.processCompanyList(data);
 	if(args[0].mp==undefined){
 	    var match = data.match(/mp=(\d+)/);
@@ -337,7 +351,13 @@ Company.prototype.wgetCompanyList=function(city){
 	    args[0].pn++;
 	    setTimeout(function(){
 		that.wgetCompanyList(args[0]);
-	    },(Math.random()*10+1)*1000);
+	    },(Math.random()*0+0)*1000);
+	}else if(args[0].ind.length>0){
+	    args[0].curInd = args[0].ind.shift();
+	    args[0].pn=1;
+	    setTimeout(function(){
+		that.wgetCompanyList(args[0]);
+	    },(Math.random()*0+0)*1000);
 	}else{
 	    console.log("City done: "+args[0].cname);
 	    that.startFetchCompanys();
@@ -358,17 +378,18 @@ Company.prototype.processCompanyList=function(data){
 	var match = href.match(/\/(\d+)\//);
 	if(match){
 	    var id = match[1];
-//	    cmps.push({id:id,name:name});
-	    fs.appendFile('../result/58tmp.cmp.txt',id+","+name+"\r\n",function(err){
-		if(err) console.log(err.message);
-	    });
+	    if(!cmps[id]){
+		fs.appendFile(that.resultDir+that.cmpIdFile,id+","+name+"\r\n",function(err){
+		    if(err) console.log(err.message);
+		});
+	    }else{
+		console.log("Skip %s",id);
+	    }
 	}
     });
     return $("#pager a:last-child").attr('class')=='next';
 }
-Company.prototype.processOneCompany=function(data){
-    
-}
+
 Company.prototype.startFetchCompanys=function(){
     if(this.cities.length==0){
 	console.log("All cities done.");
@@ -377,13 +398,44 @@ Company.prototype.startFetchCompanys=function(){
     var city = this.cities.pop();
     if(!city) city = this.cities.pop();
     city.pn=1;
+    city.ind = this.ind.concat();
+    city.curInd = city.ind.shift();
     this.wgetCompanyList(city);
 }
 
-Company.prototype.wgetOneCompany=function(){
-    
+Company.prototype.wgetOneCompany=function(cmp){
+    console.log("GET %s",cmp.name);
+    var opt = new helper.basic_options('qy.58.com','/'+cmp.id);
+    opt.agent = new http.Agent();
+    opt.agent.maxSocket = 1;
+    helper.request_data(opt,null,function(data,args){
+	that.processOneCompany(data);
+    },cmp);
+}
+
+Company.prototype.processOneCompany=function(data,args){
+    var $ = cheerio.load(data);
+    $('.basicMsg table').each(function(){
+	var member = $('.yearIco i',this).text();
+	args[0].member = member?member:"否";
+	args[0].ind=$('.c33',this).text();
+    });
+    fs.appendFileSync(this.resultDir+this.companyFile,args[0].id+','+args[0].name+','+args[0].member+','+args[0].ind+'\n');
+    console.log("Done %s",args[0].name);
+}
+
+Company.prototype.startEachCompany = function(){
+    console.log("Start get each company.");
+    for(var key in this.gotIds){
+	var cur = this.gotIds[key];
+	if(!cur)
+	    continue;
+	this.wgetOneCompany(cur);
+    }
 }
 var worker = new Company();
+var that = worker;
 worker.init();
 //worker.start();
-worker.startFetchCompanys();
+//worker.startFetchCompanyfs();
+worker.startEachCompany();
