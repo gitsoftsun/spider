@@ -19,8 +19,8 @@ from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 import time
 from selenium.webdriver.common.by import By
 
-fromDate = '2014-05-01'
-toDate = '2014-05-02'
+fromDate = '2014-06-01'
+toDate = '2014-06-02'
 
 
 # city_map = {
