@@ -61,14 +61,7 @@ CtripFlight.prototype.wgetFlights=function(){
     var cur = this.todoFlights.pop();
     var ctripQuery = {DCity1:cur.dep.code,ACity1:cur.arr.code,SearchType:"S",DDate1:this.departDate};
 
-    var opt = null;
-    if(useproxy){
-        var p = getProxy();
-	//http://flights.ctrip.com/domesticsearch/search/SearchFirstRouteFlights?DCity1=BJS&ACity1=SHA&SearchType=S&DDate1=2014-05-01
-        opt = new helper.basic_options(p.host,"flights.ctrip.com/domesticsearch/search/SearchFirstRouteFlights",'GET',false,false,ctripQuery,p.port);
-    }else{
-        opt = new helper.basic_options('flights.ctrip.com','/domesticsearch/search/SearchFirstRouteFlights','GET',false,false,ctripQuery);
-    }
+    var opt = new helper.basic_options('flights.ctrip.com','/domesticsearch/search/SearchFirstRouteFlights','GET',false,false,ctripQuery);
     opt.agent=false;
     console.log("GET "+cur.dep.cname+"-"+cur.arr.cname);
     helper.request_data(opt,null,function(data,args){
