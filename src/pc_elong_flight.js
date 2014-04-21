@@ -74,8 +74,8 @@ function start(){
         }
         //opt.headers["referer"]="http://flight.elong.com/"+dep.pinyin+"-"+arr.pinyin+"/cn_day2.html";
         //get flight data from elong.com
-        //helper.request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
-        request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
+        helper.request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
+        //request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
     }
   }
 }
