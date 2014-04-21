@@ -135,7 +135,7 @@ function filterFlightInfo(flightlist,reqQuery){
     
     opt.headers["referer"]="http://flight.elong.com/"+reqQuery.DepartCityNameEn+"-"+reqQuery.ArriveCityNameEn+"/cn_day3.html";
     //helper.request_data(opt,null,getRule,[fl,cabin]);
-    request_data(opt,null,getRule,[fl,cabin]);
+    helper.request_data(opt,null,getRule,[fl,cabin]);
   }
 }
 function elong_fls(data,args){
