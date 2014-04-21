@@ -36,7 +36,7 @@ CtripFlight.prototype.init=function(){
     this.todoFlights=[];
     for(var j=0;j<this.cities.length;j++){
 	var dep = this.cities[j];
-	for(var k=0;k<this.cities.length;knen++){
+	for(var k=0;k<this.cities.length;k++){
             var arr = this.cities[k];
             if(k==j || this.doneCities[dep.cname+"-"+arr.cname] || this.citySkip[dep.cname+"-"+arr.cname]) continue;
 	    this.todoFlights.push({dep:dep,arr:arr});
