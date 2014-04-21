@@ -154,7 +154,7 @@ function process_hotel_list(data,args){
 	    if(pointsAndZone){
 		var matches = pointsAndZone.match(/\d*\.\d*/);
 		h.points = matches&&matches[0];
-		h.zoneName = pointsAndZone.split(' ')[1];	
+		h.zoneName = pointsAndZone.split(' ')[1];
 	    }
 	    var opt = null;
 	    if(useProxy){

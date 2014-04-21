@@ -69,9 +69,7 @@ CtripFlight.prototype.wgetFlights=function(){
     }else{
         opt = new helper.basic_options('flights.ctrip.com','/domesticsearch/search/SearchFirstRouteFlights','GET',false,false,ctripQuery);
     }
-    var myAgent = new http.Agent();
-    myAgent.maxSockets=1;
-    opt.agent=myAgent;
+    opt.agent=false;
     console.log("GET "+cur.dep.cname+"-"+cur.arr.cname);
     helper.request_data(opt,null,function(data,args){
 	that.processFlights(data,args);
