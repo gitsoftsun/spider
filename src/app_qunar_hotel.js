@@ -353,6 +353,7 @@ function getSpecifyHotel(city,hotelName){
 	opt = new helper.basic_options("h.qunar.com",'/list.jsp','GET',true,false,query,null);
     }
     opt.agent = false;
+    console.log("GET %s,%s",city.cname,hotelName);
     helper.request_data(opt,null,getFirstHotelOfPage,[cs[city],hotelName]);
 }
 function getFirstHotelOfPage(data,args){
