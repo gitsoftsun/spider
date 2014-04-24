@@ -323,8 +323,9 @@ function begin(){
 	    doneHotels2[dones[k]] = true;
 	}
     }
+    
     todo = fs.readFileSync("../result/pc_qunar_done_hotel.txt").toString().split("\n").filter(function(line){
-	if(!line || line='\r') return false;
+	if(!line || line=='\r') return false;
 	line = line.replace('\r','');
 	var vals = line.split(',');
 	if(doneHotels2[vals[0]+','+vals[2]])
@@ -335,7 +336,10 @@ function begin(){
 	var vals = line.split(',');
 	return {city:vals[0],elongId:vals[1],elongName:vals[2],qunarAppId:vals[3],qunarAppName:vals[4]};
     });
-    var r = todo.shift();
+    var r=null;
+    while(!r){
+	r = todo.shift();
+    }
     getSpecifyHotel(r.city,r.qunarAppName);
 }
 

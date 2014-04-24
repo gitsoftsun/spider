@@ -305,7 +305,7 @@ MCtripHotel.prototype.wgetList = function(){
 	    that.processList(data,args);
 	    that.wgetList();
 	},that.cur);
-    },(Math.random()*1+1)*1000);
+    },(Math.random()*0+0)*1000);
     /*
     var query = new this.listQuery(this.cur,this.cur.curPageIdx);
     var opt = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true,query);
@@ -337,7 +337,7 @@ MCtripHotel.prototype.wgetDetail = function(){
 	    that.processDetail(data,args);
 	    that.wgetDetail();
 	},[that.cur,curHotel]);
-    },(Math.random()*1+1)*1000);
+    },(Math.random()*0+0)*1000);
 }
 
 MCtripHotel.prototype.processList = function(obj,args){

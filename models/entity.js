@@ -85,7 +85,7 @@ exports.hotel.prototype.toString=function(site){
         return sb.toString();
     }
     else if(site=='elong'){
-        var sb = new helper.StrinpgBuffer();
+        var sb = new helper.StringBuffer();
         for(var i=0;i<this.rooms.length;i++){
             sb.append(this.city);
             sb.append(',');
