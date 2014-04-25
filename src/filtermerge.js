@@ -5,9 +5,9 @@ function FilterMerge(){
     this.elonghFile = "elonghotels.txt";
     this.ctriphFile = "pc_ctrip_done_hotel.txt";
     this.qunarhFile = "pc_qunar_done_hotel.txt";
-    this.elongrFile = "xlsx/pc_elong_hotel.csv";
-    this.ctriprFile = "xlsx/pc_ctrip_hotel.csv";
-    this.qunarrFile = "xlsx/pc_qunar_hotel.csv";
+    this.elongrFile = "pc_elong_hotel.txt";
+    this.ctriprFile = "pc_ctrip_hotel-.txt";
+    this.qunarrFile = "pc_qunar_hotel.txt";
     this.elongHotels=[];
     this.ctripHotels=[];
     this.qunarHotels=[];
@@ -87,6 +87,7 @@ FilterMerge.prototype.preProcess=function(){
 	var ctripId = vals[4];
 	if(!this.dictCtHotel[ctripId]){
 	    var obj = this.dictElHotel[vals[1]];
+	    if(!obj) continue;
 	    obj.cid = vals[4];
 	    obj.cname = vals[5];
 	    obj.star = vals[6];
@@ -98,6 +99,7 @@ FilterMerge.prototype.preProcess=function(){
 	if(!this.qunarHotels[k]) continue;
 	var vals = this.qunarHotels[k].split(',');
 	var obj = this.dictElHotel[vals[1]];
+	if(!obj) continue;
 	obj.qid=vals[3];
 	obj.qname=vals[4];
 	this.dictQuHotel[vals[3]]=obj;

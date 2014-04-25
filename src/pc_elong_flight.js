@@ -59,18 +59,30 @@ function start(){
 	for(var k=0;k<cities.length;k++){
             var arr = cities[k];
             if(k==j || doneCities[dep.cname+"-"+arr.cname] || citySkip[dep.cname+'-'+arr.cname]) continue;
-            todo.push({dep:dep,arr:arr});
+	        var eq = new elong_query(dep,arr);
+	    var opt = new helper.basic_options('flight.elong.com','/isajax/OneWay/S','GET',false,true,eq);
+	    //get flight data from elong.com
+	    opt.agent = false;
+	    helper.request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
+//            todo.push({dep:dep,arr:arr});
 	}
+    }
+//    wget();
+}
+
+function wget(){
+    if(todo.length==0) {
+	console.log("DONE");
+	return;
     }
     var cur = todo.pop();
     var dep = cur.dep;
     var arr = cur.arr;
     var eq = new elong_query(dep,arr);
     var opt = new helper.basic_options('flight.elong.com','/isajax/OneWay/S','GET',false,true,eq);
-    //opt.headers["referer"]="http://flight.elong.com/"+dep.pinyin+"-"+arr.pinyin+"/cn_day2.html";
     //get flight data from elong.com
+    opt.agent = false;
     helper.request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
-    //request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
 }
 
 var flights = {};
@@ -143,7 +155,7 @@ function filterFlightInfo(flightlist,reqQuery){
 	for(var k in reqQuery){
 	    query['request.'+k]=reqQuery[k];
 	}*/
-	var opt = new helper.basic_options('flight.elong.com','/isajax/flightajax/GetShoppingRestrictionRuleInfo','GET',false,true,query);
+	var opt = new helper.basic_options('flight.elong.com','/isajax/OneWay/RestrictionRule','GET',false,true,query);
 	opt.agent=false;
 	opt.headers["referer"]="http://flight.elong.com/"+reqQuery.DepartCityNameEn+"-"+reqQuery.ArriveCityNameEn+"/cn_day3.html";
 	//helper.request_data(opt,null,getRule,[fl,cabin]);
@@ -201,38 +213,12 @@ function getRule(data,args){
 	    console.log(id+" : "+doneCities[id].cur+"/"+doneCities[id].total+" done.");
 	    if(doneCities[id].cur==doneCities[id].total){
 		fs.appendFile(doneFile,id+"\r\n",function(err){});
+//		wget();
 	    }
 	}
     });
 }
 
-function request_data(opt,data,fn,args){
-    var url = "http://"+opt.host+opt.path;
-    http.get(url,function(res){
-	var chunks = [];
-	res.on('data',function(chunk){
-            chunks.push(chunk);
-	});
-	res.on('end',function(){
-            var buffer = Buffer.concat(chunks);
-            var result = buffer.toString();
-            var obj = JSON.parse(result);
-            if(Array.isArray(args)){
-		args.push(opt.data);
-		fn(obj,args);  
-            }else{
-		fn(obj,[args,opt.data]);
-            }
-            
-	});
-	res.on('error',function(e){
-            console.log(e.message);
-	});
-    }).on("error",function(e){
-	console.log(e.message);
-	request_data(opt,data,fn,args);
-    });
-}
 var citySkip = {};
 if(fs.existsSync('../appdata/invalidFlights.txt')){
     fs.readFileSync('../appdata/invalidFlights.txt')

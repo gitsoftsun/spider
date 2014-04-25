@@ -367,16 +367,12 @@ exports.flight.prototype.toString=function(site,cabin){
             sb.append(this.aTime);
             sb.append(',');
             sb.append(this.price);
+        sb.append(',');
+        sb.append(cabin.tui.replace(/[,，\r\n]*/g,''));
             sb.append(',');
-            //if(this.cabins[i].tui)
-                sb.append(cabin.tui.replace(/[,\r\n]*/g,''));
-
-            sb.append(',');
-            //if(this.cabins[i].gai)
-                sb.append(cabin.gai.replace(/[,\r\n]*/g,''));
-            sb.append(',');
-            //if(this.cabins[i].qian)
-                sb.append(cabin.qian.replace(/[,\r\n]*/g,''));
+        sb.append(cabin.gai.replace(/[,，\r\n]*/g,''));
+        sb.append(',');
+        sb.append(cabin.qian.replace(/[,，\r\n]*/g,''));
             sb.append(',');
             sb.append(cabin.ctype);
             sb.append(',');
@@ -384,7 +380,7 @@ exports.flight.prototype.toString=function(site,cabin){
             sb.append(',');
             sb.append(cabin.fan);
             sb.append(',');
-            sb.append(cabin.tCount);
+        sb.append(cabin.tCount==2147483647?"充足":cabin.tCount);
             sb.append('\r\n');
         //}
 
