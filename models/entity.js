@@ -77,7 +77,11 @@ exports.hotel.prototype.toString=function(site){
             sb.append(',');
             sb.append(this.commentCount);
             sb.append(',');
-            sb.append(this.rooms[i].breakfast);
+	    var b = this.rooms[i].breakfast;
+	    if(b=='单早') sb.append(1);
+            else if(b=="双早") sb.append(2);
+	    else if(b=="三早") sb.append(3);
+	    else sb.append(0);
             sb.append(',');
             sb.append(this.rooms[i].lan);
             sb.append('\r\n');
@@ -176,16 +180,25 @@ exports.hotel.prototype.toString=function(site){
                 sb.append(',');
                 sb.append(this.commentCount);
                 sb.append(',');
-                sb.append(this.goodComment);
-                sb.append(',');
-                sb.append(this.badComment);
-                sb.append(',');
+                //sb.append(this.goodComment);
+                //sb.append(',');
+                //sb.append(this.badComment);
+                //sb.append(',');
                 sb.append(this.prate);
                 sb.append(',');
                 sb.append(r.plans[j].name);
                 sb.append(',');
-                sb.append(r.plans[j].breakfast);
-                sb.append(',');
+		var b = r.plans[j].breakfast;
+		if(b=="单早"){
+                    sb.append(1);
+		}else if(b=="双早"){
+		    sb.append(2);
+		}else if(b=="三早"){
+		    sb.append(3);
+		}else{
+		    sb.append(0);
+		}
+		sb.append(',');
                 sb.append(r.plans[j].price);
                 sb.append(',');
                 sb.append(r.plans[j].fan);

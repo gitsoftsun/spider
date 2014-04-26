@@ -59,10 +59,10 @@ function start(){
 	for(var k=0;k<cities.length;k++){
             var arr = cities[k];
             if(k==j || doneCities[dep.cname+"-"+arr.cname] || citySkip[dep.cname+'-'+arr.cname]) continue;
-	        var eq = new elong_query(dep,arr);
+	    var eq = new elong_query(dep,arr);
 	    var opt = new helper.basic_options('flight.elong.com','/isajax/OneWay/S','GET',false,true,eq);
 	    //get flight data from elong.com
-	    opt.agent = false;
+//	    opt.agent = false;
 	    helper.request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
 //            todo.push({dep:dep,arr:arr});
 	}
@@ -81,7 +81,7 @@ function wget(){
     var eq = new elong_query(dep,arr);
     var opt = new helper.basic_options('flight.elong.com','/isajax/OneWay/S','GET',false,true,eq);
     //get flight data from elong.com
-    opt.agent = false;
+//    opt.agent = false;
     helper.request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
 }
 
@@ -156,7 +156,7 @@ function filterFlightInfo(flightlist,reqQuery){
 	    query['request.'+k]=reqQuery[k];
 	}*/
 	var opt = new helper.basic_options('flight.elong.com','/isajax/OneWay/RestrictionRule','GET',false,true,query);
-	opt.agent=false;
+//	opt.agent=false;
 	opt.headers["referer"]="http://flight.elong.com/"+reqQuery.DepartCityNameEn+"-"+reqQuery.ArriveCityNameEn+"/cn_day3.html";
 	//helper.request_data(opt,null,getRule,[fl,cabin]);
 	console.log('GET Rule %s-%s',fl.dname,fl.aname);
