@@ -6,8 +6,8 @@ var entity = require('../models/entity.js')
 var sprintf = require("sprintf-js").sprintf
 var cheerio = require("cheerio")
 //basic settings.
-var checkindate = "2014-06-01";
-var checkoutdate = "2014-06-02";
+var checkindate = "2014-07-01";
+var checkoutdate = "2014-07-02";
 
 
 //get cities
@@ -30,7 +30,7 @@ function process_hotel_list(data,args){
 	console.log("error occured.");
 	return;	
     }
-
+    
     //get hotel list data
     for(var i=0;i<data.Items.length;i++){
 	var item = data.Items[i];
@@ -122,4 +122,20 @@ function appendToFile(file,data){
 	if(err)
 	    console.log(err.message);
     });
+}
+
+function ElongHotel(){
+    
+}
+
+ElongHotel.prototype.init = function(){
+    
+}
+
+ElongHotel.prototype.start = function(){
+    this.init();
+}
+
+ElongHotel.prototype.wgetDetail = function(){
+    
 }
