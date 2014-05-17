@@ -94,7 +94,7 @@ function filterFlightInfo(flightlist,reqQuery){
       fl.aTime = new Date(Number(flight.SegmentList[0].ArriveTime.match(/\d+/)[0])).toString().match(/\d+:\d+:\d+/)[0];
       fl.price = flight.SalePrice;
       flights[no]=fl;
-    } 
+    }
     else
       fl = flights[no];
     
@@ -106,7 +106,7 @@ function filterFlightInfo(flightlist,reqQuery){
     fl.cabins.push(cabin);
 
     //request to get tui,gai,qian data.
-    var query = {
+    /*var query = {
       "flightNums":no,
       "channel":"AirShopping",
       "flag":"channel1",
@@ -135,7 +135,8 @@ function filterFlightInfo(flightlist,reqQuery){
     
     opt.headers["referer"]="http://flight.elong.com/"+reqQuery.DepartCityNameEn+"-"+reqQuery.ArriveCityNameEn+"/cn_day3.html";
     //helper.request_data(opt,null,getRule,[fl,cabin]);
-    request_data(opt,null,getRule,[fl,cabin]);
+    request_data(opt,null,getRule,[fl,cabin]);*/
+    saveFile([fl]);
   }
 }
 function elong_fls(data,args){
@@ -161,6 +162,16 @@ function elong_fls(data,args){
   console.log(id+" : "+doneCities[id].total);
   filterFlightInfo(FlightLegList,args[2]);
   filterFlightInfo(RecommendLegList,args[2]);
+}
+
+function saveFile(args){
+    fs.appendFileSync(resultFile,args[0].toString("elong_pc",cabin));
+    var id = args[0].dname+"-"+args[0].aname;
+    ++doneCities[id].cur;
+    console.log(id+" : "+doneCities[id].cur+"/"+doneCities[id].total+" done.");
+    if(doneCities[id].cur==doneCities[id].total){
+        fs.appendFileSync(doneFile,id+"\r\n");
+    }
 }
 
 function getRule(data,args){

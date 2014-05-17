@@ -350,14 +350,14 @@ exports.flight.prototype.toString=function(site,cabin){
             sb.append(',');
             sb.append(this.price);
             sb.append(',');
-            //if(this.cabins[i].tui)
+            if(this.cabins[i].tui)
                 sb.append(cabin.tui.replace(/[,\r\n]*/g,''));
 
             sb.append(',');
-            //if(this.cabins[i].gai)
+            if(this.cabins[i].gai)
                 sb.append(cabin.gai.replace(/[,\r\n]*/g,''));
             sb.append(',');
-            //if(this.cabins[i].qian)
+            if(this.cabins[i].qian)
                 sb.append(cabin.qian.replace(/[,\r\n]*/g,''));
             sb.append(',');
             sb.append(cabin.ctype);
