@@ -115,7 +115,7 @@ function filterFlightInfo(flightlist,reqQuery){
 	fl.cabins.push(cabin);
 
 	//request to get tui,gai,qian data.
-	var query = {
+	/*var query = {
 	    "uniqueKey":fl.uid,
 	    "flightNums":no,
 	    "channel":"AirShopping",
@@ -151,18 +151,31 @@ function filterFlightInfo(flightlist,reqQuery){
 	    "request.language":"cn",
 	    "request.viewpath":"~/views/list/oneway.aspx"
 	};
-/*
+
 	for(var k in reqQuery){
 	    query['request.'+k]=reqQuery[k];
-	}*/
+	}
 	var opt = new helper.basic_options('flight.elong.com','/isajax/OneWay/RestrictionRule','GET',false,true,query);
 //	opt.agent=false;
 	opt.headers["referer"]="http://flight.elong.com/"+reqQuery.DepartCityNameEn+"-"+reqQuery.ArriveCityNameEn+"/cn_day3.html";
 	//helper.request_data(opt,null,getRule,[fl,cabin]);
 	console.log('GET Rule %s-%s',fl.dname,fl.aname);
 	helper.request_data(opt,null,getRule,[fl,cabin]);
+	*/
+	saveFile([fl]);
     }
 }
+
+function saveFile(args){
+    fs.appendFileSync(resultFile,args[0].toString("elong_pc",{tui:"",gai:"",qian:""}));
+    var id = args[0].dname+"-"+args[0].aname;
+    ++doneCities[id].cur;
+    console.log(id+" : "+doneCities[id].cur+"/"+doneCities[id].total+" done.");
+    if(doneCities[id].cur==doneCities[id].total){
+	fs.appendFileSync(doneFile,id+"\r\n");
+    }
+}
+
 function elong_fls(data,args){
     var id = args[0]+"-"+args[1];
     if(!data||!data.success){
