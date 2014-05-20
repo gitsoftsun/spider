@@ -9,7 +9,7 @@ function MQunarFlight(){
     this.resultFile = "app_qunar_flight.txt";
     this.doneFile = "app_qunar_done_flight.txt";
     this.skipFile = "invalidFlights.txt";
-    this.departDate = "20140601";
+    this.departDate = "20140701";
     this.cityFile = "qunar_flight_hot_city.txt";
 
     this.citySkip = {};

@@ -4,8 +4,8 @@ var cheerio = require('cheerio')
 var entity = require('../models/entity.js')
 
 //basic settings.
-var checkindate = "2014-06-01";
-var checkoutdate = "2014-06-02";
+var checkindate = "2014-07-01";
+var checkoutdate = "2014-07-02";
 var app_qunar_done_city_file = "../result/app_qunar_done_city_hotel.txt";
 var app_qunar_done_hotel= "../result/app_qunar_done_hotel.txt";
 var countOfHotelsPerCity = 20;
@@ -206,7 +206,6 @@ function process_hotel_list(data,args){
 
 var donehotelcount=0;
 function process_one_hotel(data,args){
-    console.log("got hotel page.");
     var $ = cheerio.load(data);
 
     var infoNode = $("div.ct1 table tr td:last-child").contents();
@@ -289,15 +288,12 @@ function process_one_hotel(data,args){
     fs.appendFileSync("../result/app_qunar_hotel.txt",args[0].toString("qunar"));
     setTimeout(function(){
 	var r = todo.shift();
-	getSpecifyHotel(r.city,r.qunarAppName);
+	getSpecifyHotel(r);
     },(Math.random()*9+2)*1000);
     //console.log(args[1].cname+": "+(++args[1].curHotelIdx)+"/"+args[1].hotelCount);
-    fs.appendFile(doneHotelFile,args[0].city+','+args[2]+'\r\n',function(err){
-	if(err) console.log(err.message);
-	else{
-	    console.log(args[0].city+','+args[2]);
-	}
-    });
+    fs.appendFileSync(doneHotelFile,args[1].city.cname+','+args[1].elongId+','+args[1].elongName+','+args[0].id+','+args[0].name+'\r\n');
+    console.log(args[0].city+','+args[0].name);
+    
     // if(args[1].curHotelIdx==args[1].hotelCount){
     // doneCities[args[1].cname] = true;
     // fs.appendFile(app_qunar_done_city_hotel,args[1].cname+'\r\n',function(err){
@@ -320,31 +316,34 @@ function begin(){
     if(fs.existsSync(doneHotelFile)){
 	var dones = fs.readFileSync(doneHotelFile).toString().split("\r\n");
 	for(var k=0;k<dones.length;k++){
-	    doneHotels2[dones[k]] = true;
+	    if(!dones[k]) continue;
+	    var eid = dones[k].split(',')[1];
+	    doneHotels2[eid] = true;
 	}
     }
     
-    todo = fs.readFileSync("../result/pc_qunar_done_hotel.txt").toString().split("\n").filter(function(line){
+    todo = fs.readFileSync("../result/app_ctrip_done_hotels.txt").toString().split("\n").filter(function(line){
 	if(!line || line=='\r') return false;
 	line = line.replace('\r','');
 	var vals = line.split(',');
-	if(doneHotels2[vals[0]+','+vals[2]])
+	if(doneHotels2[vals[1]])
 	   return false;
 	return true;
     }).map(function(line){
 	line = line.replace('\r','');
 	var vals = line.split(',');
-	return {city:vals[0],elongId:vals[1],elongName:vals[2],qunarAppId:vals[3],qunarAppName:vals[4]};
+	return {city:cs[vals[0]],elongId:vals[1],elongName:vals[2]};
     });
     var r=null;
     while(!r){
 	r = todo.shift();
     }
-    getSpecifyHotel(r.city,r.qunarAppName);
+    getSpecifyHotel(r);
 }
 
-function getSpecifyHotel(city,hotelName){
-    var query = {"checkin":checkindate.replace(/\-/g,''),"days":1,"city":city,"level":0,"priceRange":0,"queryKey":hotelName};
+function getSpecifyHotel(record){
+    var city = record.city,hotelName = record.elongName;
+    var query = {"checkin":checkindate.replace(/\-/g,''),"days":1,"city":city.cname,"level":0,"priceRange":0,"queryKey":hotelName};
     var opt = null;
     if(useProxy){
 	var p = getProxy();
@@ -354,7 +353,7 @@ function getSpecifyHotel(city,hotelName){
     }
     opt.agent = false;
     console.log("GET %s,%s",city.cname,hotelName);
-    helper.request_data(opt,null,getFirstHotelOfPage,[cs[city],hotelName]);
+    helper.request_data(opt,null,getFirstHotelOfPage,[city,record]);
 }
 function getFirstHotelOfPage(data,args){
     //console.log("done got "+args[0].cname+" page:"+ args[1].pageNum);
@@ -364,9 +363,10 @@ function getFirstHotelOfPage(data,args){
    }
     var $ = cheerio.load(data);
     var h = new entity.hotel();
-    $('table.fl tr td:first-child').each(function(i,e){
+    $('table.fl tr:first-child td:first-child').each(function(i,e){
 	h.city = args[0].cname;
 	h.name = $('a',this).text();
+	h.name = h.name && h.name.replace(/[,]/g,";");
 	var href=$('a',this).attr('href');
 	var matches = href&&href.match(/seq=(\w+)/);
 	var id = matches&&matches[1];
@@ -424,7 +424,7 @@ function getFirstHotelOfPage(data,args){
 	opt = new helper.basic_options("h.qunar.com",'/preDetail.jsp','GET',true,false,{'seq':h.id,'checkin':checkindate.replace(/\-/g,''),'days':1,"city":args[0].cname,'pageNum':args[1].pageNum},null);
     }
     opt.agent=false;
-    helper.request_data(opt,null,process_one_hotel,[h,args[0],args[1]]);
+    helper.request_data(opt,null,process_one_hotel,[h,args[1]]);
 }
 
 begin();

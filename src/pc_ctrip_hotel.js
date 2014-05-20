@@ -17,8 +17,8 @@ for(var i=0;i<cities.length;i++){
 }
 
 function CtripHotel(){
-    this.checkindate = "2014-06-01";
-    this.checkoutdate = "2014-06-02";
+    this.checkindate = "2014-07-01";
+    this.checkoutdate = "2014-07-02";
     this.resultDir = "../result/";
     this.dataDir = "../appdata/";
     this.resultFile = "pc_ctrip_hotel-.txt";

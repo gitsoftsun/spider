@@ -7,8 +7,8 @@ var entity = require('../models/entity.js')
 var sprintf = require("sprintf-js").sprintf
 
 //basic settings.
-var checkindate = "2014/06/01";
-var checkoutdate = "2014/06/02";
+var checkindate = "2014/07/01";
+var checkoutdate = "2014/07/02";
 var arguments = process.argv.splice(2);
 var level = '';
 useproxy = arguments[0]!=undefined;
@@ -160,7 +160,7 @@ function process_one_hotel(data,args){
     }
     
     fs.appendFile(resultFile,args[0].toString("elong_pc"));
-    fs.appendFileSync(hotelInfoFile,args[0].city+','+args[0].id+','+args[0].name+','+args[0].star+'\r\n');
+    //fs.appendFileSync(hotelInfoFile,args[0].city+','+args[0].id+','+args[0].name+','+args[0].star+'\r\n');
     console.log(args[1].cname+" : "+(++args[1].curHotelIdx)+"/"+args[1].hotelCount);
 }
 function process_one_hotel_info(data,args){

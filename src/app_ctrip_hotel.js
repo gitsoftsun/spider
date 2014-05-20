@@ -6,8 +6,8 @@ var helper = require('../helpers/webhelper.js')
 
 var hotel_list_options = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true);
 var hotel_detail_options= new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelDetail',"POST",true,true);
-var checkindate = "2014-06-01";
-var checkoutdate = "2014-06-02";
+var checkindate = "2014-07-01";
+var checkoutdate = "2014-07-02";
 var doneFile = "../result/app_ctrip_done_hotels.txt";
 var resultFile = "../result/app_ctrip_hotel.txt";
 var cityFile = "../appdata/qunar_hot_city.txt";
@@ -254,14 +254,32 @@ MCtripHotel.prototype.start = function(){
 
 MCtripHotel.prototype.startSearch = function(){
     this.init();
+    fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,cur){
+	cur = cur && cur.replace('\r','');
+	if(cur){
+	    var eid = cur.split(',')[1];
+	    pre[eid]=true;
+	}
+	return pre;
+    },this.doneHotels);
+    var doneCount = 0;
     this.hotelList = fs.readFileSync(this.appDir+this.elongHotelsFile).toString().split('\n').filter(function(line){
 	if(!line) return false;
+	var vals = line.split(',');
+	if(that.doneHotels[vals[1]]){
+	    doneCount++;
+	    return false;
+	}
 	return true;
     }).map(function(line){
 	line = line.replace('\r','');
 	var vals = line.split(',');
-	return {city:vals[0],hid:vals[1],hname:vals[2],hstar:vals[3]};
+	var city  = that.cityDict[vals[0]];
+	return {city:city,eid:vals[1],ename:vals[2],estar:vals[3]};
     });
+    console.log("hotel count : %d, done count: %d",this.hotelList.length,doneCount);
+    
+    this.search();
 }
 
 MCtripHotel.prototype.init = function(){
@@ -282,15 +300,17 @@ MCtripHotel.prototype.load = function(){
 }
 
 MCtripHotel.prototype.search = function(){
+    if(this.hotelList.length==0)
+	return;
+    
     var cur =  this.hotelList.shift();
-    var city  = this.cityDict[cur.city];
-    var query = new this.listQuery(city,1);
-    query.KeyWord = cur.hname;
+    var query = new this.listQuery(cur.city,1);
+    query.KeyWord = cur.ename;
     var opt = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true,query);
     opt.headers['Content-Type']="application/json";
     opt.agent=false;
     setTimeout(function(){
-	console.log("GET %s:%s",cur.city,cur.hname);
+	console.log("GET %s:%s",cur.city.cname,cur.ename);
 	helper.request_data(opt,query,function(data,args){
 	    that.getFirstOfPage(data,args);
 	},cur);
@@ -310,7 +330,7 @@ MCtripHotel.prototype.getFirstOfPage = function(obj,args){
             var h_obj = a[0].HotelLists[0];
 	    if(!h_obj) return;
 	    
-            h.city=args[0].cname;
+            h.city=args[0].city.cname;
             h.id=h_obj.HotelID;
             h.name=h_obj.HotelName;
 	    h.name = h.name && h.name.trim().replace(/[,，]/g,';');
@@ -318,19 +338,21 @@ MCtripHotel.prototype.getFirstOfPage = function(obj,args){
             h.currency=h_obj.Currency;
             h.points = h_obj.Points;
             h.zoneName = h_obj.ZoneName;
-
-	    var query = new this.detailQuery(this.cur.id,curHotel.id);
+	    
+	    var query = new this.detailQuery(args[0].city.code,h.id);
 	    var opt = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelDetail',"POST",true,true,query);
 	    opt.headers['Content-Type']="application/json";
 	    opt.agent = false;
 	    setTimeout(function(){
-		console.log("GET %s, %s",that.cur.cname,curHotel.name);
+		console.log("GET %s, %s",args[0].city.cname,h.name);
 		helper.request_data(opt,query,function(data,args){
 		    that.processDetail(data,args);
-		},[that.cur,curHotel]);
+		},[args[0],h]);
 	    },(Math.random()*1+1)*1000);
+	    return;
         }
     }
+    this.search();
 }
 
 MCtripHotel.prototype.wgetList = function(){
@@ -459,18 +481,27 @@ MCtripHotel.prototype.processDetail = function(obj,args){
         data = obj.Data;
     }else{
 	console.log("Failed: %s",args[1].name);
-	args[0].failedCount++;
+	if(args[0].failedCount != undefined){
+	    args[0].failedCount++;
+	}
     }
     if(data&&data!==''){
         data = helper.CtripUnPack(data);
         if(data&&data[0]){
             var h = args[1];
+/*	    h.id = data[0].HotelID;
+	    h.name = data[0].HotelName;
+	    h.name = h.name && h.name.trim().replace(/[,，]/g,';');
+	    h.star = data[0].Star;
+	    h.currency = data[0].Currency;
+	    h.points =data[0].CustPoints;
+	    h.zoneName = data[0].ZoneName;*/
             h.commentCount=data[0].CommentTotal;
             h.custPoints = data[0].CustPoints;
-            h.faclPoints= data[0].FaclPoints;
-            h.raAtPoints = data[0].RaAtPoints;
-            h.ratPoints = data[0].RatPoints;
-            h.servPoints = data[0].ServPoints;
+            h.faclPoints= data[0].FaclPoints;//设施
+            h.raAtPoints = data[0].RaAtPoints;//环境
+            h.ratPoints = data[0].RatPoints;//卫生
+            h.servPoints = data[0].ServPoints;//服务
             if(data[0].HotelPicList)
                 h.picCount = data[0].HotelPicList.length;
             if(data[0].RoomDetailList){
@@ -489,13 +520,17 @@ MCtripHotel.prototype.processDetail = function(obj,args){
                     h.rooms.push(rm);
                 }
 		fs.appendFileSync(this.resultDir+this.resultFile,h.toString());
-		fs.appendFileSync(this.resultDir+this.doneFile,h.id+"\n");
+		//fs.appendFileSync(this.resultDir+this.doneFile,h.id+"\n");
+		fs.appendFileSync(this.resultDir+this.doneFile,args[0].city.cname+","+args[0].eid+','+args[0].ename+','+args[0].estar+','+h.id+','+h.name+','+h.star+"\r\n");
 		console.log("Saved: %d/%d",++args[0].doneCount,args[0].totalCount);
             }
         }
     }
+
+    this.search();
 }
 
 var instance = new MCtripHotel();
 var that = instance;
-instance.start();
+//instance.start();
+instance.startSearch();

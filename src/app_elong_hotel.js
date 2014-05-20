@@ -37,6 +37,7 @@ function process_hotel_list(data,args){
 	var h = new entity.hotel();
 	h.id = item.HotelId;
 	h.name = item.HotelName;
+	h.name = h.name && h.name.replace(/[,]/g,";");
 	h.city = data.CityName;
 	h.star = item.StarCode;
 	h.prate = item.GoodCommentPercent;
