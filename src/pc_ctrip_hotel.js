@@ -48,18 +48,22 @@ CtripHotel.prototype.init = function(){
 	.filter(function(l){
 	    if(!l || l=='\r')
 		return false;
-	    return true;
-	})
+	    var kvs = l.split(',');
+	    var cityName = kvs[0];
+	    var elongId = kvs[1];
+	    var hotelName = kvs[2];
+	    var elongStar = kvs[3].replace('\r',"").replace('\n',"");
+	    return !this.doneHotel[hotelName];
+	},this)
 	.map(function(l){
 	    var kvs = l.split(',');
 	    var cityName = kvs[0];
 	    var elongId = kvs[1];
 	    var hotelName = kvs[2];
-	    var elongStar = kvs[3];
-	    if(!this.doneHotelsDic[hotelName]){
-		return {cityName:cityName,hotelName:hotelName,elongId:elongId,elongStar:elongStar};
-	    }
+	    var elongStar = kvs[3].replace('\r',"").replace('\n',"");
+	    return {cityName:cityName,hotelName:hotelName,elongId:elongId,elongStar:elongStar};
 	},this);
+    console.log("%d hotels to do",this.todoHotels.length);
 }
 
 CtripHotel.prototype.start = function(){
@@ -75,7 +79,7 @@ CtripHotel.prototype.search = function(){
     if(this.todoHotels.length==0)
 	return;
     
-    var cur = this.todoHotels.pop();
+    var cur = this.todoHotels.shift();
     var c = cs[cur.cityName];
     var query = {
 	StartDate : this.checkindate,
@@ -83,6 +87,9 @@ CtripHotel.prototype.search = function(){
 	cityId : c.id,
 	star : 0
     };
+    if(c.id==1024){
+	c.pinyin = "ma'anshan";
+    }
     var path = "/hotel/"+c.pinyin+c.id+"/k1"+encodeURI(cur.hotelName);
     var opt = new helper.basic_options('hotels.ctrip.com',path,'POST',false,false,query);
     
@@ -94,8 +101,10 @@ CtripHotel.prototype.search = function(){
 }
 
 CtripHotel.prototype.filterFromResult = function(data,args){
-    if(!data)
+    if(!data){
+	this.search();
 	return;
+    }
     var $=cheerio.load(data);
     var c = args[0];
     if(!c.pageCount) {
@@ -109,6 +118,7 @@ CtripHotel.prototype.filterFromResult = function(data,args){
 		return;
 	    }
 	}else{
+	    this.search();
 	    return;
 	}
     }
@@ -126,7 +136,8 @@ CtripHotel.prototype.filterFromResult = function(data,args){
 		return;
 	    }
 	}else{
-	    return;
+	    //this.search();
+	    //return;
 	}
     }
     if(c.curHotelIdx==undefined) c.curHotelIdx=0;
@@ -135,14 +146,18 @@ CtripHotel.prototype.filterFromResult = function(data,args){
 	cnf = cnf[0];
     else{
 //	fs.appendFileSync(failedFile,args[1].cityName+","+args[1].hotelName+'\r\n');
-//	return;
+	this.search();
+	return;
     }
     var url = cnf.split(':')[1].replace(/[\',\s]*/g,'');
     var hotelList = $("#hotel_list div.searchresult_list");
 
-    if(hotelList.length==0)
+    if(hotelList.length==0){
+	setTimeout(function(){
+	    that.search();
+	},100);
 	return;
-
+    }
     var item = $("#hotel_list div.searchresult_list").eq(0);
     var h = new entity.hotel();
     h.name = $("ul.searchresult_info li.searchresult_info_name h2.searchresult_name a",item).attr("title");
@@ -169,6 +184,7 @@ CtripHotel.prototype.processList = function(){
 CtripHotel.prototype.processDetail = function(data,args){
     if(!data) {
 	console.log("no data.");
+	this.search();
 	return;
     }
     var $ = cheerio.load(data);

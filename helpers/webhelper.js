@@ -119,8 +119,11 @@ exports.request_data=function(opts,data,fn,args){
 	if (res.statusCode > 300 && res.statusCode < 400&& res.headers.location) {
 
         if (url.parse(res.headers.location).hostname){
-	    console.log("Redirecting to "+res.headers.location);
-	    exports.request_data(res.headers.location,data,fn,args);
+	    
+	    console.log("%s Redirecting to %s",opts.path,res.headers.location);
+	    opts.host = url.parse(res.headers.location).host;
+	    opts.path = url.parse(res.headers.location).path;
+	    exports.request_data(opts,data,fn,args);
 	}
         else {
 

@@ -112,6 +112,10 @@ function filterFlightInfo(flightlist,reqQuery){
 	cabin.price = flight.SalePrice;
 	cabin.tCount = flight.SegmentList[0].TicketCount;
 	cabin.fan = flight.ItinerarySupportCoupon;
+	cabin.tui = "";
+	cabin.gai = "";
+	cabin.qian = "";
+	
 	fl.cabins.push(cabin);
 
 	//request to get tui,gai,qian data.
@@ -167,7 +171,7 @@ function filterFlightInfo(flightlist,reqQuery){
 }
 
 function saveFile(args){
-    fs.appendFileSync(resultFile,args[0].toString("elong_pc",{tui:"",gai:"",qian:""}));
+    fs.appendFileSync(resultFile,args[0].toString("elong_pc",args[0].cabins[0]));
     var id = args[0].dname+"-"+args[0].aname;
     ++doneCities[id].cur;
     console.log(id+" : "+doneCities[id].cur+"/"+doneCities[id].total+" done.");

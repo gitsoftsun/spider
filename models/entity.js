@@ -43,6 +43,8 @@ exports.hotel.prototype.toString=function(site){
 		sb.append(this.id);
 		sb.append(',');
                 sb.append(this.name);
+		sb.append(',');
+		sb.append(this.star);
                 sb.append(',');
                 sb.append(this.rooms[i].name);
                 sb.append(',');
