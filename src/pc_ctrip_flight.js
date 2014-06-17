@@ -12,7 +12,7 @@ function CtripFlight(){
     this.cityFile = 'ctrip_flight_hot_city.txt';
     this.logFile = "pc_ctrip_flight_log.txt";
     this.doneFile = "pc_ctrip_done_flight.txt";
-    this.departDate = '2014-06-01';
+    this.departDate = '2014-08-01';
     this.skipFile = "invalidFlights.txt";
     this.citySkip = {};
 }

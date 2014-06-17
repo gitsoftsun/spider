@@ -6,8 +6,8 @@ var helper = require('../helpers/webhelper.js')
 
 var hotel_list_options = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true);
 var hotel_detail_options= new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelDetail',"POST",true,true);
-var checkindate = "2014-07-01";
-var checkoutdate = "2014-07-02";
+var checkindate = "2014-08-01";
+var checkoutdate = "2014-08-02";
 var doneFile = "../result/app_ctrip_done_hotels.txt";
 var resultFile = "../result/app_ctrip_hotel.txt";
 var cityFile = "../appdata/qunar_hot_city.txt";
@@ -206,8 +206,8 @@ function one_page_data(obj,args){
 }
 
 function MCtripHotel(){
-    this.checkindate = "2014-07-01";
-    this.checkoutdate = "2014-07-02";
+    this.checkindate = "2014-08-01";
+    this.checkoutdate = "2014-08-02";
     this.resultDir = "../result/";
     this.appDir = "../appdata/";
     this.doneFile = "app_ctrip_done_hotels.txt";
