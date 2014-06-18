@@ -19,8 +19,8 @@ from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 import time
 from selenium.webdriver.common.by import By
 
-fromDate = '2014-06-01'
-toDate = '2014-06-02'
+fromDate = '2014-08-01'
+toDate = '2014-08-02'
 
 
 # city_map = {
@@ -96,7 +96,7 @@ def get_city_hotel_tuple_list():
         doneHotels[f.split(',')[1]]=True
         pass
     
-    fp = codecs.open('../appdata/elonghotels.txt', 'r', 'utf8')
+    fp = codecs.open('../result/pc_ctrip_done_hotel.txt', 'r', 'utf8')
     lines = fp.readlines()
     for l in lines:
         l = l.replace('\r', '').replace('\n', '')
