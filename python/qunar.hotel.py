@@ -116,8 +116,8 @@ def get_city_hotel_tuple_list():
 
 def one_driver_all_hotel():
     driver = webdriver.Firefox()
-
     city_hotel_tuple_list = get_city_hotel_tuple_list()
+    #driver.manage().timeouts().pageLoadTimeout(4,TimeUnit.SECONDS);
 
     num = len(city_hotel_tuple_list)
 
@@ -139,8 +139,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
     # site = site.replace('%(city)', city).replace('%(hotel)', hotel)     # urllib.quote(hotel))
     # print site
     driver.get(site)
-    time.sleep(3)
-
+        
     driver.find_element_by_name('toCity').clear()
     driver.find_element_by_name('toCity').send_keys(city)
     driver.find_element_by_name('fromDate').clear()

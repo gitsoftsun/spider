@@ -63,11 +63,11 @@ function start(){
 	    var opt = new helper.basic_options('flight.elong.com','/isajax/OneWay/S','GET',false,true,eq);
 	    //get flight data from elong.com
 //	    opt.agent = false;
-	    helper.request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
-//            todo.push({dep:dep,arr:arr});
+//	    helper.request_data(opt,null,elong_fls,[dep.cname,arr.cname]);
+            todo.push({dep:dep,arr:arr});
 	}
     }
-//    wget();
+    wget();
 }
 
 function wget(){
@@ -203,6 +203,9 @@ function elong_fls(data,args){
     console.log(id+" : "+doneCities[id].total);
     filterFlightInfo(FlightLegList,args[2]);
     filterFlightInfo(RecommendLegList,args[2]);
+    setTimeout(function(){
+	wget();
+    },(Math.random()*1+5)*1000);
 }
 
 function getRule(data,args){
