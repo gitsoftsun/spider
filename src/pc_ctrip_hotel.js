@@ -27,15 +27,27 @@ function CtripHotel(){
     this.proxyFile = "verified-03-02.txt";
     this.failedFile = "pc_ctrip_failed_hotel.txt";
     this.cityFile = "qunar_hot_city.txt";
+    this.invalidFile = "ctrip_hotel_invalid.txt";
+    this.invalidHotel={count:0};
     this.doneHotel = {count:0};
     this.doneHotelsDic={};
     this.todoHotels=[];
 }
 
 CtripHotel.prototype.init = function(){
+    if(fs.existsSync(this.dataDir + this.invalidFile)){
+	fs.readFileSync(this.dataDir+this.invalidFile)
+	    .toString().split('\n').reduce(function(pre,l){
+		if(!l) return pre;
+		l = l.replace('\r','');
+		pre[l]=true;
+		pre.count++;
+		return pre;
+	    },this.invalidHotel);
+    }
     if(fs.existsSync(this.resultDir + this.doneFile)){
 	this.doneHotelsCn = fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,l){
-	    if(!l) return;
+	    if(!l) return pre;
 	    var name = l.replace('\r','').split(',')[2];
 	    pre[name]=true;
 	    pre.count++;
@@ -53,7 +65,7 @@ CtripHotel.prototype.init = function(){
 	    var elongId = kvs[1];
 	    var hotelName = kvs[2];
 	    var elongStar = kvs[3].replace('\r',"").replace('\n',"");
-	    return !this.doneHotel[hotelName];
+	    return !this.doneHotel[hotelName]&&!this.invalidHotel[hotelName];
 	},this)
 	.map(function(l){
 	    var kvs = l.split(',');
@@ -102,6 +114,7 @@ CtripHotel.prototype.search = function(){
 
 CtripHotel.prototype.filterFromResult = function(data,args){
     if(!data){
+	console.log("no search result");
 	this.search();
 	return;
     }
@@ -184,7 +197,11 @@ CtripHotel.prototype.processList = function(){
 CtripHotel.prototype.processDetail = function(data,args){
     if(!data) {
 	console.log("no data.");
-	this.search();
+	fs.appendFileSync(this.dataDir+this.invalidFile,args[2].hotelName+'\n');
+	setTimeout(function(){
+	    that.search();
+	},(Math.random()*5+2)*1000);
+	//this.search();
 	return;
     }
     var $ = cheerio.load(data);
