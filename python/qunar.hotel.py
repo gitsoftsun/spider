@@ -139,17 +139,19 @@ def one_driver_hotel(driver, city, hotel,elongId):
     # site = site.replace('%(city)', city).replace('%(hotel)', hotel)     # urllib.quote(hotel))
     # print site
     driver.get(site)
+    try:
+        driver.find_element_by_name('toCity').clear()
+        driver.find_element_by_name('toCity').send_keys(city)
+        driver.find_element_by_name('fromDate').clear()
+        driver.find_element_by_name('fromDate').send_keys(fromDate)
+        driver.find_element_by_name('toDate').clear()
+        driver.find_element_by_name('toDate').send_keys(toDate)
+        driver.find_element_by_name('q').clear()
+        driver.find_element_by_name('q').send_keys(hotel)
+        driver.find_element_by_css_selector('button.btn').click()
+    except Exception as e:
+        pass
         
-    driver.find_element_by_name('toCity').clear()
-    driver.find_element_by_name('toCity').send_keys(city)
-    driver.find_element_by_name('fromDate').clear()
-    driver.find_element_by_name('fromDate').send_keys(fromDate)
-    driver.find_element_by_name('toDate').clear()
-    driver.find_element_by_name('toDate').send_keys(toDate)
-    driver.find_element_by_name('q').clear()
-    driver.find_element_by_name('q').send_keys(hotel)
-    driver.find_element_by_css_selector('button.btn').click()
-
     flag = True
     while flag:
 
@@ -167,7 +169,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
             parentTR=driver.find_element_by_xpath("//div[@class='b_hlistPanel']/div[@class='e_hlist_item js_list_block'][1]/div[@class='position_r']/div[@class='c2']/h2/a[1]")
             new_url = parentTR.get_attribute('href')
             driver.get(new_url)
-            time.sleep(6)
+            time.sleep(2)
             pass
         except Exception,e:
             print u'failed: ' + city + hotel
@@ -198,7 +200,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
             print "Rooms: %d" % len(lis)
             for li in lis:
                 if li.get_attribute('class').find("similar-expand")<0:
-                    li.find_elements_by_css_selector('a.btn_openPrc')[0].click()
+                    li.find_element_by_css_selector('a.btn_openPrc').click()
                 pass
             #elems = driver.find_elements_by_css_selector('a.btn_openPrc')
             
