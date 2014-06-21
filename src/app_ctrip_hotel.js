@@ -263,7 +263,7 @@ MCtripHotel.prototype.startSearch = function(){
 			pre[cur]=true;
 			}
 			return pre;
-		}this.invalidHotel);
+		},this.invalidHotel);
 	}
     if(fs.existsSync(this.resultDir+this.doneFile)){
 	fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,cur){
