@@ -254,14 +254,17 @@ MCtripHotel.prototype.start = function(){
 
 MCtripHotel.prototype.startSearch = function(){
     this.init();
-    fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,cur){
-	cur = cur && cur.replace('\r','');
-	if(cur){
-	    var eid = cur.split(',')[1];
-	    pre[eid]=true;
-	}
-	return pre;
-    },this.doneHotels);
+    if(fs.existsSync(this.resultDir+this.doneFile)){
+	fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,cur){
+	    cur = cur && cur.replace('\r','');
+	    if(cur){
+		var eid = cur.split(',')[1];
+		pre[eid]=true;
+	    }
+	    return pre;
+	},this.doneHotels);
+    }
+    
     var doneCount = 0;
     this.hotelList = fs.readFileSync(this.appDir+this.elongHotelsFile).toString().split('\n').filter(function(line){
 	if(!line) return false;
