@@ -214,6 +214,8 @@ function MCtripHotel(){
     this.resultFile = "app_ctrip_hotel.txt";
     this.cityFile = "qunar_hot_city.txt";
     this.elongHotelsFile = "elonghotels.txt";
+	this.invalidFile = "ctrip_hotel_invalid.txt";
+	this.invalidHotel={};
     this.cities = [];
     this.todoHotels=[];
     this.doneHotels={};
@@ -254,6 +256,15 @@ MCtripHotel.prototype.start = function(){
 
 MCtripHotel.prototype.startSearch = function(){
     this.init();
+	if(fs.existsSync(this.appDir+this.invalidFile)){
+		fs.readFileSync(this.appDir+this.invalidFile).toString().split('\n').reduce(function(pre,cur){
+			cur = cur && cur.replace('\r','');
+			if(cur){
+			pre[cur]=true;
+			}
+			return pre;
+		}this.invalidHotel);
+	}
     if(fs.existsSync(this.resultDir+this.doneFile)){
 	fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,cur){
 	    cur = cur && cur.replace('\r','');
@@ -272,6 +283,9 @@ MCtripHotel.prototype.startSearch = function(){
 	if(that.doneHotels[vals[1]]){
 	    doneCount++;
 	    return false;
+	}
+	if(that.invalidHotel[vals[1]]){
+		return false;
 	}
 	return true;
     }).map(function(line){
@@ -323,6 +337,7 @@ MCtripHotel.prototype.search = function(){
 MCtripHotel.prototype.getFirstOfPage = function(obj,args){
     if (!obj || (obj.ServerCode != 1 && obj.ServerCode != 6)){
 	console.log("Error!");
+	this.search();
         return;
     }
     if(obj.Data){
