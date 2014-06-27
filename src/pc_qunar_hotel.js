@@ -34,7 +34,7 @@ QunarHotel.prototype.filterData=function(){
 	hotel.star = $("div.htl-info h2 em").attr("title");
 	var m = $("link[rel$='canonical']").attr('href').match(/([^\/]+\/[a-zA-Z\-\d]+)\/$/);
 	hotel.id = m && m[1];
-	
+	hotel.commentCount = $("a#jt_comments em").text();
 	console.log(hotel.id);
 	if($(".htl-type-list li").length>0){
 	    $(".htl-type-list li").each(function(){

@@ -256,15 +256,15 @@ MCtripHotel.prototype.start = function(){
 
 MCtripHotel.prototype.startSearch = function(){
     this.init();
-	if(fs.existsSync(this.appDir+this.invalidFile)){
-		fs.readFileSync(this.appDir+this.invalidFile).toString().split('\n').reduce(function(pre,cur){
-			cur = cur && cur.replace('\r','');
-			if(cur){
-			pre[cur]=true;
-			}
-			return pre;
-		}this.invalidHotel);
-	}
+    if(fs.existsSync(this.appDir+this.invalidFile)){
+	fs.readFileSync(this.appDir+this.invalidFile).toString().split('\n').reduce(function(pre,cur){
+	    cur = cur && cur.replace('\r','');
+	    if(cur){
+		pre[cur]=true;
+	    }
+	    return pre;
+	},this.invalidHotel);
+    }
     if(fs.existsSync(this.resultDir+this.doneFile)){
 	fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,cur){
 	    cur = cur && cur.replace('\r','');
@@ -285,7 +285,8 @@ MCtripHotel.prototype.startSearch = function(){
 	    return false;
 	}
 	if(that.invalidHotel[vals[1]]){
-		return false;
+	    console.log(vals[1]);
+	    return false;
 	}
 	return true;
     }).map(function(line){

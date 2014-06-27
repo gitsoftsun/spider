@@ -53,6 +53,8 @@ exports.hotel.prototype.toString=function(site){
                 sb.append(this.rooms[i].book[j].price);
                 sb.append(',');
                 sb.append(this.rooms[i].book[j].fan);
+		sb.append(',');
+		sb.append(this.commentCount);
                 sb.append("\r\n");
             }
         }
