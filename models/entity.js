@@ -117,7 +117,7 @@ exports.hotel.prototype.toString=function(site){
             sb.append(',');
             sb.append(this.payType==0?'Y':'N');
             sb.append(',');
-            sb.append(this.rooms[i].sjzx=='Y'?'Y':'N')
+            sb.append(this.rooms[i].sjzx=='Y'?'Y':'N');
             sb.append(',');
             sb.append(this.rooms[i].jrtj=='Y'?'Y':'N');
             sb.append(',');
@@ -255,13 +255,13 @@ exports.hotel.prototype.toString=function(site){
         sb.append(',');
         sb.append(this.ratPoints);
         sb.append(',');
-        var b;
-        if(this.rooms[i].breakfast=="单早")
-            b=1;
-        else if(this.rooms[i].breakfast=="双早")
-            b=2;
-        else b=0;
-        sb.append(b);
+        //var b;
+        //if(this.rooms[i].breakfast=="单早")
+        //    b=1;
+        //else if(this.rooms[i].breakfast=="双早")
+        //    b=2;
+        //else b=0;
+        sb.append(this.rooms[i].breakfast);
         sb.append(',');
         if(this.rooms[i].gift){
             sb.append(this.rooms[i].gift);
@@ -269,15 +269,18 @@ exports.hotel.prototype.toString=function(site){
 	    sb.append("N");
 	}
 	sb.append(',');
-        sb.append((this.isCu==0?"N":"Y"));
-        sb.append(',');
+        //sb.append((this.isCu?"Y":"N"));
+        //sb.append(',');
         if(this.rooms[i].fanPrice)
             sb.append(this.rooms[i].fanPrice);
 	else{
 	    sb.append("￥0");
 	}
         sb.append(',');
-        sb.append(this.rooms[i].payType==0?"Y":"N");
+        //sb.append(this.rooms[i].payType==0?"Y":"N");
+	sb.append(this.rooms[i].pay);
+	sb.append(',');
+	sb.append(this.rooms[i].spay);
         sb.append('\r\n');
     }
     return sb.toString();

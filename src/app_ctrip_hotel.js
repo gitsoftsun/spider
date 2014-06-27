@@ -153,7 +153,7 @@ function hotel_page_data(obj){
 
 function one_page_data(obj,args){
     if (!obj || (obj.ServerCode != 1 && obj.ServerCode != 6)){
-	console.log("Error!");
+	console.log("response say, Error occured");
 	console.log(obj);
         return;
     }
@@ -220,31 +220,131 @@ function MCtripHotel(){
     this.todoHotels=[];
     this.doneHotels={};
 
+   /* {
+    "biz": 1,
+    "contrl": 3,
+    "facility": 0,
+    "key": "",
+    "keytp": 0,
+    "pay": 0,
+    "querys": [
+        {
+            "type": 8,
+            "val": "厦门初恋海景主题旅馆"
+        }
+    ],
+    "setInfo": {
+        "cityId": 25,
+        "dstId": 0,
+        "inDay": "2014-08-01",
+        "outDay": "2014-08-02"
+    },
+    "sort": {
+        "dir": 1,
+        "idx": 1,
+        "ordby": 0,
+        "size": 25
+    },
+    "head": {
+        "cid": "c88bb8e4-824e-351b-c090-f55e404e43f8",
+        "ctok": "351858059049938",
+        "cver": "1.0",
+        "lang": "01",
+        "sid": "8888",
+        "syscode": "09",
+        "auth": ""
+    },
+    "contentType": "json"
+}*/
+    
     this.listQuery = function(city,pageNum){
 	if(!city || !city.id || !city.cname)
 	    return;
+	this.biz = 1;
+	this.contrl=3;
+	this.facility=0;
+	this.key = "";
+	this.keytp=0;
+	this.pay=0;
+	this.querys=[{
+	    'type':8,
+	    'val':""
+	}];
+	this.setInfo={
+	    'cityId':city.id,
+	    'dstId':0,
+	    'inDay':'2014-08-01',
+	    'outDay':'2014-08-02'
+	};
+	this.sort={
+	    "dir": 1,
+            "idx": 1,
+            "ordby": 0,
+            "size": 25
+	};
+
+	this.head = {
+	    "cid": "c88bb8e4-824e-351b-c090-f55e404e43f8",
+            "ctok": "351858059049938",
+            "cver": "1.0",
+            "lang": "01",
+            "sid": "8888",
+            "syscode": "09",
+            "auth": ""
+	};
+	this.contentType = "json";
+	
+	
 	if(pageNum==undefined)
 	    pageNum=1;
 	
-	this.CheckInCityID=city.id;
-	this.CheckInCity=city.cname;
-	this.isHot=2;
-	this.OrderName=0;
-	this.OrderType=1;
-	this.CheckInDate=that.checkindate;
-	this.PageNumber = pageNum;
-	this.CheckOutDate=that.checkoutdate;
-	this.Days = 1;
-	this.DistrictId = -1;
-	this.IsMorning=0;
-	this.isYesterdayOrder=false;
+	
+	//this.CheckInCityID=city.id;
+	//this.CheckInCity=city.cname;
+	//this.isHot=2;
+	//this.OrderName=0;
+	//this.OrderType=1;
+	//this.CheckInDate=that.checkindate;
+	//this.PageNumber = pageNum;
+	//this.CheckOutDate=that.checkoutdate;
+	//this.Days = 1;
+	//this.DistrictId = -1;
+	//this.IsMorning=0;
+	//this.isYesterdayOrder=false;
     };
     this.detailQuery = function(cityId,hotelId){
-	this.CheckInDate= that.checkindate;
-	this.CheckOutDate=that.checkoutdate;
-	this.CityID= cityId;
-	this.HotelID= hotelId;
-	this.IsMorning= "0";
+	this.id=hotelId;
+	this.setInfo = {
+	    "cityId": cityId,
+            "dstId": 0,
+            "inDay": "2014-06-26",
+            "outDay": "2014-06-27",
+            "membertype": ""
+	};
+	this.pay = 0;
+	this.contrl = 2;
+	this.needRoom = true;
+	this.num = 0;
+	this.biz = 1;
+	this.sourBiz = 0;
+	this.priceBiz = 0;
+	this.icldrid = 0;
+	this.alliance = {
+	    "aid": 0,
+            "ouid": "",
+            "sid": 0
+	};
+	this.membertype=null;
+	this.head = {
+	    "cid": "45812afe-cf9f-d03b-7d3e-e08d53583af4", 
+            "ctok": "351858059049938", 
+            "cver": "1.0", 
+            "lang": "01", 
+            "sid": "8888", 
+            "syscode": "09", 
+            "auth": ""
+	};
+	this.contentType = "json";
     };
 }
 
@@ -265,6 +365,7 @@ MCtripHotel.prototype.startSearch = function(){
 	    return pre;
 	},this.invalidHotel);
     }
+
     if(fs.existsSync(this.resultDir+this.doneFile)){
 	fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,cur){
 	    cur = cur && cur.replace('\r','');
@@ -317,15 +418,25 @@ MCtripHotel.prototype.load = function(){
     },this.doneHotels);
 }
 
+//'{"biz":1,"contrl":3,"facility":0,"key":"","keytp":0,"pay":0,"querys":[{"type":8,"val":"金广快捷(松江泗泾店)"}],"setInfo":{"cityId":2,"dstId":0,"inDay":"2014-06-26","outDay":"2014-06-27"},"sort":{"dir":1,"idx":1,"ordby":0,"size":25},"head":{"cid":"45812afe-cf9f-d03b-7d3e-e08d53583af4","ctok":"351858059049938","cver":"1.0","lang":"01","sid":"8888","syscode":"09","auth":""},"contentType":"json"}'
+
+//http://m.ctrip.com/restapi/hotels/Product/HotelGet
 MCtripHotel.prototype.search = function(){
     if(this.hotelList.length==0)
 	return;
     
     var cur =  this.hotelList.shift();
     var query = new this.listQuery(cur.city,1);
-    query.KeyWord = cur.ename;
-    var opt = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true,query);
-    opt.headers['Content-Type']="application/json";
+    
+    query.querys[0].val = cur.ename;
+    
+    console.log(query);
+    
+    var opt = new helper.basic_options('m.ctrip.com','/restapi/hotels/Product/HotelGet',"POST",true,true,query);
+    opt.headers['Content-Type']="application/json; charset=UTF-8";
+    opt.headers["Referer"] = "http://m.ctrip.com/webapp/hotel/";
+    opt.headers["Cookie"] = "AX-20480-gateway=BIAOAIAKJABP";
+    console.log(opt);
     opt.agent=false;
     setTimeout(function(){
 	console.log("GET %s:%s",cur.city.cname,cur.ename);
@@ -336,42 +447,45 @@ MCtripHotel.prototype.search = function(){
 }
 
 MCtripHotel.prototype.getFirstOfPage = function(obj,args){
-    if (!obj || (obj.ServerCode != 1 && obj.ServerCode != 6)){
-	console.log("Error!");
+    if (!obj || !obj.head || obj.head.errcode != 0){
+	console.log("search key word Error!");
+	//console.log(obj);
 	this.search();
         return;
     }
-    if(obj.Data){
-        var a = obj.Data;
-        a = helper.CtripUnPack(a);
-        if(a && a.length > 0 && a[0].TotalCount > 0 && a[0].HotelLists && a[0].HotelLists.length > 0){
-            var h = new entity.hotel();
-            var h_obj = a[0].HotelLists[0];
-	    if(!h_obj) return;
-	    
-            h.city=args[0].city.cname;
-            h.id=h_obj.HotelID;
-            h.name=h_obj.HotelName;
-	    h.name = h.name && h.name.trim().replace(/[,，]/g,';');
-            h.star = h_obj.Star;
-            h.currency=h_obj.Currency;
-            h.points = h_obj.Points;
-            h.zoneName = h_obj.ZoneName;
-	    
-	    var query = new this.detailQuery(args[0].city.code,h.id);
-	    var opt = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelDetail',"POST",true,true,query);
-	    opt.headers['Content-Type']="application/json";
-	    opt.agent = false;
-	    setTimeout(function(){
-		console.log("GET %s, %s",args[0].city.cname,h.name);
-		helper.request_data(opt,query,function(data,args){
-		    that.processDetail(data,args);
-		},[args[0],h]);
-	    },(Math.random()*1+1)*1000);
-	    return;
-        }
+    
+    if(!obj.htlInfos || obj.htlInfos.length==0){
+	//no search result. should be added to invalid hotel list?
     }
-    this.search();
+    
+    var h_obj = obj.htlInfos[0];
+    var h = new entity.hotel();
+    
+    console.log(h_obj.baseInfo);
+    
+    h.city=args[0].city.cname;
+    h.id=h_obj.baseInfo.id;
+    h.name=h_obj.baseInfo.name;
+    h.name = h.name && h.name.trim().replace(/[,，]/g,';');
+    
+    h.star = h_obj.activeinfo.star;
+    h.points = h_obj.extend.point;
+    //h.zoneName = h_obj.ZoneName;
+    var query = new this.detailQuery(args[0].city.code,h.id);
+    var opt = new helper.basic_options('m.ctrip.com','/restapi/hotels/product/hoteldetailget',"POST",true,true,query);
+    opt.headers['Content-Type']="application/json";
+    opt.agent = false;
+    setTimeout(function(){
+	console.log("GET %s, %s",args[0].city.cname,h.name);
+	helper.request_data(opt,query,function(data,args){
+	    that.processDetail(data,args);
+	},[args[0],h]);
+    },(Math.random()*1+1)*1000);
+
+    return;
+
+
+    //this.search();
 }
 
 MCtripHotel.prototype.wgetList = function(){
@@ -456,7 +570,7 @@ MCtripHotel.prototype.processList = function(obj,args){
     if(args[0].failedCount==undefined)
 	args[0].failedCount=0;
     if (!obj || (obj.ServerCode != 1 && obj.ServerCode != 6)){
-	console.log("Error!");
+	console.log("Request List Error!");
 	console.log(obj);
 	args[0].failedPageCount++;
         return;
@@ -495,26 +609,54 @@ MCtripHotel.prototype.processList = function(obj,args){
 }
 
 MCtripHotel.prototype.processDetail = function(obj,args){
-    var data=null;
-    if(obj&&obj.Data){
-        data = obj.Data;
-    }else{
-	console.log("Failed: %s",args[1].name);
-	if(args[0].failedCount != undefined){
-	    args[0].failedCount++;
-	}
+    if(!obj || !obj.head || obj.head.errcode!=0){
+	
     }
-    if(data&&data!==''){
+    var data=null,h=args[1];
+
+    h.commentCount = obj.comtInfo.total;
+    h.faclPoints = obj.comtInfo.facl;//设施
+    h.raAtPoints = obj.comtInfo.raAt;//环境
+    h.ratPoints = obj.comtInfo.rat;//卫生
+    h.servPoints = obj.comtInfo.serv;//服务
+    h.custPoints = obj.comtInfo.point;
+    h.picCount = obj.imgs.length;
+    for(var i = 0;i<obj.rooms.length;i++){
+	var r = obj.rooms[i];
+	var rm = new entity.room();
+	rm.id = r.rbasic.id;
+	rm.name = r.rbasic.name;
+	rm.name = rm.name && rm.name.replace(/[,，]/g,';');
+	rm.price = r.prices[0].detail.price;
+	rm.breakfast = r.rbasic.brefast;
+	rm.fan = r.tickets[0] && (r.tickets[0].avgAmt || r.tickets[0].totalAmt);
+	
+	rm.pay = r.rbasic.pay;
+	rm.spay = r.rbasic.spay;
+	h.rooms.push(rm);
+    }
+    
+    fs.appendFileSync(this.resultDir+this.resultFile,h.toString());
+    //fs.appendFileSync(this.resultDir+this.doneFile,h.id+"\n");
+    fs.appendFileSync(this.resultDir+this.doneFile,args[0].city.cname+","+args[0].eid+','+args[0].ename+','+args[0].estar+','+h.id+','+h.name+','+h.star+"\r\n");
+    console.log("Saved: %d/%d",++args[0].doneCount,args[0].totalCount);
+    
+    //console.log("Failed: %s",args[1].name);
+    //if(args[0].failedCount != undefined){
+	//args[0].failedCount++;
+    //}
+    
+    /*if(data&&data!==''){
         data = helper.CtripUnPack(data);
         if(data&&data[0]){
             var h = args[1];
-/*	    h.id = data[0].HotelID;
+	    h.id = data[0].HotelID;
 	    h.name = data[0].HotelName;
 	    h.name = h.name && h.name.trim().replace(/[,，]/g,';');
 	    h.star = data[0].Star;
 	    h.currency = data[0].Currency;
 	    h.points =data[0].CustPoints;
-	    h.zoneName = data[0].ZoneName;*/
+	    h.zoneName = data[0].ZoneName;
             h.commentCount=data[0].CommentTotal;
             h.custPoints = data[0].CustPoints;
             h.faclPoints= data[0].FaclPoints;//设施
@@ -544,7 +686,7 @@ MCtripHotel.prototype.processDetail = function(obj,args){
 		console.log("Saved: %d/%d",++args[0].doneCount,args[0].totalCount);
             }
         }
-    }
+    }*/
 
     this.search();
 }

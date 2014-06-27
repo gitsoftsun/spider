@@ -130,7 +130,7 @@ CtripFlight.prototype.processFlights=function(data,args){
 	    cabin.price=cb.p;
 	    cabin.ctype=cb.c=="F"?"头等舱":cb.c=="Y"?"经济舱":cb.c=="C"?"公务舱":"";
 	    cabin.fan = cb.ra;
-	    cabin.isSpec=cb.inp?"Y":"N";
+	    cabin.isSpec=cb.inp?"Y":"N";//网络专享价
 	    cabin.isAgent=cb.ia?"Y":"N";
 	    for(var k=0;k<cb.ics.length;k++){
 		switch(cb.ics[k].IconType){
