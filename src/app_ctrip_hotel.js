@@ -628,9 +628,14 @@ MCtripHotel.prototype.processDetail = function(obj,args){
 	rm.price = r.prices[0].detail.price;
 	rm.breakfast = r.rbasic.brefast;
 	rm.fan = r.tickets[0] && (r.tickets[0].avgAmt || r.tickets[0].totalAmt);
-	
-	rm.pay = r.rbasic.pay;
-	rm.spay = r.rbasic.spay;
+	for(var j = 0;j<r.tickets.length;j++){
+	    if(r.tickets[i].type==10){
+		rm.gift = "Y";
+	    }else if(r.tickets[i].type==9){
+		rm.isCu = "Y";
+	    }
+	}
+	rm.pay = r.rbasic.pay==0?"Y":"N";
 	h.rooms.push(rm);
     }
     
