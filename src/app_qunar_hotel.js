@@ -335,13 +335,15 @@ function begin(){
 	return {city:cs[vals[0]],elongId:vals[1],elongName:vals[2]};
     });
     var r=null;
-    while(!r){
+    while(!r && todo.length>0){
 	r = todo.shift();
     }
     getSpecifyHotel(r);
 }
 
 function getSpecifyHotel(record){
+    if(!record)
+	return;
     var city = record.city,hotelName = record.elongName;
     var query = {"checkin":checkindate.replace(/\-/g,''),"days":1,"city":city.cname,"level":0,"priceRange":0,"queryKey":hotelName};
     var opt = null;

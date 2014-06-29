@@ -194,6 +194,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
             #print len(elems)
             for elem in elems:
                 elem.click()
+                time.sleep(1)
 
             ul = driver.find_element_by_css_selector("ul.htl-type-list")
             lis = ul.find_elements_by_tag_name('li')
@@ -201,6 +202,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
             for li in lis:
                 if li.get_attribute('class').find("similar-expand")<0:
                     li.find_element_by_css_selector('a.btn_openPrc').click()
+                    time.sleep(1)
                 pass
             #elems = driver.find_elements_by_css_selector('a.btn_openPrc')
             
@@ -211,6 +213,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
             #time.sleep(1)
             for e in elems:
                 e.click();
+                time.sleep(1)
             #time.sleep(1);
                 # classes = elem.get_attribute('class')
                 # print classes

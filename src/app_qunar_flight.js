@@ -12,7 +12,19 @@ function MQunarFlight(){
     this.departDate = "20140801";
     this.cityFile = "qunar_flight_hot_city.txt";
 
-    this.citySkip = {};
+    this.citySkip = {
+	'太原-济南':true,
+	'南昌-武汉':true,
+	'南昌-长春':true,
+	'武汉-南昌':true,
+	'三亚-大连':true,
+	'济南-太原':true,
+	'济南-丽江':true,
+	'长春-南昌':true,
+	'长春-大连':true,
+	'丽江-济南':true,
+	'丽江-南宁':true
+    };
     this.cities = [];
     this.doneFlights = {};
     this.todoFlights=[];
@@ -80,11 +92,20 @@ MQunarFlight.prototype.load=function(){
 	    },this.citySkip);
     }
 }
-
+var sleepTime = 2400000;
+var sleepCount = 0;
 MQunarFlight.prototype.processList = function(data,args){
     if(Buffer.byteLength(data)==1939){
 	console.log("current ip has been forbidden.");
+	//setTimeout(function(){
+	//    that.wgetList(args[0]);
+	//},sleepTime);
+	//sleepCount++;
+	//sleepTime*=sleepCount+1;
 	return;
+    }else{
+	sleepTime = 2400000;
+	sleepCount = 0;
     }
     var $ = cheerio.load(data);
     var sb = new helper.StringBuffer();
@@ -124,6 +145,9 @@ MQunarFlight.prototype.processList = function(data,args){
 	fs.appendFileSync(this.resultDir+this.doneFile,args[0].d.cname+'-'+args[0].a.cname+'\r\n');
     }
     args[0].pageIdx++;
+//    setTimeout(function(){
+//	that.wgetList(args[0]);
+//    },(Math.random()*3+20)*1000);
     this.wgetList(args[0]);
 /*    
     while(args[0].pageIdx<args[0].pageCount){
