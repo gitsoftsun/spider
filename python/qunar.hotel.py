@@ -200,7 +200,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
         except Exception as e:
             pass
         
-        time.sleep(4)
+        time.sleep(6)
         # 展开报价
         try:
             # elems = driver.find_elements_by_xpath("//li[@class='defaultpricetype']")
@@ -219,35 +219,31 @@ def one_driver_hotel(driver, city, hotel,elongId):
             lis = ul.find_elements_by_tag_name('li')
             roomCount =  len(lis)
             print "Rooms: %d" % roomCount
-            filteredLis = filter(lambda l:l.get_attribute("class").find("similar-expand")<0,lis)
-            roomCountNeedOpen = len(filteredLis)
+            idList = map(lambda l:l.get_attribute("id"),filter(lambda l:l.get_attribute("class").find("similar-expand")<0,lis))
+            roomCountNeedOpen = len(idList)
             print "%d rooms price need open " % roomCountNeedOpen
         except Exception as e:
             print "something wrong with getting room list"
             pass
-        try:
-            li = None
-            while len(lis) > 0:
-                li = lis.pop()
-                if li is None:
-                    continue
+
+        li = None
+        while len(idList) > 0:
+            liId = idList.pop()
+            if liId is None:
+                continue
                 
-                if li.get_attribute('class').find("similar-expand")<0:
-                    #xpath = '//a[@class="btn_openPrc"]['+str(len(lis))+']';
-                    liId = li.get_attribute("id")
-                    aId = liId+"-detailEl"
-                    #print aId
-                    ele = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,aId)))
-                    ele.click();
-                    
-                    #pBtns = driver.find_elements_by_css_selector('a.btn_openPrc')
-                    #pBtns[len(lis)].click() 
-                    print "open price detail " , aId
-                    time.sleep(1)
-                
-        except Exception as e:
-            print "failed to open all price"
-        
+            #if li.get_attribute('class').find("similar-expand")<0:
+
+            #liId = li.get_attribute("id")
+            aId = liId+"-detailEl"
+            
+            try:
+                driver.find_element_by_id(aId).click()
+                #ele = WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.ID,aId)))
+                #ele.click()
+                print "open price detail " , aId
+            except Exception as e:
+                print "failed to open price"
         try:
             #elems = driver.find_elements_by_css_selector('a.btn_openPrc')
             
