@@ -164,16 +164,29 @@ def one_driver_hotel(driver, city, hotel,elongId):
             pass
 
         try:
-            time.sleep(1)
+            parentTR =None
+            items = driver.find_elements_by_css_selector(".position_r .c2 h2 a")
+            print len(items)
+            if len(items) > 0:
+                parentTR = items[0]
+            else:
+                f = codecs.open('../result/qunar_hotel/' + city + ','+elongId+',' + hotel.replace(',','')  + '.html',
+                        'w+',
+                        'utf8')
+                f.write(" ")
+                f.close()
+                flag=False
+                continue
+            print "result avaliable"
             #parentTR = driver.find_element_by_xpath("//span[@class='namered']//..")
-            parentTR=driver.find_element_by_xpath("//div[@class='b_hlistPanel']/div[@class='e_hlist_item js_list_block'][1]/div[@class='position_r']/div[@class='c2']/h2/a[1]")
+            #parentTR=driver.find_element_by_xpath("//div[@id='js-singleHotel']/div/div[@class='position_r']/div[@class='c2']/h2/a[1]")
+            #parentTR=driver.find_element_by_xpath("//div[@class='b_hlistPanel']/div[@class='e_hlist_item js_list_block'][1]/div[@class='position_r']/div[@class='c2']/h2/a[1]")
             new_url = parentTR.get_attribute('href')
             driver.get(new_url)
-            time.sleep(2)
+
             pass
         except Exception,e:
             print u'failed: ' + city + hotel
-            print e
             flag=False
             continue
             pass
@@ -185,7 +198,8 @@ def one_driver_hotel(driver, city, hotel,elongId):
                 pass
         except Exception as e:
             pass
-
+        
+        time.sleep(4)
         # 展开报价
         try:
             # elems = driver.find_elements_by_xpath("//li[@class='defaultpricetype']")
@@ -195,15 +209,34 @@ def one_driver_hotel(driver, city, hotel,elongId):
             for elem in elems:
                 elem.click()
                 time.sleep(1)
-
+        except Exception as e:
+            print "there are no e_prcDetail element"
+            pass
+        
+        try:
             ul = driver.find_element_by_css_selector("ul.htl-type-list")
             lis = ul.find_elements_by_tag_name('li')
             print "Rooms: %d" % len(lis)
-            for li in lis:
-                if li.get_attribute('class').find("similar-expand")<0:
-                    li.find_element_by_css_selector('a.btn_openPrc').click()
-                    time.sleep(1)
-                pass
+            filteredLis = filter(lambda l:l.get_attribute("class").find("similar-expand")<0,lis)
+            print "rooms price need open",len(filteredLis)
+        except Exception as e:
+            print "something wrong with getting room list"
+            pass
+        try:
+            li = None
+            while len(filteredLis) > 0:
+                li = filteredLis.pop()
+                if li is None:
+                    continue
+               # if li.get_attribute('class').find("similar-expand")<0:
+                li.find_element_by_css_selector('a.btn_openPrc').click()
+                print "open price detail"
+                time.sleep(1)
+                
+        except Exception as e:
+            print "failed to open all price"
+        
+        try:
             #elems = driver.find_elements_by_css_selector('a.btn_openPrc')
             
             #for elem in elems:
@@ -221,8 +254,8 @@ def one_driver_hotel(driver, city, hotel,elongId):
                 #     elem.click()
             pass
         except Exception as e:
-            print e
-            print traceback.format_exc()
+            print "there are no icoR_open elements"
+            #print traceback.format_exc()
             pass
 
         elem = driver.find_element_by_xpath("//*")

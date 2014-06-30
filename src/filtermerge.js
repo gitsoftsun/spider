@@ -61,7 +61,7 @@ FilterMerge.prototype.merge = function(){
 		for(var k=0;k<h.qrooms.length;k++){
 		    if(h.crooms[j].type==h.erooms[i].type && h.qrooms[k].type==h.erooms[i].type){
 			c++;
-			if(this.ItsFactor(h.crooms[j].tags,h.erooms[i].tags)>=0.7){
+			if(this.ItsFactor(h.crooms[j].tags,h.erooms[i].tags)>=0.5){
 			    var str = h.city+","+h.ename+','+h.cname+','+h.qname+','+h.crooms[j].type+','+h.star+','+h.crooms[j].price+','+h.crooms[j].fan+','+h.erooms[i].price+','+h.erooms[i].fan+','+h.qrooms[k].price+','+h.qrooms[k].fan+','+h.qrooms[k].book;
 			    console.log(str);
 			}
@@ -91,11 +91,12 @@ FilterMerge.prototype.ItsFactor=function(a,b){
 
 FilterMerge.prototype.prepareHotel = function(){
     var dictHotel={},i,j,k;
-    var total=0;
+    var total=0,elongCount=0,ctripCount=0,qunarCount=0;
     for(i=0;i<this.elongHotels.length;i++){
 	if(!this.elongHotels[i]) continue;
 	var vals = this.elongHotels[i].replace('\r','').split(',');
 	this.dictElHotel[vals[1]]={city:vals[0],eid:vals[1],ename:vals[2]};
+	elongCount++;
     }
     for(j=0;j<this.ctripHotels.length;j++){
 	if(!this.ctripHotels[j]) continue;
@@ -108,7 +109,7 @@ FilterMerge.prototype.prepareHotel = function(){
 	    obj.cname = vals[5];
 	    obj.star = vals[6];
 	    this.dictCtHotel[ctripId]=obj;
-	    total++;
+	    ctripCount++;
 	}
     }
     for(k=0;k<this.qunarHotels.length;k++){
@@ -119,8 +120,9 @@ FilterMerge.prototype.prepareHotel = function(){
 	obj.qid=vals[3];
 	obj.qname=vals[4];
 	this.dictQuHotel[vals[3]]=obj;
+	qunarCount++;
     }
-    console.log("After preProcessing, elong: "+i+", ctrip: "+total+", qunar: "+k);
+    console.log("After preProcessing, elong: "+elongCount+", ctrip: "+ctripCount+", qunar: "+qunarCount);
 }
 FilterMerge.prototype.preProcessApp = function(){
     fs.readFileSync(this.resultDir+this.elongrFile).toString().split('\n').forEach(function(line){
@@ -203,6 +205,7 @@ FilterMerge.prototype.preProcessApp = function(){
     });
 }
 FilterMerge.prototype.preProcess=function(){
+    var elongRoomCount=0,ctripRoomCount=0,qunarRoomCount=0;
     fs.readFileSync(this.resultDir+this.elongrFile).toString().split('\n').forEach(function(line){
 	if(!line) return;
 	var vals = line.replace('\r','').split(',');
@@ -224,7 +227,7 @@ FilterMerge.prototype.preProcess=function(){
 	//    room = room.replace(/[^升级至]/,'').replace(/[升级至]/g,'');
 	//}
 	var obj = that.dictElHotel[vals[1]];
-
+	elongRoomCount++;
 	if(obj){
 	    if(obj.erooms==undefined)
 		obj.erooms = [];
@@ -256,6 +259,7 @@ FilterMerge.prototype.preProcess=function(){
 	room.fan = vals[7]?vals[7]:"返0元";
 	
 	var obj = that.dictCtHotel[vals[1]];
+	ctripRoomCount++;
 	if(obj){
 	    if(obj.crooms==undefined)
 		obj.crooms = [];
@@ -278,12 +282,12 @@ FilterMerge.prototype.preProcess=function(){
 	var vals = line.replace('\r','').split(',');
 	var room = {};
 	room.tags=[];
-	room.type = vals[3].replace(/[房间]/,'');
+	room.type = vals[4].replace(/[房间]/,'');
 	
-	room.price = vals[5];
-	room.fan = vals[6]?vals[6]:"¥0";
+	room.price = vals[6];
+	room.fan = vals[7]?vals[7]:"¥0";
 	room.finalPrice = eval(room.price.replace(/¥/g,'')-room.fan.replace(/[返¥]/g,''));
-	room.book = vals[4];
+	room.book = vals[5];
 	var obj = that.dictQuHotel[vals[1]];
 	if(obj){
 	    if(obj.qrooms == undefined){
@@ -303,7 +307,7 @@ FilterMerge.prototype.preProcess=function(){
 		if(!exists)
 		    obj.qrooms.push(room);
 	    }
-	    
+	    qunarRoomCount++;
 	}
 	/*
 	  return {city:vals[0],
@@ -316,6 +320,7 @@ FilterMerge.prototype.preProcess=function(){
 	  };
 	*/
     });
+    console.log(elongRoomCount+','+ctripRoomCount+','+qunarRoomCount);
     //    console.log(this.qunarRecords[234]);
     //    console.log("Total records, elong: "+this.elongRecords.length+", ctrip: "+this.ctripRecords.length+", qunar: "+this.qunarRecords.length);
 }
@@ -324,6 +329,7 @@ FilterMerge.prototype.start=function(){
     this.init();
     this.load();
     this.prepareHotel();
+    console.log(this.isApp?"merge app start":"merge pc start");
     if(this.isApp){
 	this.preProcessApp();
     }else{
@@ -333,6 +339,6 @@ FilterMerge.prototype.start=function(){
     this.merge();
 }
 
-var fm = new FilterMerge();
+var fm = new FilterMerge(true);
 var that = fm;
 fm.start();

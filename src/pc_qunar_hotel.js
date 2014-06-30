@@ -32,8 +32,10 @@ QunarHotel.prototype.filterData=function(){
 	var $ = cheerio.load(fs.readFileSync(f).toString());
 	hotel.name = $("div.htl-info h2 span").text().trim();
 	hotel.star = $("div.htl-info h2 em").attr("title");
-	var m = $("link[rel$='canonical']").attr('href').match(/([^\/]+\/[a-zA-Z\-\d]+)\/$/);
+	var href = $("link[rel$='canonical']").attr('href');
+	var m = href && href.match(/([^\/]+\/[a-zA-Z\-\d]+)\/$/);
 	hotel.id = m && m[1];
+	if(!hotel.id) continue;
 	hotel.commentCount = $("a#jt_comments em").text();
 	console.log(hotel.id);
 	if($(".htl-type-list li").length>0){

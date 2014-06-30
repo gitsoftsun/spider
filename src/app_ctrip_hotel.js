@@ -214,8 +214,8 @@ function MCtripHotel(){
     this.resultFile = "app_ctrip_hotel.txt";
     this.cityFile = "qunar_hot_city.txt";
     this.elongHotelsFile = "elonghotels.txt";
-	this.invalidFile = "ctrip_hotel_invalid.txt";
-	this.invalidHotel={};
+    this.invalidFile = "ctrip_hotel_invalid.txt";
+    this.invalidHotel={};
     this.cities = [];
     this.todoHotels=[];
     this.doneHotels={};
@@ -356,16 +356,17 @@ MCtripHotel.prototype.start = function(){
 
 MCtripHotel.prototype.startSearch = function(){
     this.init();
+    var invalidCount = 0;
     if(fs.existsSync(this.appDir+this.invalidFile)){
 	fs.readFileSync(this.appDir+this.invalidFile).toString().split('\n').reduce(function(pre,cur){
 	    cur = cur && cur.replace('\r','');
 	    if(cur){
 		pre[cur]=true;
+		invalidCount++;
 	    }
 	    return pre;
 	},this.invalidHotel);
     }
-
     if(fs.existsSync(this.resultDir+this.doneFile)){
 	fs.readFileSync(this.resultDir+this.doneFile).toString().split('\n').reduce(function(pre,cur){
 	    cur = cur && cur.replace('\r','');
@@ -385,8 +386,7 @@ MCtripHotel.prototype.startSearch = function(){
 	    doneCount++;
 	    return false;
 	}
-	if(that.invalidHotel[vals[1]]){
-	    console.log(vals[1]);
+	if(that.invalidHotel[vals[2]]){
 	    return false;
 	}
 	return true;
@@ -396,7 +396,7 @@ MCtripHotel.prototype.startSearch = function(){
 	var city  = that.cityDict[vals[0]];
 	return {city:city,eid:vals[1],ename:vals[2],estar:vals[3]};
     });
-    console.log("hotel count : %d, done count: %d",this.hotelList.length,doneCount);
+    console.log("hotel count : %d, done count: %d， invalid count: %d",this.hotelList.length,doneCount,invalidCount);
     
     this.search();
 }
@@ -430,13 +430,13 @@ MCtripHotel.prototype.search = function(){
     
     query.querys[0].val = cur.ename;
     
-    console.log(query);
+    //console.log(query);
     
     var opt = new helper.basic_options('m.ctrip.com','/restapi/hotels/Product/HotelGet',"POST",true,true,query);
     opt.headers['Content-Type']="application/json; charset=UTF-8";
     opt.headers["Referer"] = "http://m.ctrip.com/webapp/hotel/";
     opt.headers["Cookie"] = "AX-20480-gateway=BIAOAIAKJABP";
-    console.log(opt);
+    //console.log(opt);
     opt.agent=false;
     setTimeout(function(){
 	console.log("GET %s:%s",cur.city.cname,cur.ename);
@@ -461,7 +461,7 @@ MCtripHotel.prototype.getFirstOfPage = function(obj,args){
     var h_obj = obj.htlInfos[0];
     var h = new entity.hotel();
     
-    console.log(h_obj.baseInfo);
+    //console.log(h_obj.baseInfo);
     
     h.city=args[0].city.cname;
     h.id=h_obj.baseInfo.id;
@@ -481,10 +481,6 @@ MCtripHotel.prototype.getFirstOfPage = function(obj,args){
 	    that.processDetail(data,args);
 	},[args[0],h]);
     },(Math.random()*1+1)*1000);
-
-    return;
-
-
     //this.search();
 }
 
@@ -610,8 +606,21 @@ MCtripHotel.prototype.processList = function(obj,args){
 
 MCtripHotel.prototype.processDetail = function(obj,args){
     if(!obj || !obj.head || obj.head.errcode!=0){
-	
+	console.log("no data .");
+	setTimeout(function(){
+	    that.search();
+	},10); 
+	return;
     }
+
+    if(!obj.rooms.length){
+	console.log("hotel invalid.");
+	setTimeout(function(){
+	    that.search();
+	},10);
+	return;
+    }
+    
     var data=null,h=args[1];
 
     h.commentCount = obj.comtInfo.total;
