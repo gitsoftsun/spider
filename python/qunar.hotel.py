@@ -213,7 +213,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
         except Exception as e:
             print "there are no e_prcDetail element"
             pass
-        
+        idList=[]
         try:
             ul = driver.find_element_by_css_selector("ul.htl-type-list")
             lis = ul.find_elements_by_tag_name('li')
