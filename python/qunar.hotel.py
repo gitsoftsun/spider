@@ -16,6 +16,7 @@ from selenium import webdriver
 from selenium.webdriver.common.proxy import *
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
+from selenium.webdriver.support import expected_conditions as EC
 import time
 from selenium.webdriver.common.by import By
 
@@ -216,22 +217,33 @@ def one_driver_hotel(driver, city, hotel,elongId):
         try:
             ul = driver.find_element_by_css_selector("ul.htl-type-list")
             lis = ul.find_elements_by_tag_name('li')
-            print "Rooms: %d" % len(lis)
+            roomCount =  len(lis)
+            print "Rooms: %d" % roomCount
             filteredLis = filter(lambda l:l.get_attribute("class").find("similar-expand")<0,lis)
-            print "rooms price need open",len(filteredLis)
+            roomCountNeedOpen = len(filteredLis)
+            print "%d rooms price need open " % roomCountNeedOpen
         except Exception as e:
             print "something wrong with getting room list"
             pass
         try:
             li = None
-            while len(filteredLis) > 0:
-                li = filteredLis.pop()
+            while len(lis) > 0:
+                li = lis.pop()
                 if li is None:
                     continue
-               # if li.get_attribute('class').find("similar-expand")<0:
-                li.find_element_by_css_selector('a.btn_openPrc').click()
-                print "open price detail"
-                time.sleep(1)
+                
+                if li.get_attribute('class').find("similar-expand")<0:
+                    #xpath = '//a[@class="btn_openPrc"]['+str(len(lis))+']';
+                    liId = li.get_attribute("id")
+                    aId = liId+"-detailEl"
+                    #print aId
+                    ele = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,aId)))
+                    ele.click();
+                    
+                    #pBtns = driver.find_elements_by_css_selector('a.btn_openPrc')
+                    #pBtns[len(lis)].click() 
+                    print "open price detail " , aId
+                    time.sleep(1)
                 
         except Exception as e:
             print "failed to open all price"
