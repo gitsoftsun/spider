@@ -37,7 +37,7 @@ QunarHotel.prototype.filterData=function(){
 	hotel.id = m && m[1];
 	if(!hotel.id) continue;
 	hotel.commentCount = $("a#jt_comments em").text();
-	console.log(hotel.id);
+	//console.log(hotel.id);
 	if($(".htl-type-list li").length>0){
 	    $(".htl-type-list li").each(function(){
 		var r = new entity.room();
@@ -92,7 +92,7 @@ QunarHotel.prototype.filterData=function(){
 	}
 	fs.appendFileSync(this.resultDir+this.doneFile,hotel.city+','+names[1]+','+names[2].replace(/\.html/,'')+','+hotel.id+','+hotel.name+"\r\n");
 	fs.appendFileSync(this.resultDir+this.resultFile,hotel.toString("qunar_pc"));
-	console.log("["+(i+1)+"]."+hotel.name);
+	console.log("["+(i+1)+"].");
     }
 }
 
