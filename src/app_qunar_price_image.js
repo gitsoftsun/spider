@@ -1,15 +1,15 @@
 var http = require('http')
-var zlib = require('zlib')
 var fs = require('fs')
-var helper = require('./helpers/webhelper.js')
-var $ = require('jquery')
-var entity = require('./models/entity.js')
+var helper = require('../helpers/webhelper.js')
+var entity = require('../models/entity.js')
 var proxy = new helper.proxy();
 var proxyfile = "verified-2-25.txt";
 proxy.load(proxyfile);
 
+var resultFile = "../result/qunar_imgs/";
+
 var requestCount = 0;
-var datafile = "app_qunar_flight.txt";
+var datafile = "../result/app_qunar_flight.txt";
 function downloadImg(filename){
 	var lines = fs.readFileSync(filename).toString().split('\r\n');
 	for(var i in lines){
@@ -32,7 +32,7 @@ function getData(vals){
 	    res.on('end',function(){
 	        var buffer = Buffer.concat(chunks);
 
-	        fs.writeFile("imgs/"+vals[0]+","+vals[1]+","+vals[2]+","+vals[3].replace(":","-")+","+vals[4].replace(":","-")+".gif",buffer,function(err){
+	        fs.writeFile(resultFile+vals[0]+","+vals[1]+","+vals[2]+","+vals[3].replace(":","-")+","+vals[4].replace(":","-")+".gif",buffer,function(err){
 	        	if(err) console.log(err.message);
 	        });
 	    });
@@ -55,17 +55,17 @@ function getProxy(){
 }
 
 function scanImageFiles(path){
-	if(fs.existsSync(path)){
-		return fs.readdirSync(path);
-	}
-	return [];
+    if(fs.existsSync(path)){
+	return fs.readdirSync(path);
+    }
+    return [];
 }
 function outputHtmlTag(arr){
-	if(!arr) return;
-	for(var i=0;i<arr.length;i++){
-		var file = arr[i];
-		console.log("<img id=\""+file.replace(".gif",'')+"\" src=\""+file+"\" />\r\n");
-	}
+    if(!arr) return;
+    for(var i=0;i<arr.length;i++){
+	var file = arr[i];
+	console.log("<img id=\""+file.replace(".gif",'')+"\" src=\""+file+"\" />\r\n");
+    }
 }
 
-//outputHtmlTag(scanImageFiles("imgs/"));
+outputHtmlTag(scanImageFiles("../result/qunar_imgs/"));

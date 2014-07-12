@@ -10,6 +10,7 @@
     	"sprintf-js":"*",
 	"iconv":"*",
 "cheerio":"*",
-"mongodb":"*"
+"mongodb":"*",
+"selenium-webdriver":"*"
   }
 }

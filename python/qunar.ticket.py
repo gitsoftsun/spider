@@ -10,6 +10,8 @@ import codecs
 import time
 import ipaddr
 import datetime
+import os
+import random
 import traceback
 from selenium import webdriver
 from selenium.webdriver.common.proxy import *
@@ -34,9 +36,9 @@ hotel_city = grade_1_city_list + grade_2_city_list + grade_3_city_list
 
 hotel_type_list = [u'经济型', u'二星级', u'三星级', u'四星级', u'五星级']
 
-site = 'http://flight.qunar.com/site/oneway_list.htm?searchDepartureAirport=%E5%8C%97%E4%BA%AC&searchArrivalAirport=%E4%B8%8A%E6%B5%B7&searchDepartureTime=2014-04-01&searchArrivalTime=2014-04-05&nextNDays=0&startSearch=true&from=fi_ont_search'
+site = 'http://flight.qunar.com/site/oneway_list.htm?searchDepartureAirport=%E5%8C%97%E4%BA%AC&searchArrivalAirport=%E4%B8%8A%E6%B5%B7&searchDepartureTime=2014-08-01&searchArrivalTime=2014-08-05&nextNDays=0&startSearch=true&from=fi_ont_search'
 
-date = '2014-04-01'
+date = '2014-08-01'
 
 
 def one_driver_all_ticket():
@@ -45,12 +47,26 @@ def one_driver_all_ticket():
 
     num = len(hot_city_list)
     # num = 2
-
-    for i in xrange(len(short_hot_city_list)):
+    doneArr = os.listdir("../result/qunar_flight/");
+    doneDict = {}
+    doneCount=0
+    for f in doneArr:
+        vals = f.split(',')
+        dep=vals[0]
+        arr=vals[1].replace('2014-08-01','')
+        key= unicode(dep+'-'+arr,'utf-8')
+        doneDict[key] = True
+        doneCount+=1
+        pass
+    print "%d flights done." % doneCount
+    for i in xrange(num):
         for j in xrange(num):
-            from_city = short_hot_city_list[i]
+            from_city = hot_city_list[i]
             to_city = hot_city_list[j]
             if from_city == to_city:
+                continue
+            key=from_city+'-'+to_city
+            if key in doneDict:
                 continue
             one_driver_ticket(driver, from_city, to_city)
         pass
@@ -68,7 +84,7 @@ def one_driver_ticket(driver, from_city, to_city):
     driver.find_element_by_name('toCity').send_keys(to_city)
     driver.find_element_by_name('fromDate').clear()
     driver.find_element_by_name('fromDate').send_keys(date)
-    driver.find_element_by_css_selector('button.btn_search').click()
+    driver.find_element_by_css_selector('button.btn_txt').click()
 
     flag = True
     page_num = 0
@@ -76,7 +92,7 @@ def one_driver_ticket(driver, from_city, to_city):
     while flag:
         next_page = None
         prev_page = None
-        time.sleep(5)
+        time.sleep(random.randint(5, 12))
 
         try:
             if driver.find_element_by_css_selector('div.msg'):
@@ -100,7 +116,7 @@ def one_driver_ticket(driver, from_city, to_city):
         elem = driver.find_element_by_xpath("//*")
         source_code = elem.get_attribute("outerHTML")
         # print type(source_code)
-        f = codecs.open(u'./data/ticket/' + from_city + u',' + to_city + unicode(date) + u',' + unicode(str(page_num+1)) + u'.html',
+        f = codecs.open(u'../result/qunar_flight/' + from_city + u',' + to_city + unicode(date) + u',' + unicode(str(page_num+1)) + u'.html',
                         'w+',
                         'utf8')
         f.write(source_code)
