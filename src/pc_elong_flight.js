@@ -208,15 +208,15 @@ function elong_fls(data,args){
     },(Math.random()*1+5)*1000);
 }
 
-function saveFile(args){
-    fs.appendFileSync(resultFile,args[0].toString("elong_pc",cabin));
-    var id = args[0].dname+"-"+args[0].aname;
-    ++doneCities[id].cur;
-    console.log(id+" : "+doneCities[id].cur+"/"+doneCities[id].total+" done.");
-    if(doneCities[id].cur==doneCities[id].total){
-        fs.appendFileSync(doneFile,id+"\r\n");
-    }
-}
+//function saveFile(args){
+//    fs.appendFileSync(resultFile,args[0].toString("elong_pc",cabin));
+//    var id = args[0].dname+"-"+args[0].aname;
+//    ++doneCities[id].cur;
+//    console.log(id+" : "+doneCities[id].cur+"/"+doneCities[id].total+" done.");
+//    if(doneCities[id].cur==doneCities[id].total){
+//        fs.appendFileSync(doneFile,id+"\r\n");
+//    }
+//}
 
 function getRule(data,args){
     if(!data||!data.success||!data.value){
