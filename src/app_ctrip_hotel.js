@@ -640,9 +640,9 @@ MCtripHotel.prototype.processDetail = function(obj,args){
 	rm.breakfast = r.rbasic.brefast;
 	rm.fan = r.tickets[0] && (r.tickets[0].avgAmt || r.tickets[0].totalAmt);
 	for(var j = 0;j<r.tickets.length;j++){
-	    if(r.tickets[i].type==10){
+	    if(r.tickets[j].type==10){
 		rm.gift = "Y";
-	    }else if(r.tickets[i].type==9){
+	    }else if(r.tickets[j].type==9){
 		rm.isCu = "Y";
 	    }
 	}
