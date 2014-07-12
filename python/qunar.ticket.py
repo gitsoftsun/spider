@@ -36,9 +36,9 @@ hotel_city = grade_1_city_list + grade_2_city_list + grade_3_city_list
 
 hotel_type_list = [u'经济型', u'二星级', u'三星级', u'四星级', u'五星级']
 
-site = 'http://flight.qunar.com/site/oneway_list.htm?searchDepartureAirport=%E5%8C%97%E4%BA%AC&searchArrivalAirport=%E4%B8%8A%E6%B5%B7&searchDepartureTime=2014-08-01&searchArrivalTime=2014-08-05&nextNDays=0&startSearch=true&from=fi_ont_search'
+site = 'http://flight.qunar.com/site/oneway_list.htm?searchDepartureAirport=%E5%8C%97%E4%BA%AC&searchArrivalAirport=%E4%B8%8A%E6%B5%B7&searchDepartureTime=2014-09-01&searchArrivalTime=2014-09-05&nextNDays=0&startSearch=true&from=fi_ont_search'
 
-date = '2014-08-01'
+date = '2014-09-01'
 
 
 def one_driver_all_ticket():
@@ -53,7 +53,7 @@ def one_driver_all_ticket():
     for f in doneArr:
         vals = f.split(',')
         dep=vals[0]
-        arr=vals[1].replace('2014-08-01','')
+        arr=vals[1].replace('2014-09-01','')
         key= unicode(dep+'-'+arr,'utf-8')
         doneDict[key] = True
         doneCount+=1
