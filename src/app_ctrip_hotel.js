@@ -6,8 +6,8 @@ var helper = require('../helpers/webhelper.js')
 
 var hotel_list_options = new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelList',"POST",true,true);
 var hotel_detail_options= new helper.basic_options('m.ctrip.com','/html5/Hotel/GetHotelDetail',"POST",true,true);
-var checkindate = "2014-08-01";
-var checkoutdate = "2014-08-02";
+var checkindate = "2014-09-01";
+var checkoutdate = "2014-09-02";
 var doneFile = "../result/app_ctrip_done_hotels.txt";
 var resultFile = "../result/app_ctrip_hotel.txt";
 var cityFile = "../appdata/qunar_hot_city.txt";
@@ -206,8 +206,8 @@ function one_page_data(obj,args){
 }
 
 function MCtripHotel(){
-    this.checkindate = "2014-08-01";
-    this.checkoutdate = "2014-08-02";
+    this.checkindate = "2014-09-01";
+    this.checkoutdate = "2014-09-02";
     this.resultDir = "../result/";
     this.appDir = "../appdata/";
     this.doneFile = "app_ctrip_done_hotels.txt";
@@ -236,8 +236,8 @@ function MCtripHotel(){
     "setInfo": {
         "cityId": 25,
         "dstId": 0,
-        "inDay": "2014-08-01",
-        "outDay": "2014-08-02"
+        "inDay": "2014-09-01",
+        "outDay": "2014-09-02"
     },
     "sort": {
         "dir": 1,
@@ -273,8 +273,8 @@ function MCtripHotel(){
 	this.setInfo={
 	    'cityId':city.id,
 	    'dstId':0,
-	    'inDay':'2014-08-01',
-	    'outDay':'2014-08-02'
+	    'inDay':'2014-09-01',
+	    'outDay':'2014-09-02'
 	};
 	this.sort={
 	    "dir": 1,
@@ -317,8 +317,8 @@ function MCtripHotel(){
 	this.setInfo = {
 	    "cityId": cityId,
             "dstId": 0,
-            "inDay": "2014-06-26",
-            "outDay": "2014-06-27",
+            "inDay": "2014-09-01",
+            "outDay": "2014-09-02",
             "membertype": ""
 	};
 	this.pay = 0;
@@ -640,9 +640,9 @@ MCtripHotel.prototype.processDetail = function(obj,args){
 	rm.breakfast = r.rbasic.brefast;
 	rm.fan = r.tickets[0] && (r.tickets[0].avgAmt || r.tickets[0].totalAmt);
 	for(var j = 0;j<r.tickets.length;j++){
-	    if(r.tickets[i].type==10){
+	    if(r.tickets[j].type==10){
 		rm.gift = "Y";
-	    }else if(r.tickets[i].type==9){
+	    }else if(r.tickets[j].type==9){
 		rm.isCu = "Y";
 	    }
 	}

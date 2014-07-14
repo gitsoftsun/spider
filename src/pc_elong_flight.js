@@ -6,7 +6,7 @@ var entity = require('../models/entity.js')
 
 //command args: date,useproxy
 var arguments = process.argv.splice(2);
-var departDate = arguments[0] || '2014-08-01';
+var departDate = arguments[0] || '2014-09-01';
 var useproxy = arguments[1]!=undefined;//flag to define if use proxy.
 var resultFile = "../result/pc_elong_flight.txt";
 var cityFile = '../appdata/qunar_flight_hot_city.txt';

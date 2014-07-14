@@ -4,8 +4,8 @@ var cheerio = require('cheerio')
 var entity = require('../models/entity.js')
 
 //basic settings.
-var checkindate = "2014-08-01";
-var checkoutdate = "2014-08-02";
+var checkindate = "2014-09-01";
+var checkoutdate = "2014-09-02";
 var app_qunar_done_city_file = "../result/app_qunar_done_city_hotel.txt";
 var app_qunar_done_hotel= "../result/app_qunar_done_hotel.txt";
 var countOfHotelsPerCity = 20;
