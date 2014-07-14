@@ -171,7 +171,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
             if len(items) > 0:
                 parentTR = items[0]
             else:
-                if driver.title != "非常抱歉，您访问的页面不存在。":
+                if driver.title != u"非常抱歉，您访问的页面不存在。":
                     f = codecs.open('../result/qunar_hotel/' + city + ','+elongId+',' + hotel.replace(',','')  + '.html','w+','utf8')
                     f.write(" ")
                     f.close()
