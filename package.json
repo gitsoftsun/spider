@@ -5,12 +5,12 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "xmlhttprequest" : "*",
-    "request" : "*",
-    	"sprintf-js":"*",
-	"iconv":"*",
-"cheerio":"*",
-"mongodb":"*",
-"selenium-webdriver":"*"
+      "xmlhttprequest" : "*",
+      "request" : "*",
+      "sprintf-js":"*",
+      "iconv":"*",
+      "cheerio":"*",
+      "mongodb":"*",
+      "selenium-webdriver":"*"
   }
 }
