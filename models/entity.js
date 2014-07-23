@@ -247,13 +247,13 @@ exports.hotel.prototype.toString=function(site){
         sb.append(',');
         sb.append(this.points);
         sb.append(',');
-        sb.append(this.faclPoints);
+        sb.append(this.faclPoints);//设施
         sb.append(',');
-        sb.append(this.raAtPoints);
+        sb.append(this.raAtPoints);//环境
         sb.append(',');
-        sb.append(this.servPoints);
+        sb.append(this.servPoints);//服务
         sb.append(',');
-        sb.append(this.ratPoints);
+        sb.append(this.ratPoints);//卫生
         sb.append(',');
         //var b;
         //if(this.rooms[i].breakfast=="单早")
