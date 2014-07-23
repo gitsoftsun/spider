@@ -54,7 +54,7 @@ MQunarFlight.prototype.init = function(){
 		    a:this.cities[j]
 		});
 	}
-    }    
+    }
 }
 
 MQunarFlight.prototype.start = function(){
