@@ -27,18 +27,7 @@ lefeng.prototype.init = function(){
 	return {name:vals[1],url:vals[0]};
     });
 
-/*    fs.readFileSync(this.dataDir + this.brandFile).toString().split("\n").forEach(function(line){
-	var len = line.length;
-	var tree = that.brandDictTree;
-	for(var i=0;i<len;i++){
-	    var c = line.charCodeAt(i);
-	    if(!tree[c]){
-		tree[c] = {};
-	    }else{
-		tree = tree[c];
-	    }
-	}
-    });*/
+
 }
 
 lefeng.prototype.load = function(){
@@ -75,9 +64,10 @@ lefeng.prototype.processList = function(data,args){
 	var price = $("dd.pri img",this).attr("src") || $("dd.pri img",this).attr("src2");
 	var mktPrice = $("dd.pri del.spri",this).text() || -1;
 	var result = [new Date().toLocaleDateString(),"美妆",title,id,mktPrice,price,new Date().toLocaleDateString(),new Date().toLocaleDateString()];
-	console.log(title);
+	//console.log(title);
 	fs.appendFile(that.resultDir+that.resultFile,result.join()+"\n");
     });
+    console.log(args[0].name);
     setTimeout(function(){
 	that.wgetList();
     },0);
