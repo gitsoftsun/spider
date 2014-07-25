@@ -54,17 +54,23 @@ lefeng.prototype.wgetList = function(){
 lefeng.prototype.wgetDetail = function(){
     
 }
+Date.prototype.str = function(){
+    return this.getFullYear()+'-'+(this.getMonth()+1)+'-'+this.getDate();
+}
+
 lefeng.prototype.processList = function(data,args){
     if(!data){
 	console.log("data empty");
     }
+    
+    console.log("%s,%s",args[0].name,args[0].pageIdx);
     var $ = cheerio.load(data);
     $("div.pruwrap").each(function(){
 	var id = $(this).attr("id");
 	var title = $("dd.nam a",this).attr("title");
 	var price = $("dd.pri img",this).attr("src") || $("dd.pri img",this).attr("src2");
 	var mktPrice = $("dd.pri del.spri",this).text() || -1;
-	var result = [new Date().toLocaleDateString(),"美妆",title,id,mktPrice,price,new Date().toLocaleDateString(),new Date().toLocaleDateString()];
+	var result = [new Date().str(),"美妆",title,id,mktPrice,price,new Date().str(),new Date().str()];
 	//console.log(title);
 	fs.appendFile(that.resultDir+that.resultFile,result.join()+"\n");
     });
@@ -74,15 +80,19 @@ lefeng.prototype.processList = function(data,args){
     }
     if(args[0].pageIdx<args[0].pageCount){
 	var urlObj = url.parse(args[0].url);
-	var categoryId = urlObj && urlObj.pathname && urlObj.pathname.replace();
-	var opt = new helper.basic_options(urlObj.host,urlObj.pathname+"_0_0_0_0_0_0_"+args[0].pageIdx,'GET',false,false,urlObj.query);
-
+	var path = urlObj && urlObj.pathname && urlObj.pathname.replace(".html","_0_0_0_0_0_0_"+(++args[0].pageIdx)+".html");
+	if(path){
+	    var opt = new helper.basic_options(urlObj.host,path,'GET',false,false,urlObj.query);
+	    helper.request_data(opt,null,function(data,args){
+		that.processList(data,args);
+	    },args[0]);
+	}
     }else{
 	setTimeout(function(){
 	    that.wgetList();
 	},0);
     }
-    console.log("%s,%s",args[0].name,args[0].pageIdx);
+
 }
 
 var instance = new lefeng();

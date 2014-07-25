@@ -27,5 +27,27 @@ function recusive(tree){
 	}
     }
 }
-//console.log(brandDictTree);
-recusive(brandDictTree);
+console.log(brandDictTree);
+//recusive(brandDictTree);
+
+function matchMaxWord(tree,target){
+    var len = target.length,i=0;
+    var result = [];
+    while(i<len && tree[target.charAt(i)] && Object.keys(tree[target.charAt(i)]).length!=0){
+	tree = tree[target.charAt(i)];
+	result.push(target.charAt(i));
+	i++;
+    }
+    return result.join("");
+}
+
+var lines = fs.readFileSync("../result/pc_lefeng_sc.txt").toString().split("\n")
+var title = lines[0].split(',')[2];
+
+lines.forEach(function(line){
+    var title = line.split(',')[2];
+    if(!title) return;
+    
+    var brand = matchMaxWord(brandDictTree,title);
+    //console.log("%s --> %s",title,brand);
+});
