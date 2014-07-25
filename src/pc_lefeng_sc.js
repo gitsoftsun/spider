@@ -43,6 +43,7 @@ lefeng.prototype.wgetList = function(){
     while(!cur && this.categories.length>0){
 	cur = this.categories.shift();
     }
+    cur.pageIdx = 1;
     var urlObj = url.parse(cur.url,true);
     var opt = new helper.basic_options(urlObj.host,urlObj.pathname,'GET',false,false,urlObj.query);
     helper.request_data(opt,null,function(data,args){
@@ -67,10 +68,21 @@ lefeng.prototype.processList = function(data,args){
 	//console.log(title);
 	fs.appendFile(that.resultDir+that.resultFile,result.join()+"\n");
     });
-    console.log(args[0].name);
-    setTimeout(function(){
-	that.wgetList();
-    },0);
+
+    if(!args[0].pageCount){
+	args[0].pageCount = Number($("div.pages span a").last().prev().text());
+    }
+    if(args[0].pageIdx<args[0].pageCount){
+	var urlObj = url.parse(args[0].url);
+	var categoryId = urlObj && urlObj.pathname && urlObj.pathname.replace();
+	var opt = new helper.basic_options(urlObj.host,urlObj.pathname+"_0_0_0_0_0_0_"+args[0].pageIdx,'GET',false,false,urlObj.query);
+
+    }else{
+	setTimeout(function(){
+	    that.wgetList();
+	},0);
+    }
+    console.log("%s,%s",args[0].name,args[0].pageIdx);
 }
 
 var instance = new lefeng();
