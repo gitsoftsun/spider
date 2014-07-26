@@ -70,12 +70,15 @@ lefeng.prototype.processList = function(data,args){
     });
 
     if(!args[0].pageCount){
-	args[0].pageCount = Number($("div.pages span a").last().prev().text());
+	var lastLink = $("div.pages span a").last().prev();
+	
+	args[0].pageCount = Number(lastLink.text());
+	args[0].p = lastLink.attr("href").replace(args[0].url.replace(".html",""),"").replace(".html","").replace("#list",'').slice(0,-1);
     }
     if(args[0].pageIdx<args[0].pageCount){
 	var urlObj = url.parse(args[0].url);
 	var categoryId = urlObj && urlObj.pathname && urlObj.pathname.replace();
-	var opt = new helper.basic_options(urlObj.host,urlObj.pathname+"_0_0_0_0_0_0_"+args[0].pageIdx,'GET',false,false,urlObj.query);
+	var opt = new helper.basic_options(urlObj.host,urlObj.pathname+args[0].pageIdx,'GET',false,false,urlObj.query);
 
     }else{
 	setTimeout(function(){
