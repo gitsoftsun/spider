@@ -92,7 +92,6 @@ lefeng.prototype.processList = function(data,args){
 	    that.wgetList();
 	},0);
     }
-
 }
 
 var instance = new lefeng();
