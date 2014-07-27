@@ -54,7 +54,7 @@ function recusive(tree){
 	}
     }
 }
-//console.log(brandDictTree["H"]["A"]["N"]["D"]["L"]["O"]["V"]["E"]);
+//console.log(brandDictTree["V"]["O"]["G"]);
 //recusive(brandDictTree);
 
 function matchMaxWord(tree,target,i){
@@ -91,7 +91,7 @@ var lines = fs.readFileSync("../result/pc_lefeng_sc.txt").toString().split("\n")
 lines.forEach(function(line){
     var title = line.split(',')[3];
     if(!title) return;
-    
+    title = title.replace(/^【[\u4e00-\u9fa5]*】/,'');
     var maxLen = matchMaxWord(brandDictTree,title);
     console.log("%s --> %s",title,title.slice(0,maxLen));
 });
