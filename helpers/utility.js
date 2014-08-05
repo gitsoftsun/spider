@@ -56,32 +56,30 @@ function recusive(tree){
 }
 //console.log(brandDictTree["V"]["O"]["G"]);
 //recusive(brandDictTree);
-
-function matchMaxWord(tree,target,i){
+exports.tree = brandDictTree;
+exports.matchMaxWord = function(tree,target,i){
     if(i==undefined) i=0;
     var len = target.length,ch,c;
 
     if(i<len && tree && Object.keys(tree).length != 0){
 	c = target.charCodeAt(i);
 	ch = target.charAt(i);
-//	console.log(ch);
 	if(c==32){
-	    return matchMaxWord(tree,target,i+1)+1;
+	    return arguments.callee(tree,target,i+1)+1;
+	    //return matchMaxWord(tree,target,i+1)+1;
 	}
-	return matchMaxWord(tree[ch.toUpperCase()],target,i+1)+1;
-	/*
-	if(c>=65 && c<=90){
-	    return Math.max(matchMaxWord(tree[ch],target,i+1),matchMaxWord(tree[ch.toUpperCase()],target,i+1)) + 1;
-	}
-	if(c>=97 && c<=122){
-	    return Math.max(matchMaxWord(tree[ch],target,i+1),matchMaxWord(tree[ch.toLowerCase()],target,i+1))+1;
-	}*/
-
-//	result.push(ch);
-//	i++;
+	return arguments.callee(tree[ch.toUpperCase()],target,i+1)+1;
+	//return matchMaxWord()+1;
     }
     return 0;
 }
+
+var priceList = {};
+fs.readFileSync("../result/lefengPriceList.txt").toString().split("\n").reduce(function(pre,cur){
+    var vals = cur.split(',');
+    pre[vals[0]]=vals[1];
+    return pre;
+},priceList);
 
 var lines = fs.readFileSync("../result/pc_lefeng_sc.txt").toString().split("\n")
 //var title = lines[0].split(',')[3];
@@ -89,9 +87,16 @@ var lines = fs.readFileSync("../result/pc_lefeng_sc.txt").toString().split("\n")
 //var l = matchMaxWord(brandDictTree,title);
 //console.log(title.slice(0,l));
 lines.forEach(function(line){
-    var title = line.split(',')[3];
+    var vals = line.split(',');
+    var title = vals[3];
     if(!title) return;
-    title = title.replace(/^【[\u4e00-\u9fa5]*】/,'');
-    var maxLen = matchMaxWord(brandDictTree,title);
-    console.log("%s --> %s",title,title.slice(0,maxLen));
+    title = title.replace(/^【[\u4e00-\u9fa5]*】/,'').replace(/（[\u4e00-\u9fa5]*）/,'');
+    var unit = title.match(/\d+(mg|g|ml|l|L|ML|MG|G|KG|kg|cm|m|CM|M|KM|km)/);
+    if(unit){
+	unit = unit[0];
+    }
+    var maxLen = exports.matchMaxWord(brandDictTree,title);
+    var brand = title.slice(0,maxLen);
+    
+    console.log(line+","+brand+","+unit+","+priceList[vals[4]]);
 });
