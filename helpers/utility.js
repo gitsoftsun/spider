@@ -57,13 +57,15 @@ function recusive(tree){
 //console.log(brandDictTree["V"]["O"]["G"]);
 //recusive(brandDictTree);
 exports.tree = brandDictTree;
+//console.log(JSON.stringify(brandDictTree));
 exports.matchMaxWord = function(tree,target,i){
     if(i==undefined) i=0;
     var len = target.length,ch,c;
-
-    if(i<len && tree && Object.keys(tree).length != 0){
-	c = target.charCodeAt(i);
-	ch = target.charAt(i);
+    c = target.charCodeAt(i);
+    ch = target.charAt(i);
+    if(i<len && tree && Object.keys(tree).length != 0 && tree[ch.toUpperCase()]!=undefined){
+	
+        //console.log(ch);
 	if(c==32){
 	    return arguments.callee(tree,target,i+1)+1;
 	    //return matchMaxWord(tree,target,i+1)+1;
@@ -74,19 +76,30 @@ exports.matchMaxWord = function(tree,target,i){
     return 0;
 }
 
+/*fs.readFileSync("../result/pc_lefeng_sc.txt").toString().split('\n').forEach(function(line){
+    var title = line.split(',')[2];
+    var maxLen = exports.matchMaxWord(brandDictTree,title);
+    console.log(title+" -> " + title.slice(0,maxLen));
+});
+*/
+    //var title = "JCARE清酒美白毛孔紧致化妆水145ml 平明神仙水 亲肤易吸收";
+    //var maxLen = exports.matchMaxWord(brandDictTree,title);
+    //console.log(title+" -> " + title.slice(0,maxLen));
+
+/*
 var priceList = {};
 fs.readFileSync("../result/lefengPriceList.txt").toString().split("\n").reduce(function(pre,cur){
     var vals = cur.split(',');
     pre[vals[0]]=vals[1];
     return pre;
 },priceList);
-
-var lines = fs.readFileSync("../result/pc_lefeng_sc.txt").toString().split("\n")
+*/
+//var lines = fs.readFileSync("../result/pc_lefeng_sc.txt").toString().split("\n")
 //var title = lines[0].split(',')[3];
 //console.log(title);
 //var l = matchMaxWord(brandDictTree,title);
 //console.log(title.slice(0,l));
-lines.forEach(function(line){
+/*lines.forEach(function(line){
     var vals = line.split(',');
     var title = vals[3];
     if(!title) return;
@@ -100,3 +113,4 @@ lines.forEach(function(line){
     
     console.log(line+","+brand+","+unit+","+priceList[vals[4]]);
 });
+*/
