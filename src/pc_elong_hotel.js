@@ -7,8 +7,8 @@ var entity = require('../models/entity.js')
 var sprintf = require("sprintf-js").sprintf
 
 //basic settings.
-var checkindate = "2014/09/01";
-var checkoutdate = "2014/09/02";
+var checkindate = "2014/10/01";
+var checkoutdate = "2014/10/02";
 var arguments = process.argv.splice(2);
 var level = '';
 useproxy = arguments[0]!=undefined;
