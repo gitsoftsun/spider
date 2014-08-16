@@ -346,7 +346,7 @@ exports.flight.prototype.toString=function(site,cabin){
 	    sb.append(',');
 	    sb.append(this.tax);
 	    sb.append(',');
-	    sb.append(this.oilFee)
+	    sb.append(this.oilFee);
             sb.append(',');
             sb.append(c.tCount);
             sb.append(',');
@@ -362,7 +362,7 @@ exports.flight.prototype.toString=function(site,cabin){
             sb.append(',');
             sb.append(c.lv);
             sb.append(',');
-            sb.append(c.isSpec);
+            sb.append(c.isSpec);//网络专享价
             sb.append(',');
             sb.append(c.isAgent);
             sb.append("\r\n");
