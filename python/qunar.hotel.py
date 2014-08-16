@@ -20,8 +20,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 from selenium.webdriver.common.by import By
 
-fromDate = '2014-09-01'
-toDate = '2014-09-02'
+fromDate = '2014-10-01'
+toDate = '2014-10-02'
 
 
 # city_map = {
