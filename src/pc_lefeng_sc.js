@@ -72,7 +72,7 @@ lefeng.prototype.processList = function(data,args){
 	var price = $("dd.pri img",this).attr("src") || $("dd.pri img",this).attr("src2");
 	var mktPrice = $("dd.pri del.spri",this).text() || -1;
 
-	title = title.replace(/^【[\u4e00-\u9fa5]*】/,'');
+	title = title.replace(/^【[\u4e00-\u9fa5]*】/,'').replace(/[\n\r]/g,';');
 	var maxLen = utility.matchMaxWord(utility.tree,title);
 	var brand  = title.slice(0,maxLen);
 	var unit = title.match(/\d*(mg|g|ml|l|L|ML|MG|G|KG|kg)/)[0];

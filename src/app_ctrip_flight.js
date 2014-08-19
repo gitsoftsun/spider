@@ -10,7 +10,7 @@ function MCtripFlight(){
     this.resultFile = "app_ctrip_flight.txt";
     this.doneFile = "app_ctrip_done_flight.txt";
     this.skipFile = "invalidFlights.txt";
-    this.depdate = "2014/08/01";
+    this.depdate = "2014/10/01";
     this.cityFile = "qunar_flight_hot_city.txt";
 
     this.citySkip = {};
@@ -52,7 +52,7 @@ function MCtripFlight(){
 	this["depart-orderby"]= "asc",
 	this["arrive-sorttype"]="time",
 	this["arrive-orderby"]="asc",
-	this["calendarendtime"]= "2014/08/3000: 00: 00",
+	this["calendarendtime"]= "2014/10/3000: 00: 00",
 	this["__tripType"]=1,
 	this["head"]={
 	    "cid": "cd3b6d6c-3f75-1fef-0930-69061427de9f",

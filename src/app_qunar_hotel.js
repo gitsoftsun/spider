@@ -227,7 +227,7 @@ function process_one_hotel(data,args){
 	    var site = contents.eq(0).text().replace(/[\s\d\.]/g,'');
 	    if(site.indexOf("报价")>-1)
 		return;
-	    var pName = contents.eq(2).text().replace(/\s/g,'');
+	    var pName = contents.eq(2).text().replace(/\s/g,'').replace(/[,，]/g,';');
 	    pName = pName?pName:r.name;
 	    var tuan = "N";
 	    if(site.indexOf('团购')>-1)
@@ -368,7 +368,7 @@ function getFirstHotelOfPage(data,args){
     $('table.fl tr:first-child td:first-child').each(function(i,e){
 	h.city = args[0].cname;
 	h.name = $('a',this).text();
-	h.name = h.name && h.name.replace(/[,]/g,";");
+	h.name = h.name && h.name.replace(/,/g,";");
 	var href=$('a',this).attr('href');
 	var matches = href&&href.match(/seq=(\w+)/);
 	var id = matches&&matches[1];
