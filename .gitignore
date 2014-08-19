@@ -1,3 +1,5 @@
+*.log
+.DS_Store
 *~
 *.csv
 data.txt
@@ -22,3 +24,9 @@ result
 node_modules
 python/data
 python/data2
+*.sln
+*.dat
+*.njsproj
+*.sln
+*.suo
+obj

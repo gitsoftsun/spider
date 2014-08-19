@@ -4,8 +4,8 @@ var cheerio = require('cheerio')
 var entity = require('../models/entity.js')
 
 //basic settings.
-var checkindate = "2014-09-01";
-var checkoutdate = "2014-09-02";
+var checkindate = "2014-10-01";
+var checkoutdate = "2014-10-02";
 var app_qunar_done_city_file = "../result/app_qunar_done_city_hotel.txt";
 var app_qunar_done_hotel= "../result/app_qunar_done_hotel.txt";
 var countOfHotelsPerCity = 20;
@@ -227,7 +227,7 @@ function process_one_hotel(data,args){
 	    var site = contents.eq(0).text().replace(/[\s\d\.]/g,'');
 	    if(site.indexOf("报价")>-1)
 		return;
-	    var pName = contents.eq(2).text().replace(/\s/g,'');
+	    var pName = contents.eq(2).text().replace(/\s/g,'').replace(/[,，]/g,';');
 	    pName = pName?pName:r.name;
 	    var tuan = "N";
 	    if(site.indexOf('团购')>-1)
@@ -368,7 +368,7 @@ function getFirstHotelOfPage(data,args){
     $('table.fl tr:first-child td:first-child').each(function(i,e){
 	h.city = args[0].cname;
 	h.name = $('a',this).text();
-	h.name = h.name && h.name.replace(/[,]/g,";");
+	h.name = h.name && h.name.replace(/,/g,";");
 	var href=$('a',this).attr('href');
 	var matches = href&&href.match(/seq=(\w+)/);
 	var id = matches&&matches[1];
