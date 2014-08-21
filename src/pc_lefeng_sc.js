@@ -72,10 +72,11 @@ lefeng.prototype.processList = function(data,args){
 	var price = $("dd.pri img",this).attr("src") || $("dd.pri img",this).attr("src2");
 	var mktPrice = $("dd.pri del.spri",this).text() || -1;
 
-	title = title.replace(/^【[\u4e00-\u9fa5]*】/,'').replace(/[\n\r]/g,';');
+	title = title.replace(/^【[\u4e00-\u9fa5]*】/,'').replace(/[\n\r,，]/g,';');
 	var maxLen = utility.matchMaxWord(utility.tree,title);
-	var brand  = title.slice(0,maxLen);
-	var unit = title.match(/\d*(mg|g|ml|l|L|ML|MG|G|KG|kg)/)[0];
+        var brand = title.slice(0, maxLen);
+        var m = title.match(/\d*(mg|g|ml|l|L|ML|MG|G|KG|kg)/);
+	var unit = m && m[0];
 	var result = [new Date().str(),"美妆",args[0].name,title,id,mktPrice,price,new Date().str(),new Date().str(),brand,unit];
 	//console.log(title);
 	

@@ -13,15 +13,15 @@ function downloadImg(filename){
 }
 downloadImg("../result/pc_lefeng_sc.txt");
 function getData(vals){
-    if(!vals[6]) return;
-    http.get(vals[6],function(res){
+    if(!vals[5]) return;
+    http.get(vals[5],function(res){
 	var chunks = [];
 	res.on('data',function(chunk){
 	    chunks.push(chunk);
 	});
 	res.on('end',function(){
 	    var buffer = Buffer.concat(chunks);
-	    fs.writeFile("../result/lefengPrice/"+vals[4]+".png",buffer,function(err){
+	    fs.writeFile("../result/lefengPrice/"+vals[3]+".png",buffer,function(err){
 	        if(err) console.log(err.message);
 	    });
 	});
