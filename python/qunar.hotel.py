@@ -199,7 +199,7 @@ def one_driver_hotel(driver, city, hotel,elongId):
         except Exception as e:
             pass
         
-        time.sleep(3)
+        time.sleep(6)
         # 展开报价
         try:
             # elems = driver.find_elements_by_xpath("//li[@class='defaultpricetype']")
