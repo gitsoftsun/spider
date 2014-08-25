@@ -169,6 +169,7 @@ MCtripFlight.prototype.wgetList = function(f){
     var opt = new helper.basic_options("m.ctrip.com",'/restapi/Flight/Domestic/FlightList/Query',"POST",true,true);
     opt.agent=false;
     opt.headers['Content-Type']="application/json";
+    console.log(JSON.stringify(query));
     helper.request_data(opt,query,function(data,args){
 	that.processList(data,args);
     },f);
