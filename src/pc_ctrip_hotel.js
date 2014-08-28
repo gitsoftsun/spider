@@ -17,8 +17,8 @@ for(var i=0;i<cities.length;i++){
 }
 
 function CtripHotel(){
-    this.checkindate = "2014-10-01";
-    this.checkoutdate = "2014-10-02";
+    this.checkindate = "2014-09-01";
+    this.checkoutdate = "2014-09-02";
     this.resultDir = "../result/";
     this.dataDir = "../appdata/";
     this.resultFile = "pc_ctrip_hotel-.txt";
@@ -180,7 +180,7 @@ CtripHotel.prototype.filterFromResult = function(data,args){
     h.points = $("ul.searchresult_info li.searchresult_info_judge div.searchresult_judge_box a.hotel_judge span.hotel_value",item).text();
     h.commentCount = $("ul.searchresult_info li.searchresult_info_judge div.searchresult_judge_box a.hotel_judge span.hotel_judgement",item).text();
     h.commentCount = h.commentCount && h.commentCount.match(/\d+/)[0];
-    url="http://hotels.ctrip.com"+url+'hotel='+h.id+'&startDate=2014-10-01&depDate=2014-10-02&OrderBy=ctrip&OrderType=ASC&index=1&page=1&rs=1';
+    url="http://hotels.ctrip.com"+url+'hotel='+h.id+'&startDate=2014-09-01&depDate=2014-09-02&OrderBy=ctrip&OrderType=ASC&index=1&page=1&rs=1';
     helper.request_data(url,null,function(data,args){
 	that.processDetail(data,args);
     },[h,c,args[1]]);

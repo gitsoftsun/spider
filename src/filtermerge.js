@@ -339,6 +339,6 @@ FilterMerge.prototype.start=function(){
     this.merge();
 }
 
-var fm = new FilterMerge(true);
+var fm = new FilterMerge();
 var that = fm;
 fm.start();
