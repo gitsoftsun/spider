@@ -1,3 +1,8 @@
+NewYork
+LosAngeles
+Chicago
+Houston
+Philadelphia
 Buenos Aires
 Adelaide
 Brisbane
@@ -89,7 +94,6 @@ Livermore
 LongBeach
 LosAltos
 NorthHollywood
-LosAngeles
 ShermanOaks
 LosGatos
 MarinadelRey
@@ -155,7 +159,6 @@ Honolulu
 Lahaina
 IowaCity
 Boise
-Chicago
 Evanston
 Naperville
 Schaumburg
@@ -188,14 +191,12 @@ LasVegas
 Reno
 Brooklyn
 LongIslandCity
-NewYork
 Flushing
 Cincinnati
 Cleveland
 Columbus
 Portland
 Salem
-Philadelphia
 Pittsburgh
 Providence
 Charleston
@@ -203,7 +204,6 @@ Memphis
 Nashville
 Austin
 Dallas
-Houston
 SanAntonio
 SaltLakeCity
 Alexandria
