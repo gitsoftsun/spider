@@ -317,8 +317,8 @@ function MCtripHotel(){
 	this.setInfo = {
 	    "cityId": cityId,
             "dstId": 0,
-            "inDay": "2014-09-01",
-            "outDay": "2014-09-02",
+            "inDay": "2014-10-01",
+            "outDay": "2014-10-02",
             "membertype": ""
 	};
 	this.pay = 0;
