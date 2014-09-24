@@ -19,6 +19,7 @@ function Yelp(){
     }
     this.categories = ['active','arts','auto'];
     this.taskQueue = [];
+    this.interval = [2000,8000];
 }
 
 Yelp.prototype.init = function(){
@@ -74,15 +75,22 @@ Yelp.prototype.processList = function(data,args){
 	return;
     }
     console.log("data got: %s, %s, %d",args[0].city,args[0].cate,args[0].start);
+    
     var $ = cheerio.load(data);
-    $('ul.ylist li span.review-count').each(function(){
-	++args[0].shopCount;
-	var txt = $(this).text();
+    if(args[0].shopCount==-1){
+	args[0].shopCount = Number($("span.pagination-results-window").text().trim().match(/\d+$/)[0]);
+    }
+    $("ul.ylist li div.media-story").each(function(){
+	var path = $("a.biz-name",this).attr("href");
+	var shop = {"path":path};
+	var txt = $("span.review-count",this).text();
 	var m = txt && txt.match(/\d+/);
 	if(m && m[0]){
-	    args[0].reviews += Number(m[0]);
+	    shop.reviews = Number(m[0]);
 	}
+	args[0].shops.push(shop);
     });
+    this.wgetDetail(args[0]);
     
     var pageOfPages = $('div.page-of-pages').text().trim();
     var m = pageOfPages && pageOfPages.match(/\d+/g);
@@ -91,27 +99,61 @@ Yelp.prototype.processList = function(data,args){
     var maxStartIdx = (totalPages-1)*10;
     if(args[0].start < maxStartIdx){
 	args[0].start += 10;
+	this.wgetList(args[0]);	
     }else{
 	//append to file.
-	var record = [args[0].city,args[0].cate,args[0].shopCount,args[0].reviews,'\n'].join();
-	fs.appendFile(this.resultDir + this.resultFile,record);
-	console.log(record);
+
+	//fs.appendFile(this.resultDir + this.resultFile,record);
+	//console.log(record);
+	this.wgetList();
     }
-    this.wgetList(args[0]);
+    
+}
+
+Yelp.prototype.wgetDetail = function(task){
+    if(task.shops.length==0){
+	
+    }
+    
+    var shop = task.shops.shift();
+    var opt = new helper.basic_options("www.yelp.com",shop.path);
+    console.log("[GET] %s",shop.path);
+    helper.request_data(opt,null,function(data,args){
+	that.processDetail(data,args);
+    },[task,shop]);
+}
+
+Yelp.prototype.processDetail = function(data,args){
+    if(!data){
+	console.log("detail data empty.");
+    }
+    var $ = cheerio.load(data);
+    var photoText = $("a.see-more").text().trim();
+    var m = photoText.match(/\d+/g);
+    if(m && m[0]){
+	args[1].photoCount = Number(m[0]);
+    }
+    var record = [args[0].city,args[0].cate,args[0].shopCount,args[1].path,args[1].reviews,args[1].photoCount,'\n'].join();
+    fs.appendFileSync(this.resultDir+this.resultFile,record);
+    console.log("[DONE] %s",record);
+    setTimeout(function(){
+	that.wgetDetail(args[0]);
+    },(Math.random()*(this.intervals[1]-this.intervals[0])+this.intervals[0]));
 }
 
 Yelp.prototype.wgetList = function(t){
     if(!t || t.start>=990){
 	t = this.taskQueue.shift();
 	t.start = 0;
-	t.shopCount=0;
+	t.shopCount=-1;
 	t.reviews = 0;
+	t.shops = [];
     }
     //console.log("GET %s-%s: %d/%d",);
     
     var query = new this.searchQuery(t.city,t.cate,t.start);
     var opt = new helper.basic_options('www.yelp.com','/search','GET',false,false,query);
-    opt.agent=false;
+    //opt.agent=false;
     helper.request_data(opt,null,function(data,args){
 	that.processList(data,args);
     },t);
