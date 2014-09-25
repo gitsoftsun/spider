@@ -55,6 +55,8 @@ Yelp.prototype.init = function(){
 	return pre;
     },this.doneItems);
     console.log("[DONE COUNT] %d",doneCount);
+    console.log("[CITIES] %d",this.cities.length);
+    console.log("[CATEGORIES] %d",this.categories.length);
 }
 
 Yelp.prototype.start = function(){
@@ -62,10 +64,13 @@ Yelp.prototype.start = function(){
     this.init();
     for(var i=0;i<this.cities.length;i++){
 	for(var j=0;j<this.categories.length;j++){
+	    if(!this.cities[i] || !this.categories[j]) continue;
 	    this.taskQueue.push({city:this.cities[i],cate:this.categories[j]});
 	}
     }
-    console.log("%d task todo.",this.taskQueue.length);
+    this.taskQueue = this.taskQueue.slice(this.startIdx||0,this.count||this.taskQueue.length);
+    console.log("[TASKS] %d",this.taskQueue.length);
+    //console.log(this.taskQueue);
     this.wgetList();
 //    this.todoFlights.forEach(function(f,i,a){
 //	this.wgetList(f);
