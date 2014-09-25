@@ -64,13 +64,15 @@ Yelp.prototype.start = function(){
     this.init();
     for(var i=0;i<this.cities.length;i++){
 	for(var j=0;j<this.categories.length;j++){
-	    if(!this.cities[i] || !this.categories[j]) continue;
-	    this.taskQueue.push({city:this.cities[i],cate:this.categories[j]});
+	    if(this.cities[i] && this.categories[j])
+		this.taskQueue.push({city:this.cities[i],cate:this.categories[j]});
 	}
     }
-    this.taskQueue = this.taskQueue.slice(this.startIdx||0,this.count||this.taskQueue.length);
+    this.startIdx = Number(this.startIdx) || 0;
+    this.count = Number(this.count) || this.taskQueue.length;
+    this.taskQueue = this.taskQueue.slice(this.startIdx,this.startIdx+this.count);
     console.log("[TASKS] %d",this.taskQueue.length);
-    //console.log(this.taskQueue);
+    
     this.wgetList();
 //    this.todoFlights.forEach(function(f,i,a){
 //	this.wgetList(f);
