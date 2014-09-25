@@ -150,13 +150,13 @@ exports.request_data=function(opts,data,fn,args){
 			    obj =JSON.parse(decoded.toString());
 			}
 			if(args==undefined){
-			    fn(obj,[data]);
+			    fn(obj,[data],res);
 			}
 			else if(Array.isArray(args)){
 			    args.push(opts.data||data);
-			    fn(obj,args);
+			    fn(obj,args,res);
 			}else{
-			    fn(obj,[args,opts.data||data]);
+			    fn(obj,[args,opts.data||data],res);
 			}
 			
 		    }
@@ -176,13 +176,13 @@ exports.request_data=function(opts,data,fn,args){
 			if(res.headers['content-type'].indexOf('application/json')!=-1)
 			    obj =JSON.parse(decoded.toString());
 			if(args==undefined){
-			    fn(obj,[data]);
+			    fn(obj,[data],res);
 			}
 			else if(Array.isArray(args)){
-			    args.push(opts.data||data);
+			    args.push(opts.data||data,res);
 			    fn(obj,args);
 			}else{
-			    fn(obj,[args,opts.data||data]);
+			    fn(obj,[args,opts.data||data],res);
 			}
 		    }
 		    catch(e){
@@ -219,13 +219,13 @@ exports.request_data=function(opts,data,fn,args){
 		}
             }
             if(args==undefined){
-		fn(obj,[opts.data]);
+		fn(obj,[opts.data],res);
             }
             else if(Array.isArray(args)){
 		args.push(opts.data||data);
-		fn(obj,args);
+		fn(obj,args,res);
             }else{
-		fn(obj,[args,opts.data||data]);
+		fn(obj,[args,opts.data||data],res);
             }
 	}
     });

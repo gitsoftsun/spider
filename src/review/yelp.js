@@ -36,6 +36,10 @@ Yelp.prototype.init = function(){
     
     this.cities = fs.readFileSync(this.dataDir+this.cityFile).toString().split('\n').slice(0,5);
     this.categories = fs.readFileSync(this.dataDir+this.categoryFile).toString().split('\n');
+    if(!fs.existsSync(this.resultDir+this.resultFile)){
+	console.log("[DONE COUNT] %d",doneCount);
+	return;
+    }
     fs.readFileSync(this.resultDir+this.resultFile).toString().split('\n').filter(function(line,i){
 	if(that.startIdx<i || that.startIdx+that.count>i)
 	    return false;
