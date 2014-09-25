@@ -7,7 +7,7 @@ function Yelp(){
     this.resultDir = "../../result/";
     this.dataDir = "../../appdata/";
     this.resultFile = "yelp.txt";
-    this.doneFile = "yelp_done_item.txt";
+    //this.doneFile = "yelp_done_item.txt";
     this.cityFile = "yelp_city.txt";
     this.categoryFile = "yelp_categories.txt";
     this.cities = [];
@@ -19,12 +19,38 @@ function Yelp(){
     }
     this.categories = ['active','arts','auto'];
     this.taskQueue = [];
-    this.interval = [2000,8000];
+    this.interval = [20000,40000];
+    this.doneItems = {};
 }
 
 Yelp.prototype.init = function(){
+    var doneCount = 0;
+
+    var args = process.argv.slice(2);
+    if(args.length>0){
+	this.startIdx = args[0];
+    }
+    if(args.length>1){
+	this.count = args[1];
+    }
+    
     this.cities = fs.readFileSync(this.dataDir+this.cityFile).toString().split('\n').slice(0,5);
     this.categories = fs.readFileSync(this.dataDir+this.categoryFile).toString().split('\n');
+    fs.readFileSync(this.resultDir+this.resultFile).toString().split('\n').filter(function(line,i){
+	if(that.startIdx<i || that.startIdx+that.count>i)
+	    return false;
+	return true;
+    }).map(function(line){
+	if(line){
+	    return line.split(',')[3];
+	}
+	return "";
+    }).reduce(function(cur,pre){
+	pre[cur]=true;
+	++doneCount;
+	return pre;
+    },this.doneItems);
+    console.log("[DONE COUNT] %d",doneCount);
 }
 
 Yelp.prototype.start = function(){
@@ -69,7 +95,11 @@ Yelp.prototype.load=function(){
 }
 var sleepTime = 2400000;
 var sleepCount = 0;
-Yelp.prototype.processList = function(data,args){
+Yelp.prototype.processList = function(data,args,res){
+    if(res.statusCode==403){
+	console.log("IP has been forbidden");
+	return;
+    }
     if(!data){
 	console.log("data empty");
 	return;
@@ -88,7 +118,8 @@ Yelp.prototype.processList = function(data,args){
 	if(m && m[0]){
 	    shop.reviews = Number(m[0]);
 	}
-	args[0].shops.push(shop);
+	if(!that.doneItems[path])
+	    args[0].shops.push(shop);
     });
     //console.log(args[0].shops);
     
@@ -154,8 +185,8 @@ Yelp.prototype.wgetList = function(t){
     var opt = new helper.basic_options('www.yelp.com','/search','GET',false,false,query);
     //opt.agent=false;
     console.log("[GET] %s,%s: %d/%d",t.city,t.cate,t.start,t.maxStartIdx);
-    helper.request_data(opt,null,function(data,args){
-	that.processList(data,args);
+    helper.request_data(opt,null,function(data,args,res){
+	that.processList(data,args,res);
     },t);
 }
 
