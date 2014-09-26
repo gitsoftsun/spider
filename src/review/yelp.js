@@ -40,16 +40,12 @@ Yelp.prototype.init = function(){
 	console.log("[DONE COUNT] %d",doneCount);
 	return;
     }
-    fs.readFileSync(this.resultDir+this.resultFile).toString().split('\n').filter(function(line,i){
-	if(that.startIdx<i || that.startIdx+that.count>i)
-	    return false;
-	return true;
-    }).map(function(line){
+    fs.readFileSync(this.resultDir+this.resultFile).toString().split('\n').map(function(line){
 	if(line){
 	    return line.split(',')[3];
 	}
 	return "";
-    }).reduce(function(cur,pre){
+    }).reduce(function(pre,cur){
 	pre[cur]=true;
 	++doneCount;
 	return pre;
@@ -100,8 +96,7 @@ Yelp.prototype.load=function(){
 	    },this.citySkip);
     }
 }
-var sleepTime = 2400000;
-var sleepCount = 0;
+
 Yelp.prototype.processList = function(data,args,res){
     if(res.statusCode==403){
 	console.log("IP has been forbidden");
@@ -111,7 +106,6 @@ Yelp.prototype.processList = function(data,args,res){
 	console.log("data empty");
 	return;
     }
-
     
     var $ = cheerio.load(data);
     if(args[0].shopCount==-1){
