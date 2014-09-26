@@ -74,10 +74,6 @@ Yelp.prototype.start = function(){
     console.log("[TASKS] %d",this.taskQueue.length);
     
     this.wgetList();
-//    this.todoFlights.forEach(function(f,i,a){
-//	this.wgetList(f);
-//    },this);
-//    this.wgetList(this.todoFlights[0]);
 }
 
 Yelp.prototype.load=function(){
@@ -115,7 +111,7 @@ Yelp.prototype.processList = function(data,args,res){
 	console.log("data empty");
 	return;
     }
-    console.log("[DATA] %s, %s, %d",args[0].city,args[0].cate,args[0].start);
+
     
     var $ = cheerio.load(data);
     if(args[0].shopCount==-1){
@@ -132,7 +128,7 @@ Yelp.prototype.processList = function(data,args,res){
 	if(!that.doneItems[path])
 	    args[0].shops.push(shop);
     });
-    //console.log(args[0].shops);
+    console.log("[DATA] %s, %s, %d, %d",args[0].city,args[0].cate,args[0].start,args[0].shops.length);
     
     var pageOfPages = $('div.page-of-pages').text().trim();
     var m = pageOfPages && pageOfPages.match(/\d+/g);
