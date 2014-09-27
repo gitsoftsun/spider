@@ -33,7 +33,7 @@ Dp.prototype.init = function(){
 	return line;
     }).map(function(line){
 	var vals = line.split(',');
-	return {id:vals[0],name:vals[1]};
+	return {id:vals[0],name:vals[1],code:vals[2]};
     });
     this.categories = fs.readFileSync(this.dataDir+this.categoryFile).toString().split('\n').filter(function(line){
 	return line;
@@ -85,7 +85,14 @@ Dp.prototype.wgetList = function(t){
 	t.shops = [];
 	t.photoCount = 0;
     }
-    var opt = new helper.basic_options('ppe.www.dianping.com','/search/category/'+t.city.id+'/'+t.cate.id+'/p'+t.pageIdx);
+    var id = t.cate.id;
+    t.onlyList = id==55||id==70||id==90;
+    t.isHotel = id==60;
+    var path = '/search/category/'+t.city.id+'/'+t.cate.id+'/p'+t.pageIdx;
+    if(t.isHotel){
+	path = "/"+t.city.code+"/hotel/p"+t.pageIdx;
+    }
+    var opt = new helper.basic_options('www.dianping.com',path);
     console.log(opt);
     console.log("[GET] %s,%s: %d/%d",t.city.name,t.cate.name,t.pageIdx,Math.ceil(t.shopCount/15));
     helper.request_data(opt,null,function(data,args,res){
@@ -102,15 +109,28 @@ Dp.prototype.processList = function(data,args,res){
 	console.log("data empty");
 	return;
     }
-    var id = args[0].cate.id;
-    args[0].onlyList = id==55||id==70||id==90;
-    args[0].isHotel = id==60;
+
     var $ = cheerio.load(data);
     if(args[0].shopCount==-1){
 	var m;
 	if(args[0].onlyList){
-	    m = Number($("div.searchNav div.guide span.Color7").text().trim().match(/\d+/)[0]);
+	    if(args[0].cate.id!=55){
+		m = Number($("div.searchNav div.guide span.Color7").text().trim().match(/\d+/)[0]);
+	    }else{
+		m=0;
+		$("ul.navBlock li ul.current li ul li a span.num").each(function(){
+		    var match = $(this).text().match(/\d+/);
+		    if(match && match[0]){
+			m += Number(match[0]);
+		    }
+		});
+	    }
+	    //console.log($("div.searchNav div.guide").html());
+	    //m = Number($("div.Pages a.PageLink").last().attr('title'));
+	}else if(args[0].isHotel){
+	    m = Number($(".search-wrap .section .inner .tit span").text().match(/\d+/)[0]);
 	}else{
+	    //console.log($("div.bread").html());
 	    m = Number($("div.bread span.num").text().trim().match(/\d+/)[0]);
 	}
 	
@@ -120,8 +140,8 @@ Dp.prototype.processList = function(data,args,res){
     var itemSelector;
     if(args[0].onlyList){
 	itemSelector = "div.searchList dl dd ul.remark";
-	$(itemSelector).each(function(){
-	    var links = $("li a",this);
+	$("div.searchList dl dd").each(function(){
+	    var links = $("ul.remark li a",this);
 	    var shop = {};
 	    if(links.length>0){
 		var m = links.eq(0).text().match(/\d+/);
@@ -139,9 +159,12 @@ Dp.prototype.processList = function(data,args,res){
 		    shop.photoCount = 0;
 		}
 	    }
-	    var record = [args[0].city.name,args[0].cate.name,args[0].shopCount,"",shop.reviews,shop.photoCount,'\n'].join;
-	    fs.appendFileSync(that.resultDir+that.resultFile,record);
-	    console.log("[DONE] ",record);
+	    shop.path = $("ul.detail li.shopname a").attr("href");
+	    if(!that.doneItems[shop.path]){
+		var record = [args[0].city.name,args[0].cate.name,args[0].shopCount,shop.path,shop.reviews,shop.photoCount,'\n'].join();
+		fs.appendFileSync(that.resultDir+that.resultFile,record);
+		console.log("[DONE] ",record);
+	    }
 	    args[0].reviews+=shop.reviews;
 	    args[0].photoCount+=shop.photoCount;
 	    args[0].shops.push(shop);
@@ -156,7 +179,7 @@ Dp.prototype.processList = function(data,args,res){
 	    }else{
 		shop.reviews = 0;
 	    }
-	    if(!that.doneItems[path])
+	    if(!that.doneItems[shop.path])
 		args[0].shops.push(shop);
 	});
     }else{
@@ -176,15 +199,15 @@ Dp.prototype.processList = function(data,args,res){
     }
     console.log("[DATA] %s, %s, %d, %d",args[0].city.name,args[0].cate.name,args[0].pageIdx,args[0].shopCount);
 
-    if(onlyList){//different page structure which just parse list page.
+    if(args[0].onlyList){//different page structure which just parse list page.
 	if(args[0].pageIdx<args[0].pageCount){
 	    args[0].pageIdx++;
 	    setTimeout(function(){
-		this.wgetList(args[0]);
+		that.wgetList(args[0]);
 	    },1000);
 	}else{
 	    setTimeout(function(){
-		this.wgetList();
+		that.wgetList();
 	    },1000);
 	}
     }
@@ -209,7 +232,7 @@ Dp.prototype.wgetDetail = function(task){
     }
     
     var shop = task.shops.shift();
-    var opt = new helper.basic_options("ppe.www.dianping.com",shop.path);
+    var opt = new helper.basic_options("www.dianping.com",shop.path);
     console.log("[GET] %s",shop.path);
     helper.request_data(opt,null,function(data,args,res){
 	that.processDetail(data,args,res);
