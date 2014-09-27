@@ -1,4 +1,4 @@
-1,上海
-2,北京
-4,广州
-7,深圳
+1,上海,shanghai
+2,北京,beijing
+4,广州,guangzhou
+7,深圳,shenzhen
