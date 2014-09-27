@@ -17,7 +17,7 @@ function Yelp(){
 	this.cflt = category;
 	this.start = startIdx==undefined?0:startIdx;
     }
-    this.categories = ['active','arts','auto'];
+    this.categories = [];
     this.taskQueue = [];
     this.interval = [20000,40000];
     this.doneItems = {};
@@ -70,31 +70,6 @@ Yelp.prototype.start = function(){
     console.log("[TASKS] %d",this.taskQueue.length);
     
     this.wgetList();
-}
-
-Yelp.prototype.load=function(){
-    if(fs.existsSync(this.resultDir+this.doneFile)){
-	fs.readFileSync(this.resultDir+this.doneFile)
-	    .toString()
-	    .split('\r\n')
-	    .reduce(function(pre,cur){
-		if(cur)
-		    pre[cur]=true;
-		return pre;
-	    },this.doneFlights);
-    }
-    if(fs.existsSync(this.dataDir+this.skipFile)){
-	fs.readFileSync(this.dataDir+this.skipFile)
-	    .toString()
-	    .split('\n')
-	    .reduce(function(pre,cur){
-		if(cur){
-		    cur = cur.replace('\r','');
-		    pre[cur]=true;
-		}
-		return pre;
-	    },this.citySkip);
-    }
 }
 
 Yelp.prototype.processList = function(data,args,res){
