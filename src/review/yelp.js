@@ -94,8 +94,12 @@ Yelp.prototype.processList = function(data,args,res){
 	if(m && m[0]){
 	    shop.reviews = Number(m[0]);
 	}
-	if(!that.doneItems[path])
-	    args[0].shops.push(shop);
+	if(!that.doneItems[path]){
+	    var record = [args[0].city,args[0].cate,args[0].shopCount,shop.path,shop.reviews,shop.photoCount,'\n'].join();
+	    fs.appendFileSync(that.resultDir+that.resultFile,record);
+	    console.log(record);
+	}
+//	args[0].shops.push(shop);
     });
     console.log("[DATA] %s, %s, %d, %d",args[0].city,args[0].cate,args[0].start,args[0].shops.length);
     
@@ -103,7 +107,13 @@ Yelp.prototype.processList = function(data,args,res){
     var m = pageOfPages && pageOfPages.match(/\d+/g);
     var totalPages = m && m[1];
     args[0].maxStartIdx = (totalPages-1)*10;
-    this.wgetDetail(args[0]);
+    if(args[0].start < args[0].maxStartIdx){
+	args[0].start+=10;
+	this.wgetList(args[0]);	
+    }else{
+	this.wgetList();
+    }
+    //this.wgetDetail(args[0]);
 }
 
 Yelp.prototype.wgetDetail = function(task){
