@@ -71,15 +71,18 @@ Company.prototype.init=function(){
     });
     console.log("city load done.");
     //load companys that has id and name from cmpIdFile
-    fs.readFileSync(this.resultDir+this.cmpIdFile).toString().split('\n').reduce(function(pre,cur){
-	if(cur){
-	    cur = cur.replace('\r','');
-	    var vals = cur.split(',');
-	    var obj = {id:vals[0],name:vals[1]};
-	    pre[cur.split(',')[0]]=obj;
-	}
-	return pre;
-    },this.gotIds);
+    if(fs.existsSync(this.resultDir+this.cmpIdFile)){
+	fs.readFileSync(this.resultDir+this.cmpIdFile).toString().split('\n').reduce(function(pre,cur){
+	    if(cur){
+		cur = cur.replace('\r','');
+		var vals = cur.split(',');
+		var obj = {id:vals[0],name:vals[1]};
+		pre[cur.split(',')[0]]=obj;
+	    }
+	    return pre;
+	},this.gotIds);
+    }
+    
     console.log("init done.");
 }
 Company.prototype.preProcess=function(){
