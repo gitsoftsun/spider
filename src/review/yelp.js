@@ -19,7 +19,7 @@ function Yelp(){
     }
     this.categories = [];
     this.taskQueue = [];
-    this.interval = [20000,40000];
+    this.interval = [10000,10000];
     this.doneItems = {};
 }
 
@@ -98,8 +98,9 @@ Yelp.prototype.processList = function(data,args,res){
 	    var record = [args[0].city,args[0].cate,args[0].shopCount,shop.path,shop.reviews,shop.photoCount,'\n'].join();
 	    fs.appendFileSync(that.resultDir+that.resultFile,record);
 	    console.log(record);
+	    args[0].shops.push(shop);
 	}
-//	args[0].shops.push(shop);
+	
     });
     console.log("[DATA] %s, %s, %d, %d",args[0].city,args[0].cate,args[0].start,args[0].shops.length);
     
@@ -109,9 +110,15 @@ Yelp.prototype.processList = function(data,args,res){
     args[0].maxStartIdx = (totalPages-1)*10;
     if(args[0].start < args[0].maxStartIdx){
 	args[0].start+=10;
-	this.wgetList(args[0]);	
+	setTimeout(function(){
+	    that.wgetList(args[0]);
+	},(Math.random()*(this.interval[1]-this.interval[0])+this.interval[0]));
+	//this.wgetList(args[0]);	
     }else{
-	this.wgetList();
+	setTimeout(function(){
+	    that.wgetList();
+	},(Math.random()*(this.interval[1]-this.interval[0])+this.interval[0]));
+	//this.wgetList();
     }
     //this.wgetDetail(args[0]);
 }
