@@ -42,7 +42,11 @@ Sofun.prototype.process = function(data,args,res){
 Date.prototype.toYYMMDD = function(){
     var month = this.getMonth()<9?("0"+(this.getMonth()+1)):(this.getMonth()+1);
     var day = this.getDate()<10?("0"+this.getDate()):this.getDate();
-    return this.getFullYear()+"-"+month+"-"+day;
+    var hour = this.getHours();
+    var minute = this.getMinutes();
+    var second = this.getSeconds();
+    return this.getFullYear()+"-"+month+"-"+day+" "+hour+":"+minute+":"+second;
+    //return this.getFullYear()+"-"+month+"-"+day;
 };
 Sofun.prototype.wgetCity = function(){
     if(this.cities.length==0){
