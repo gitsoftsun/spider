@@ -204,7 +204,7 @@ exports.request_data=function(opts,data,fn,args){
             }
             var buffer = Buffer.concat(chunks);
             var obj=null;
-            if(encode=="gb2312"){
+            if(encode=="gb2312"||encode=="GBK"){
 		//obj = decodeFromGb2312(obj);
 		var gbk_to_utf8_iconv = new Iconv('GBK', 'UTF-8//TRANSLIT//IGNORE');
 		obj = gbk_to_utf8_iconv.convert(buffer).toString();
