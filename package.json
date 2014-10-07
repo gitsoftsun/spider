@@ -11,6 +11,7 @@
       "iconv":"*",
       "cheerio":"*",
       "mongodb":"*",
-      "selenium-webdriver":"*"
+      "selenium-webdriver":"*",
+      "nodemailer":"0.7.1"
   }
 }

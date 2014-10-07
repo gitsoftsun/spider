@@ -78,6 +78,7 @@ Sofun.prototype.processCity = function(data,args){
 	var district = match && match.length>1 && match[1];
 	houseName = houseName.replace(/(\[|【)[^\]]*(\]|】)/,'');
 	var promo = $("li.li_lf p",this).text().trim();
+	promo = promo && promo.replace(/[,，]/g,";");
 	var commitCount = Number($("li.li_ri p",this).eq(0).text().match(/\d+/)[0]);
 	var m = $("li.li_ri p",this).eq(1).text().match(/\d+/);
 	var pps = m && m[0] && Number(m[0]);
