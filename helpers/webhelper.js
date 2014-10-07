@@ -591,3 +591,23 @@ exports.syncDoneCities = function(filename){
     console.log(i+" cities' flights has been done.");
     return doneCities;
 }
+
+Date.prototype.toYYMMDD = function () {
+    var month = this.getMonth() < 9?("0" + (this.getMonth() + 1)):(this.getMonth() + 1);
+    var day = this.getDate() < 10?("0" + this.getDate()):this.getDate();
+    var hour = this.getHours();
+    var minute = this.getMinutes();
+    var second = this.getSeconds();
+    return this.getFullYear() + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+    //return this.getFullYear()+"-"+month+"-"+day;
+};
+
+Date.prototype.toString = function (format) {
+    var month = this.getMonth() < 9?("0" + (this.getMonth() + 1)):(this.getMonth() + 1);
+    var day = this.getDate() < 10?("0" + this.getDate()):this.getDate();
+    var hour = this.getHours();
+    var minute = this.getMinutes();
+    var second = this.getSeconds();
+    
+    return this.getFullYear() + "-" + month + "-" + day;
+}
