@@ -3,6 +3,7 @@ var zlib = require('zlib')
 var fs = require('fs')
 var Iconv = require('iconv').Iconv
 var url = require('url')
+var qs = require("querystring")
 exports.toQuery = function(obj){
     var sb = new exports.StringBuffer();
     sb.append('?');
@@ -31,7 +32,7 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
     if(method=="POST")
 	   this.headers["Content-Type"] = "application/x-www-form-urlencoded";
     if(method=="GET"&&data&&data instanceof Object){
-        var sb = new exports.StringBuffer();
+        /*var sb = new exports.StringBuffer();
         sb.append('?');
         for(var k in data){
             sb.append(k);
@@ -42,7 +43,8 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
         }
         sb.removeLast();
         this.path+=(sb.toString());
-        sb=null;
+        sb=null;*/
+	this.path += "?"+qs.stringify(data);
     }
 
     if(isApp){

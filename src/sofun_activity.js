@@ -6,7 +6,7 @@ var Url = require("url")
 function Sofun() {
     this.resultDir = "../result/";
     this.dataDir = "../appdata/";
-    this.resultFile = "sofun_activity.txt";
+    this.resultFile = "sofun_activity_"+new Date().toString()+".txt";
     this.cities = [];
     this.taskQueue = [];
     this.interval = [0, 500];

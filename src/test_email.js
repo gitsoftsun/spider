@@ -1,4 +1,5 @@
 var nodemailer = require("nodemailer");
+var helper = require("../helpers/webhelper.js");
 var fs = require("fs");
 
 // 开启一个 SMTP 连接池
@@ -12,7 +13,7 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
   }
 });
 
-var filePath = "/Users/mike/Projects/spider/result/sofun_activity.txt";
+var filePath = "../result/sofun_activity_"+new Date().toString()+".txt";
 var cnt = "<table><tbody>"+fs.readFileSync(filePath).toString().split("\n").map(function(line){
     var row = line.split(',').map(function(field){
 	return "<td>"+field+"</td>";
@@ -22,14 +23,14 @@ var cnt = "<table><tbody>"+fs.readFileSync(filePath).toString().split("\n").map(
 // 设置邮件内容
 var mailOptions = {
     from: "Mike <mike442144@163.com>", // 发件地址
-    to: "790475083@qq.com, 0713022100gd@163.com", // 收件列表
-    subject: "Hello world", // 标题
-    html: cnt,
-    attachments:[{
-	filename:"sofun.txt",
+    to: "790475083@qq.com, haidong.sun@bda.com, Meiqin.fang@bda.com", // 收件列表
+    subject: "Sofun Data", // 标题
+    html: cnt
+    //attachments:[{
+	//filename:"sofun.txt",
 	//path:filePath
-	content:fs.createReadStream(filePath)
-    }]
+	//content:fs.createReadStream(filePath)
+    //}]
 }
 //console.log(mailOptions);
 // 发送邮件
