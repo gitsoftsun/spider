@@ -1,6 +1,7 @@
 var fs = require('fs')
 var cheerio = require("cheerio")
 var helper = require('../../helpers/webhelper.js')
+var http = require("http")
 var entity = require('../../models/entity.js')
 
 function Place(){
@@ -17,13 +18,14 @@ function Place(){
     this.doneItems = {};
     
     this.query = function(cateId,cateName,cateCode,cityName,cityCode,pageIdx){
+	//this.categoryId=296;
 	this.categoryId=cateId
-	//this.what=encodeURIComponent(cateName.trim())
-	this.whatUrl=cateCode
-	//this.where=encodeURIComponent(cityName.trim())
-	this.whereUrl=cityCode
-	this.page=pageIdx || 1
-	this.sort = ""
+	this.what=cateName;//"Ng%C3%A2n+h%C3%A0ng"
+	this.whatUrl=cateCode;//"ngan-hang-c296"
+	this.where=cityName;//"H%C3%A0+N%E1%BB%99i"
+	this.whereUrl=cityCode;//"ha-noi"
+	this.page=pageIdx || 1;
+	this.sort = "";
     }
 }
 
@@ -82,8 +84,17 @@ Place.prototype.start = function(){
     this.count = Number(this.count) || this.taskQueue.length;
     this.taskQueue = this.taskQueue.slice(this.startIdx,this.startIdx+this.count);
     console.log("[TASKS] %d",this.taskQueue.length);
-    
-    this.wgetList();
+    /*
+    http.get("http://www.place.vn/",function(res){
+	var key = "Set-Cookie";
+	console.log(res[key]);
+	if(res[key]){
+	    var cookies = res[key].split(";");
+	    that.cookie = cookies[0];
+	}
+
+    });*/
+    that.wgetList();
 }
 Place.prototype.wgetList = function(t){
     if(!t){
@@ -95,15 +106,11 @@ Place.prototype.wgetList = function(t){
 	t.photoCount = 0;
     }
     var id = t.cate.id;
-    //t.onlyList = id==55||id==70||id==90;
-    //t.isHotel = id==60;
     var path = '/search/resultmore'+t.cate.id+'/'+t.city.code+'/p'+t.pageIdx;
-    //if(t.isHotel){
-	//path = "/"+t.city.code+"/hotel/p"+t.pageIdx;
-    //}
-    //var opt = new helper.basic_options('www.dianping.com',path);
     var q = new this.query(t.cate.id,t.cate.name,t.cate.code,t.city.name,t.city.code,t.pageIdx);
     var opt = new helper.basic_options('www.place.vn',"/search/resultmore",'POST',false,true,q);
+    //opt.headers["Cookie"] = "ASP.NET_SessionId=upybfwhnj5fymg4wylquadm4";
+    //opt.headers["Cookie"] = this.cookie;
     console.log(opt);
     console.log("[GET] %s,%s: %d",t.city.enname,t.cate.enname,t.pageIdx);
     helper.request_data(opt,q,function(data,args,res){
@@ -121,7 +128,7 @@ Place.prototype.processList = function(data,args,res){
 	this.wgetList();
 	return;
     }
-
+    fs.appendFileSync("fdfdfd"+args[0].pageIdx+".txt",data);
     var $ = cheerio.load(data);
     if(args[0].shopCount==-1){
 	//var m=
@@ -160,6 +167,7 @@ Place.prototype.wgetDetail = function(task){
     
     var shop = task.shops.shift();
     var opt = new helper.basic_options("www.place.vn",shop.path);
+    //opt.headers["Cookie"] = "ASP.NET_SessionId=upybfwhnj5fymg4wylquadm4";
     console.log("[GET] %s",shop.name);
     helper.request_data(opt,null,function(data,args,res){
 	that.processDetail(data,args,res);
