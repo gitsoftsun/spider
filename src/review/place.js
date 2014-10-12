@@ -3,6 +3,7 @@ var cheerio = require("cheerio")
 var helper = require('../../helpers/webhelper.js')
 var http = require("http")
 var entity = require('../../models/entity.js')
+var qs = require("querystring")
 
 function Place(){
     this.resultDir = "../../result/";
@@ -110,16 +111,14 @@ Place.prototype.wgetList = function(t){
 	    return;
 	}
     }
-    var id = t.cate.id;
-    var path = '/search/resultmore'+t.cate.id+'/'+t.city.code+'/p'+t.pageIdx;
     var q = new this.query(t.cate.id,t.cate.name,t.cate.code,t.city.name,t.city.code,t.pageIdx);
-    
-    var data_string = "categoryId=" + q['categoryId'] + "&what=" + encodeURIComponent(q['what']) + "&whatUrl=" + q['whatUrl'] + "&where=" + encodeURIComponent(q['where']) + "&whereUrl=" + q['whereUrl'] + "&page=" + q['page'] + "&sort=";
+    var data_string = qs.stringify(q);
+    //var data_string = "categoryId=" + q['categoryId'] + "&what=" + encodeURIComponent(q['what']) + "&whatUrl=" + q['whatUrl'] + "&where=" + encodeURIComponent(q['where']) + "&whereUrl=" + q['whereUrl'] + "&page=" + q['page'] + "&sort=";
 
     var opt = new helper.basic_options('www.place.vn',"/search/resultmore",'POST',false,true,data_string);
     //opt.headers["Cookie"] = "ASP.NET_SessionId=upybfwhnj5fymg4wylquadm4";
     //opt.headers["Cookie"] = this.cookie;
-    //console.log(opt);
+    console.log(opt);
     console.log("[GET] %s,%s: %d",t.city.enname,t.cate.enname,t.pageIdx);
     helper.request_data(opt,data_string,function(data,args,res){
 	that.processList(data,args,res);
