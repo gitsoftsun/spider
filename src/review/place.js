@@ -118,7 +118,7 @@ Place.prototype.wgetList = function(t){
     var opt = new helper.basic_options('www.place.vn',"/search/resultmore",'POST',false,true,data_string);
     //opt.headers["Cookie"] = "ASP.NET_SessionId=upybfwhnj5fymg4wylquadm4";
     //opt.headers["Cookie"] = this.cookie;
-    console.log(opt);
+    //console.log(opt);
     console.log("[GET] %s,%s: %d",t.city.enname,t.cate.enname,t.pageIdx);
     helper.request_data(opt,data_string,function(data,args,res){
 	that.processList(data,args,res);
