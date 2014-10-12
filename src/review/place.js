@@ -153,14 +153,16 @@ Place.prototype.processList = function(data,args,res){
 	shop.star = Number($("ul.place-info li rate-score",this).text());
 	shop.reviews = Number($("ul.place-info li span.comment-no",this).text());
 	
-	//if(!that.doneItems[shop.path]){
+	if(!that.doneItems[shop.path]){
+	    args[0].shops.push(shop);
+	}
 	//    var record = [args[0].city.name,args[0].cate.name,shop.path,shop.reviews,'\n'].join();
 	//    fs.appendFileSync(that.resultDir+that.resultFile,record);
 	//    console.log("[DONE] ",record);
 	//}
-	args[0].reviews+=shop.reviews;
+	//args[0].reviews+=shop.reviews;
 	//args[0].photoCount+=shop.photoCount;
-	args[0].shops.push(shop);
+
     });
     console.log("[DATA] %s, %s, %d",args[0].city.enname,args[0].cate.enname,args[0].pageIdx);
     this.wgetDetail(args[0]);
