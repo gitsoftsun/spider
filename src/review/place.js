@@ -189,7 +189,7 @@ Place.prototype.processDetail = function(data,args){
     console.log("[DONE] %s",record);
     setTimeout(function(){
 	that.wgetDetail(args[0]);
-    },1000);
+    },100);
 }
 
 var instance = new Place();
