@@ -98,12 +98,17 @@ Place.prototype.start = function(){
 }
 Place.prototype.wgetList = function(t){
     if(!t){
-	t = this.taskQueue.shift();
-	t.pageIdx = 1;
-	t.shopCount=-1;
-	t.reviews = 0;
-	t.shops = [];
-	t.photoCount = 0;
+	if(this.taskQueue.length>0){
+	    t = this.taskQueue.shift();
+	    t.pageIdx = 1;
+	    t.shopCount=-1;
+	    t.reviews = 0;
+	    t.shops = [];
+	    t.photoCount = 0;
+	}else{
+	    console.log("job done.");
+	    return;
+	}
     }
     var id = t.cate.id;
     var path = '/search/resultmore'+t.cate.id+'/'+t.city.code+'/p'+t.pageIdx;
@@ -126,6 +131,7 @@ Place.prototype.processList = function(data,args,res){
 	console.log("IP has been forbidden");
 	return;
     }
+    data = data.trim();
     if(!data){
 	console.log("data empty");
 	this.wgetList();
