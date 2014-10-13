@@ -1,2 +1,2 @@
-Ha Noi,tp-ho-chi-minh/3,Hồ Chí Minh
-Ho Chi Minh,ha-noi/1,Hà Nội 
+﻿Ha Noi,3,tp-ho-chi-minh,Hồ Chí Minh
+Ho Chi Minh,1,ha-noi,Hà Nội 
