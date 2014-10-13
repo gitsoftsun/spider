@@ -1,6 +1,7 @@
 var fs = require('fs')
 var cheerio = require("cheerio")
 var helper = require('../../helpers/webhelper.js')
+var qs = require("querystring")
 
 function DD(){
     this.resultDir = "../../result/";
@@ -18,7 +19,7 @@ function DD(){
     this.query = function(ajax, offset, areaid, areaseo){
 	//this.categoryId=296;
     this.ajax = ajax || 1;
-    this.offset = offset || 0;
+    this.offset = offset || 10;
     this.areaid = areaid;
     this.areaseo = areaseo;
 	this.sort = "";
@@ -92,15 +93,22 @@ DD.prototype.start = function(){
 }
 DD.prototype.wgetList = function(t){
     if(!t){
-	t = this.taskQueue.shift();
-	t.offset = 0;
-	t.shopCount=-1;
-	t.reviews = 0;
-	t.shops = [];
-	t.photoCount = 0;
+	if(this.taskQueue.length>0){
+	    t = this.taskQueue.shift();
+	    t.offset = 0;
+	    t.shopCount=-1;
+	    t.reviews = 0;
+	    t.shops = [];
+	    t.photoCount = 0;
+	}else{
+	    console.log("job done.");
+	    return;
+	}
+	
     }
     var q = new this.query(1, t.offset, t.city.code, t.city.seo);//I don't know the query parameters for pool network
-    var opt = new helper.basic_options('diadiemanuong.com/',"/location/ajaxLoadMore",'POST',false,true,q);//path of url the same to query parameters.
+    var queryBody = qs.stringify(q);
+    var opt = new helper.basic_options('diadiemanuong.com',"/location/ajaxLoadMore/",'POST',false,true,queryBody);//path of url the same to query parameters.
     console.log(opt);
     console.log("[GET] %s: %d + (10 more)",t.city.enname,t.offset);
     helper.request_data(opt,q,function(data,args,res){
@@ -113,6 +121,7 @@ DD.prototype.processList = function(data,args,res){
 	console.log("IP has been forbidden");
 	return;
     }
+    data = data.trim();
     if(!data){
 	console.log("data empty");
 	this.wgetList();
@@ -135,6 +144,7 @@ DD.prototype.processList = function(data,args,res){
 	args[0].shops.push(shop);
     });
     console.log("[DATA] %s, %d",args[0].city.enname,args[0].pageIdx);
+    console.log(args);
     this.wgetDetail(args[0]);
 }
 
@@ -171,6 +181,7 @@ DD.prototype.processDetail = function(data,args){
     setTimeout(function(){
 	that.wgetDetail(args[0]);
     },1000);
+
 }
 
 var instance = new DD();
