@@ -55,7 +55,7 @@ DD.prototype.init = function(){
     }
     fs.readFileSync(this.resultDir+this.resultFile).toString().split('\n').map(function(line){
 	if(line){
-	    return line.split(',')[2];
+	    return line.split(',')[1];
 	}
 	return "";
     }).reduce(function(pre,cur){
@@ -133,15 +133,17 @@ DD.prototype.processList = function(data,args,res){
     itemSelector = "li.detail-event-main-item";//shop item selector
     $(itemSelector).each(function(){
 	var shop = {};
-    //TODO: parse elements to shop.
-    var item = $("div.desc h2.post-title a", this);
-    shop.path = item.attr("href");
-    shop.path = shop.path.replace("http://diadiemanuong.com", "");
-    shop.name = item.attr("title");
-    shop.star = Number(5);//always 5, so it's nonsense
-    shop.like = Number($("div.desc p.place-action span.like-count", this).text());
-    shop.reviews = Number($("div.desc p.place-action span.comment-count", this).text());
-	args[0].shops.push(shop);
+	//TODO: parse elements to shop.
+	var item = $("div.desc h2.post-title a", this);
+	shop.path = item.attr("href");
+	shop.path = shop.path.replace("http://diadiemanuong.com", "");
+	shop.name = item.attr("title");
+	shop.star = Number(5);//always 5, so it's nonsense
+	shop.like = Number($("div.desc p.place-action span.like-count", this).text());
+	shop.reviews = Number($("div.desc p.place-action span.comment-count", this).text());
+	if(!that.doneItems[shop.path]){
+	    args[0].shops.push(shop);
+	}
     });
     console.log("[DATA] %s, %d",args[0].city.enname,args[0].offset);
     //console.log(args);
@@ -180,7 +182,7 @@ DD.prototype.processDetail = function(data,args){
     console.log("[DONE] %s",record);
     setTimeout(function(){
 	that.wgetDetail(args[0]);
-    },1000);
+    },200);
 
 }
 

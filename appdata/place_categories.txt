@@ -14,7 +14,7 @@ State Agencies,co-quan-nha-nuoc,206,Cơ quan nhà nước
 Hotel,khach-san,75,Khách sạn
 University,dai-hoc,30,Đại học
 Bar,bar,5,Bar
-Booksellers,sach,136,Hiệu sáh
+Booksellers,sach,136,Hiệu sách
 ATM,atm,1,ATM
 Company,cong-ty,306,Công ty
 Circus 3,truong-cap-3,181,Trường cấp 3
