@@ -113,7 +113,12 @@ exports.StringBuffer.prototype.removeLast = function(){
 
 exports.request_data=function(opts,data,fn,args){
     if(!opts || !fn) throw "argument null 'opt' or 'data'";
-    var strData = data && JSON.stringify(data);
+
+    var strData = data;
+    if(typeof strData != 'string'  ) 
+    {
+        strData = JSON.stringify(strData);
+    }
     if(opts.method=='POST')
         opts.headers['Content-Length']=Buffer.byteLength(strData,'utf8');
     
