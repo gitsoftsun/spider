@@ -111,7 +111,7 @@ DD.prototype.wgetList = function(t){
     var opt = new helper.basic_options('diadiemanuong.com',"/location/ajaxLoadMore/",'POST',false,true,queryBody);//path of url the same to query parameters.
     console.log(opt);
     console.log("[GET] %s: %d + (10 more)",t.city.enname,t.offset);
-    helper.request_data(opt,q,function(data,args,res){
+    helper.request_data(opt,queryBody,function(data,args,res){
 	that.processList(data,args,res);
     },t);
 }
@@ -143,8 +143,8 @@ DD.prototype.processList = function(data,args,res){
     shop.reviews = Number($("div.desc p.place-action span.comment-count", this).text());
 	args[0].shops.push(shop);
     });
-    console.log("[DATA] %s, %d",args[0].city.enname,args[0].pageIdx);
-    console.log(args);
+    console.log("[DATA] %s, %d",args[0].city.enname,args[0].offset);
+    //console.log(args);
     this.wgetDetail(args[0]);
 }
 
@@ -172,7 +172,7 @@ DD.prototype.processDetail = function(data,args){
     //photoCount is on the bubble of top right.
     //category is on the right of the map which tag color is yellow.
     args[1].photoCount = $("div.review-widget-content div div.thread_image_list img").length;
-    var category_item = $("div#place-detail-desc div.desc a", this);
+    var category_item = $("div#place-detail-desc div.desc a");
     args[1].category = category_item.attr("title");
     
     var record = [args[0].city.enname,args[1].path,args[1].star,args[1].like,args[1].reviews,args[1].photoCount,args[1].category,'\n'].join();
