@@ -66,10 +66,11 @@ Job.prototype.processList = function (data, args) {
         record.top = $('a.ico ding1', this).length;
         record.jing = $('a.ico jingpin', this).length;
         record.cmpName = $('a.fl', this).attr('title');
+					    record.cmpName = record.cmpName && record.cmpName.replace(/[,，\r\n]/g,";");
         record.cmpUrl = $('a.fl', this).attr('href');
         record.time = $('dd.w68', this).text();
         //record.fileName = fileName;
-        record.name = $('a.t', this).text().replace(/[,，]/g,';');
+        record.name = $('a.t', this).text().replace(/[,，\r\n]/g,';');
         //records.push(record);
         if (!record.name || !record.cmpName) { 
             return true;

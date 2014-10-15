@@ -1,9 +1,9 @@
-var http = require('http')
-var zlib = require('zlib')
+//var http = require('http')
+//var zlib = require('zlib')
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
-var dhelper = require('../helpers/domhelper.js')
-var cp = require('child_process')
+//var dhelper = require('../helpers/domhelper.js')
+//var cp = require('child_process')
 var cheerio = require('cheerio')
 function Job(){
     this.dataDir='../appdata/';
@@ -55,11 +55,12 @@ Job.prototype.processList = function (data, args){
 	
 	cntNode.find('dl').each(function(){
 	    var record={};
-	    record.name = $('.list_title',this).text().replace(/[,，]/g,';');
+	    record.name = $('.list_title',this).text().replace(/[,，\n\r]/g,';');
 	    record.hot = $('.ico-hot',this).length;
 	    record.top = $('.ico-stick-yellow',this).length;
 	    record.adTop = $('.ico-stick-red',this).length;
 	    record.cmpName=$('.company a',this).attr('title');
+	    record.cmpName = record.cmpName && record.cmpName.replace(/[,，\n\r]/g,';');
 	    record.cmpUrl=$('.company a',this).attr('href');
 	    record.member=$('span.ico-bang-new',this).first().text();
 	    if(!record.member) record.member=0;
