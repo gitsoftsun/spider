@@ -63,8 +63,8 @@ Job.prototype.processList = function (data, args) {
     var records = [];
     $('#infolist dl').each(function (i, e) {
         var record = {};
-        record.top = $('a.ico ding1', this).length;
-        record.jing = $('a.ico jingpin', this).length;
+        record.top = $('a.ico.ding1', this).length;
+        record.jing = $('a.ico.jingpin', this).length;
         record.cmpName = $('a.fl', this).attr('title');
 					    record.cmpName = record.cmpName && record.cmpName.replace(/[,，\r\n]/g,";");
         record.cmpUrl = $('a.fl', this).attr('href');

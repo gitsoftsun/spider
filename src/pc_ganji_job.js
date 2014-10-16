@@ -64,7 +64,7 @@ Job.prototype.processList = function (data, args){
 	    record.cmpUrl=$('.company a',this).attr('href');
 	    record.member=$('span.ico-bang-new',this).first().text();
 	    if(!record.member) record.member=0;
-        record.time = $('.pub-time', this).text();
+            record.time = $('.pub-time', this).text();
         //records.push(record);
         if (!record.name || !record.cmpName) {
             return true;
@@ -112,14 +112,13 @@ Job.prototype.wgetList = function (city,cate){
     var path = '/'+curCategory+'/u3o'+cate.pidx+'/';
     var opt = new helper.basic_options(host,path);
     console.log("[GET ] %s, %s, %d",city.cname,cate.cl3,cate.pidx);
-    
-    helper.request_data(opt,null,function(data,args){
+					      helper.request_data(opt,null,function(data,args){
      //   var fileName = args[1].cl1 + ',' 
 	    //+ args[1].cl2 + ',' 
 	    //+ args[1].cl3 + ',' 
 	    //+ args[0].cname + ',' 
 	    //+ args[1].pidx + '.html';
-     //   fs.writeFileSync(that.resultDir + fileName, data);
+	//   fs.writeFileSync(that.resultDir + fileName, data);
      //   console.log("File saved: ", fileName);
 	that.processList(data,args);
     },[city,cate]);
