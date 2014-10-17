@@ -446,10 +446,11 @@ Company.prototype.processOneCompany = function (data, args) {
             args[0].member = member?member:0;
             args[0].ind = $('.c33', this).text();
         });
-        fs.appendFileSync(this.resultDir + this.companyFile, args[0].id + ',' + args[0].name + ',' + args[0].member?args[0].member:0 + ',' + args[0].ind?args[0].args[0].ind:"其他" + '\n');
+        fs.appendFileSync(this.resultDir + this.companyFile, args[0].id + ',' + args[0].name + ',' + (args[0].member?args[0].member:0) + ',' + (args[0].ind?args[0].ind:"其他") + '\n');
         console.log("[DONE] %s", args[0].name);
     } else { 
         console.log("[WARN] company has been deleted");
+	     fs.appendFileSync(this.resultDir+this.companyFile,args[0].id+',该公司已经被删除,,\n');
     }
     setTimeout(function () { 
         that.wgetOneCompany();
