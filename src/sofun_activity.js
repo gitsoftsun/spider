@@ -2,6 +2,7 @@
 var cheerio = require('cheerio')
 var helper = require('../helpers/webhelper.js')
 var Url = require("url")
+var spawn = require('child_process').spawn
 
 function Sofun() {
     this.resultDir = "../result/";
@@ -12,7 +13,6 @@ function Sofun() {
     this.interval = [0, 500];
     this.doneItems = {};
 }
-
 
 Sofun.prototype.init = function () {
     
@@ -43,6 +43,10 @@ Sofun.prototype.process = function(data,args,res){
 Sofun.prototype.wgetCity = function(){
     if(this.cities.length==0){
 	console.log("done.");
+	var sendMail = spawn('node',['test_email.js']);
+	sendMail.on('close',function(code){
+	    console.log("mail sent.");
+	});
 	return;
     }
     var city = this.cities.shift();
@@ -82,7 +86,7 @@ Sofun.prototype.processCity = function(data,args){
     });
     setTimeout(function(){
 	that.wgetCity();
-    },5000);
+    },500);
 }
 
 var sofun = new Sofun();
