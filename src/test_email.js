@@ -24,7 +24,7 @@ var cnt = fs.readFileSync(filePath).toString().replace(/\n/g,'<br />');
 // 设置邮件内容
 var mailOptions = {
     from: "Mike <mike442144@163.com>", // 发件地址
-    to: "790475083@qq.com",//, haidong.sun@bda.com, Meiqin.fang@bda.com", // 收件列表
+    to: "790475083@qq.com, haidong.sun@bda.com, Meiqin.fang@bda.com", // 收件列表
     subject: "Sofun Data", // 标题
     html: cnt
     //attachments:[{
