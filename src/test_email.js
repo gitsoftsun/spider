@@ -14,12 +14,13 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 });
 
 var filePath = "../result/sofun_activity_"+new Date().toString()+".txt";
-var cnt = "<table><tbody>"+fs.readFileSync(filePath).toString().split("\n").map(function(line){
+/*var cnt = "<table><tbody>"+fs.readFileSync(filePath).toString().split("\n").map(function(line){
     var row = line.split(',').map(function(field){
 	return "<td>"+field+"</td>";
     }).join("");
     return "<tr>"+row+"</tr>";
-}).join("")+"</tbody></table>";
+}).join("")+"</tbody></table>";*/
+var cnt = fs.readFileSync(filePath).toString().replace(/\n/g,'<br />');
 // 设置邮件内容
 var mailOptions = {
     from: "Mike <mike442144@163.com>", // 发件地址
