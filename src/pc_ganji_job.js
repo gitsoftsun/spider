@@ -78,12 +78,12 @@ Job.prototype.processList = function (data, args){
         args[1].pidx++;
         setTimeout(function () { 
             that.wgetList(args[0], args[1]);
-        }, 999);
+        }, (Math.random() * 2 + 2) * 1000);
     } else {
         console.log("[DONE] Category: %s", args[1].cl3);
         setTimeout(function () { 
             that.wgetList(args[0], that.getCate());
-        }, 999);
+        }, (Math.random() * 2 + 2) * 1000);
    }
 }
 /*
