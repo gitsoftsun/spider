@@ -17,6 +17,7 @@ function Job() {
     this.cateIdx = -1;
     this.resultFile = '58_jobs.txt';
     //this.cmpIdFile = "58cmpId.txt";
+    this.pagePerCategory = 100;
 }
 
 Job.prototype.init = function () {
@@ -61,29 +62,29 @@ Job.prototype.processList = function (data, args) {
     console.log("[GOT] %s,%s,%d",args[0].cname,args[1].cl3,args[1].pidx);
     var $ = cheerio.load(data);
     var records = [];
+    var goNextPage = false;
     $('#infolist dl').each(function (i, e) {
         var record = {};
         record.top = $('a.ico.ding1', this).length;
         record.jing = $('a.ico.jingpin', this).length;
         record.cmpName = $('a.fl', this).attr('title');
-					    record.cmpName = record.cmpName && record.cmpName.replace(/[,，\r\n]/g,";");
+	record.cmpName = record.cmpName && record.cmpName.replace(/[,，\r\n]/g,";");
         record.cmpUrl = $('a.fl', this).attr('href');
         record.time = $('dd.w68', this).text();
-        //record.fileName = fileName;
         record.name = $('a.t', this).text().replace(/[,，\r\n]/g,';');
-        //records.push(record);
         if (!record.name || !record.cmpName) { 
             return true;
         }
         var line = args[0].cname+","+record.name + ',' + record.cmpName + ',' + record.time + ',' + record.jing + ',' + record.top + ',' + record.cmpUrl + '\n';
         fs.appendFileSync(that.resultDir + that.resultFile, line);
+	goNextPage = !!(record.top||record.jing);
     });
     if (data.search("新信息较少，我们为您推荐以下相关信息") != -1) {
         console.log("[DONE] Category: " + args[1].cl3);
         setTimeout(function () {
             that.wgetList(args[0], that.getCate());
         }, (Math.random() * 1 + 2) * 1000);
-    } else if (data.search('pagerout') != -1 && args[1].pidx < 100) {
+    } else if (goNextPage && data.search('pagerout') != -1 && args[1].pidx < this.pagePerCategory) {
         data = null;
         args[1].pidx++;
         setTimeout(function () {
