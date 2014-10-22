@@ -110,35 +110,71 @@ exports.StringBuffer.prototype.removeLast = function(){
     return result;
 }
 
+exports.HttpCookie = Array;
+
+exports.HttpCookie.parse = function(data){
+    if(typeof data == "string"){
+	return data.split(";").map(function(item){
+	    return qs.parse(item,",","=");
+	});
+    }
+}
+
+exports.HttpCookie.prototype.toString = function(){
+    return this.map(function(c){
+	return qs.stringify(c,",","=");
+    }).join(";");
+}
+
+exports.HttpCookie.prototype.add = function(cookie,val){
+    var ck = {};
+    if(cookie instanceof Array){
+	for(var i=0;i<cookie.length;i++){
+	    arguments.callee.call(this, cookie[i]);
+	}
+    }else if(cookie && typeof cookie == "string"){
+	ck[cookie] = val || "";
+	this.push(ck);
+    }else if(typeof cookie == "object"){
+	for(var k in cookie){
+	    if(cookie.hasOwnProperty(k) && k!="path" && k!="domain" && k!="expires"){
+		ck[k]=cookie[k];
+	    }
+	}
+	this.push(ck);
+    }
+    
+}
+exports.CookieInstance = new exports.HttpCookie();
 
 exports.request_data=function(opts,data,fn,args){
     if(!opts || !fn) throw "argument null 'opt' or 'data'";
 
     var strData = data;
-    if(typeof strData != 'string'  ) 
+    if(typeof strData != 'string'  )
     {
         strData = JSON.stringify(strData);
     }
     if(opts.method=='POST')
         opts.headers['Content-Length']=Buffer.byteLength(strData,'utf8');
-    
+    //opts.headers["Cookie"] = exports.CookieInstance.toString();
     var req = http.request(opts, function(res) {
+	//console.log(res.headers["Set-Cookie"]);
 	if (res.statusCode > 300 && res.statusCode < 400&& res.headers.location) {
 
         if (url.parse(res.headers.location).hostname){
-	    
 	    console.log("%s Redirecting to %s",opts.path,res.headers.location);
 	    opts.host = url.parse(res.headers.location).host;
 	    opts.path = url.parse(res.headers.location).path;
 	    exports.request_data(opts,data,fn,args);
 	}
         else {
-
+	    
         }
     }
     var chunks=[];
     res.on('data', function (chunk) {
-            chunks.push(chunk);
+        chunks.push(chunk);
     });
     res.on('end',function(){
 	if(res.statusCode>300&&res.statusCode<400) return;

@@ -28,7 +28,7 @@ Job.prototype.init=function(){
     
     //load cities from file
     this.cities = fs.readFileSync(this.dataDir + this.cityFile).toString().split('\n').filter(function (line, i) {
-        if (i > 11) return false;
+        if (i > 0) return false;
         return true;
     }).map(function (line) {
         if (!line||line=='\r') return;
@@ -84,7 +84,7 @@ Job.prototype.processList = function (data, args){
         setTimeout(function () { 
             that.wgetList(args[0], that.getCate());
         }, 999);
-    }
+   }
 }
 /*
  */
