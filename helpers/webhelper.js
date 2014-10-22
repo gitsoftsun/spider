@@ -114,9 +114,7 @@ exports.HttpCookie = Array;
 
 exports.HttpCookie.parse = function(data){
     if(typeof data == "string"){
-	return data.split(";").map(function(item){
-	    return qs.parse(item,",","=");
-	});
+	return qs.parse(data,";","=");
     }
 }
 
@@ -137,8 +135,10 @@ exports.HttpCookie.prototype.add = function(cookie,val){
 	this.push(ck);
     }else if(typeof cookie == "object"){
 	for(var k in cookie){
-	    if(cookie.hasOwnProperty(k) && k!="path" && k!="domain" && k!="expires"){
-		ck[k]=cookie[k];
+	    if(cookie.hasOwnProperty(k))
+		var kk = k.trim();
+		if(kk!="path" && kk!="domain" && kk!="expires" && kk!="max-age"){
+		    ck[k]=cookie[k];
 	    }
 	}
 	this.push(ck);
@@ -157,9 +157,16 @@ exports.request_data=function(opts,data,fn,args){
     }
     if(opts.method=='POST')
         opts.headers['Content-Length']=Buffer.byteLength(strData,'utf8');
-    //opts.headers["Cookie"] = exports.CookieInstance.toString();
+    opts.headers["Cookie"] = exports.CookieInstance.toString();
     var req = http.request(opts, function(res) {
-	//console.log(res.headers["Set-Cookie"]);
+	console.log(res.headers["set-cookie"]);
+	var cookiesToSet = res.headers["set-cookie"] || res.headers["Set-Cookie"];
+	if(cookiesToSet instanceof Array){
+	    for(var i=0;i<cookiesToSet.length;i++){
+		exports.CookieInstance.add(exports.HttpCookie.parse(cookiesToSet[i]));
+	    }
+	}
+	//console.log(exports.CookieInstance.toString());
 	if (res.statusCode > 300 && res.statusCode < 400&& res.headers.location) {
 
         if (url.parse(res.headers.location).hostname){

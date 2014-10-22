@@ -45,14 +45,12 @@ Job.prototype.processList = function (data, args){
         return;
     }
     console.log("[GOT ] %s, %s, %d", args[0].cname, args[1].cl3, args[1].pidx);
-	var $=cheerio.load(data);
-	var cntNode = $('#list_recommend').prev('div');
-	var cntName=cntNode.attr('class');
-	if(cntName=='lab-zbd'){
-	    console.log('No data on this page');
-	    return;
-	}
-	
+    var $=cheerio.load(data);
+    var cntNode = $('#list_recommend').prev('div');
+    var cntName=cntNode.attr('class');
+    if(cntName=='lab-zbd'){
+	console.log('No data on this page');
+    }else{
 	cntNode.find('dl').each(function(){
 	    var record={};
 	    record.name = $('.list_title',this).text().replace(/[,，\n\r]/g,';');
@@ -65,14 +63,14 @@ Job.prototype.processList = function (data, args){
 	    record.member=$('span.ico-bang-new',this).first().text();
 	    if(!record.member) record.member=0;
             record.time = $('.pub-time', this).text();
-        //records.push(record);
-        if (!record.name || !record.cmpName) {
-            return true;
-        }
-        var line = args[0].cname + "," + record.name + ',' + record.cmpName + ',' +record.member+','+ record.time + ',' + record.hot + ',' + record.top + ','+ record.adTop+',' + record.cmpUrl + '\n';
-        fs.appendFileSync(that.resultDir + that.resultFile, line);
+            if (!record.name || !record.cmpName) {
+		return true;
+            }
+            var line = args[0].cname + "," + record.name + ',' + record.cmpName + ',' +record.member+','+ record.time + ',' + record.hot + ',' + record.top + ','+ record.adTop+',' + record.cmpUrl + '\n';
+            fs.appendFileSync(that.resultDir + that.resultFile, line);
 	});
-	
+    }
+    
     if (data.search('下一页') != -1 && args[1].pidx < 100) {
         data = null;
         args[1].pidx++;
