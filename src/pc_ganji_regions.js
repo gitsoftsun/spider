@@ -7,8 +7,8 @@ function Rent() {
     this.dataDir = '../appdata/';
     this.resultDir = '../result/';
     this.cities = [];
-    this.cityFile = "58.city.txt";
-    this.resultFile = '58_regions.txt';
+    this.cityFile = "ganji.city.txt";
+    this.resultFile = 'ganji_regions.txt';
     this.doneCities = [];
 }
 
@@ -37,7 +37,7 @@ Rent.prototype.wgetLocationData = function(){
     }
 
     var c = this.cities.shift();
-    var opt = new helper.basic_options(c.cen+".58.com","/chuzu/");
+    var opt = new helper.basic_options(c.cen+".ganji.com","/fang1/");
     console.log("[GET ] %s",c.cname);
     opt.agent = false;
     helper.request_data(opt,null,function(data,args,res){
@@ -53,20 +53,15 @@ Rent.prototype.processLocationData = function(data,args,res){
 	args[0].districts = [];
     }
     var $ = cheerio.load(data);
-    var quyu = $("div.relative dl").first();
-    $("dd>a",quyu).each(function(){
-	if($(this).attr("id") == "fissionid"){
-	    return;
-	}
+    var quyu = $(".seltion-cont dl dd.posrelative div.area>a").each(function(i){
+	if(i==0) return;
 	var path = $(this).attr("href");
-	var dPinyin = path && path.replace(/\/chuzu\//g,"").replace(/\//g,"");
-	if(!dPinyin.trim() || dPinyin.indexOf("sub")==0){
-	    return;
-	}
-	var dName = $(this).text();
-	console.log("[DATA ] %s, %s",dName,dPinyin);
-	args[0].districts.push({"pinyin":dPinyin,"name":dName,"regions":[]});
+	var pinyin = path && path.replace(/\/fang1\//g,"").replace(/\//g,"");
+	var dname = $(this).text().trim();
+	console.log("[DATA] %s, %s",dname,pinyin);
+	args[0].districts.push({"pinyin":pinyin,"name":dname,"regions":[]});
     });
+    
     this.dIdx = 0;
     this.wgetRegions(args[0]);
 }
@@ -82,7 +77,7 @@ Rent.prototype.wgetRegions = function(city){
     var district = city.districts[this.dIdx];
     console.log(this.dIdx+","+JSON.stringify(district));
 
-    var opt = new helper.basic_options(city.cen+".58.com","/"+district.pinyin+"/chuzu/");
+    var opt = new helper.basic_options(city.cen+".ganji.com","/fang1/"+district.pinyin+"/");
     console.log("[GET ] %s",district.name);
     opt.agent = false;
     helper.request_data(opt,null,function(data,args,res){
@@ -95,9 +90,10 @@ Rent.prototype.processRegions = function(data,args,res){
     }
     var $ = cheerio.load(data);
     
-    $(".subarea a").each(function(){
+    $(".subarea>a").each(function(i){
+	if(i==0) return;
 	var path = $(this).attr("href");
-	var rPinyin = path && path.replace(/\/chuzu\//g,"").replace(/\//g,"");
+	var rPinyin = path && path.replace(/\/fang1\//g,"").replace(/\//g,"");
 	if(!rPinyin){
 	    return;
 	}

@@ -72,7 +72,7 @@ Job.prototype.processList = function (data, args) {
         record.cmpUrl = $('a.fl', this).attr('href');
         record.time = $('dd.w68', this).text();
         record.name = $('a.t', this).text().replace(/[,，\r\n]/g,';');
-        if (!record.name || !record.cmpName) { 
+        if (!record.name || !record.cmpName) {
             return true;
         }
         var line = args[0].cname+","+record.name + ',' + record.cmpName + ',' + record.time + ',' + record.jing + ',' + record.top + ',' + record.cmpUrl + '\n';
