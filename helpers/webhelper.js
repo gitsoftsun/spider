@@ -159,7 +159,7 @@ exports.request_data=function(opts,data,fn,args){
         opts.headers['Content-Length']=Buffer.byteLength(strData,'utf8');
     opts.headers["Cookie"] = exports.CookieInstance.toString();
     var req = http.request(opts, function(res) {
-	console.log(res.headers["set-cookie"]);
+	//console.log(res.headers["set-cookie"]);
 	var cookiesToSet = res.headers["set-cookie"] || res.headers["Set-Cookie"];
 	if(cookiesToSet instanceof Array){
 	    for(var i=0;i<cookiesToSet.length;i++){

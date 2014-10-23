@@ -99,7 +99,7 @@ Company.prototype.init = function () {
         if (matches && matches.length > 1) {
             var id = matches[1];
             if (!this.doneCompanys[id] && !this.cmpOfJobs[id]) {
-                this.cmpOfJobs[id] = { "url": url, "id": Number(id), "name": fields[2] };
+                this.cmpOfJobs[id] = { "url": url, "id": Number(id), "name": fields[2],"city":fields[0] };
             }
         }
     },this);
@@ -446,9 +446,9 @@ Company.prototype.processOneCompany = function (data, args) {
             args[0].member = member?member:0;
             args[0].ind = $('.c33', this).text();
         });
-        fs.appendFileSync(this.resultDir + this.companyFile, args[0].id + ',' + args[0].name + ',' + (args[0].member?args[0].member:0) + ',' + (args[0].ind?args[0].ind:"其他") + '\n');
+        fs.appendFileSync(this.resultDir + this.companyFile, args[0].id + ','+args[0].city + ',' + args[0].name + ',' + (args[0].member?args[0].member:0) + ',' + (args[0].ind?args[0].ind:"其他") + '\n');
         console.log("[DONE] %s", args[0].name);
-    } else { 
+    } else {
         console.log("[WARN] company has been deleted");
 	     fs.appendFileSync(this.resultDir+this.companyFile,args[0].id+',该公司已经被删除,,\n');
     }
