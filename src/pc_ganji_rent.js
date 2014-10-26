@@ -45,10 +45,11 @@ Rent.prototype.init = function(){
     }
     
     var arguments = process.argv.splice(2);
-    var start = arguments[0];
-    var len = arguments[1];
+    var start = Number(arguments[0]);
+    var len = Number(arguments[1]);
     //前闭后开区间
     this.tasks = this.tasks.slice(start,start+len);
+    console.log("[INFO] task count: %d",this.tasks.length);
 }
 
 Rent.prototype.start = function(){
@@ -98,6 +99,7 @@ Rent.prototype.processList = function(data,args,res){
 	if(words.length>1){
 	    addr = words.eq(1).text().trim();
 	}
+	houseName = houseName && houseName.replace(/[\s,，]/g,'');
 	words = $("div.list-mod2 p.list-word",this).text().trim();
 	words = words && words.split("/");
 	var pubDate = words[words.length-1];

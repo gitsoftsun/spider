@@ -47,10 +47,11 @@ Rent.prototype.init = function(){
     }
     
     var arguments = process.argv.splice(2);
-    var start = arguments[0];
-    var len = arguments[1];
+    var start = Number(arguments[0]);
+    var len = Number(arguments[1]);
     //前闭后开区间
     this.tasks = this.tasks.slice(start,start+len);
+    console.log("[INFO] task count: %d",this.tasks.length);
 }
 
 Rent.prototype.start = function(){
@@ -127,7 +128,7 @@ Rent.prototype.processList = function(data,args,res){
     });
 
     if ($("div#infolist > table.tbimg tr").length<10 || memberCount<4) {
-        console.log("[DONE] less info,Region: " + args[0].regionName);
+        console.log("[DONE] less info,Region: " + args[0].regionName||args[0].districtName);
         setTimeout(function () {
             that.wgetList();
         }, (Math.random() * 2 + 2) * 1000);
@@ -138,7 +139,7 @@ Rent.prototype.processList = function(data,args,res){
             that.wgetList(args[0]);
         }, (Math.random() * 2 + 2) * 1000);
     } else {
-        console.log("[DONE] Region: " + args[0].regionName);
+        console.log("[DONE] Region: " + args[0].regionName||args[0].districtName);
         setTimeout(function () {
             that.wgetList();
         }, (Math.random() * 2 + 2) * 1000);
