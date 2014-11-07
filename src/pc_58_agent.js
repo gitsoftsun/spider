@@ -90,9 +90,14 @@ Agent.prototype.wgetOneAgent = function () {
     do{
 	var t = this.tasks.shift();
     }
-    while(this.doneAgents[t.name+t.cmp]);
+    while(this.tasks.length>0 && t && this.doneAgents[t.name+t.cmp]);
     
-    console.log("[GET ] %s", t.name);
+    if(!t){
+	console.log("[DONE] job done.");
+	return;
+    }
+    
+    console.log("[GET ] %s", JSON.stringify(t));
     var code = this.cities[t.city].code;
     var opt = new helper.basic_options(code+'.58.com',t.postPath);
     opt.agent = false;

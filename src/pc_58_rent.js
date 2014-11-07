@@ -71,7 +71,7 @@ Rent.prototype.wgetList = function(t){
     var pinyin = t.regionPinyin || t.districtPinyin;
     var name = t.regionName || t.districtName;
     var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+pinyin+"/chuzu/pn"+t.pn+"/");
-    opt.agent = false;
+    //opt.agent = false;
     console.log("[GET ] %s, %s, %s, %d",t.cityName,t.districtName,name==t.districtName?"":name,t.pn);
     helper.request_data(opt,null,function(data,args,res){
 	that.processList(data,args,res);

@@ -88,7 +88,7 @@ Agent.prototype.wgetOneAgent = function () {
     }
     var t = this.tasks.shift();
     
-    console.log("[GET ] %s",t.postPath);
+    console.log("[GET ] %s",JSON.stringify(t));
     var code = this.cities[t.city].code;
     var opt = new helper.basic_options(code+'.ganji.com',t.postPath);
     opt.agent = false;

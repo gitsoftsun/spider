@@ -1,0 +1,52 @@
+var rootUrl = "http://dealer.bitauto.com";
+var fileRoot = "/home/bda/Projects/spider/src/auto/yiche/"
+var urlFile = "url.txt";
+var http = require("http");
+
+function getUrl(fileText, callback) {
+    var list = fileText.split("  \n");
+    for (var index in list) {
+        var s = list[index];
+        var l = s.split("\t");
+        var brand = l[0];
+        var url = l[1];
+        callback(brand, url);
+    }
+//    callback(true, null, null);
+}
+
+function start() {
+    var fs = require("fs");
+    fs.readFile(fileRoot + urlFile, "utf8", function(err, data) {
+        if (err) {
+            throw err;
+	}
+        getUrl(data, function(brand, subUrl) {
+            url = rootUrl + subUrl;
+            download(url, function(html){
+                getAllTable(html, function(table){
+                    log(brand, table);
+		});
+	    });
+	});
+    });
+}
+
+function download(url, callback) {
+    http.get(url, function(res) {
+        var data = "";
+        res.on("data", function(chunk) {
+            data += chunk;
+	});
+        res.on("end", function() {
+            callback(data);
+	});
+    }).on("error", function() {
+        callback(null);
+    });
+}
+
+function getAllTable(html, callback) {
+    
+}
+start();
