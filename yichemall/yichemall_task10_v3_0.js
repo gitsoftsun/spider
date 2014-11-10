@@ -17,6 +17,7 @@ change: ignore the 4th level and analysis data3
 */
 var cheerio = require("cheerio");
 var http = require("http");
+var fs = require("fs");
 
 var url = "http://www.yichemall.com";//the root page url
 /*website tree
@@ -54,68 +55,107 @@ function download(url, callback){
 
 download(url, function(data){
 	if(data){
-		//console.log(data);
+		////console.log(data);
 		var $ = cheerio.load(data);
 		var x;
 		$("div.brands-item-wraper > a").each(function(i,e){
 			x = $(e).attr("href");
-			//console.log(x);
+			////console.log(x);
 			queue.push(url + x);
 		});
-		//console.log("done!");
 		/*the 2nd level*/
 		for(var i = 0, _len = queue.length; i < _len; i++){
 			data = "";
 			var current = queue.shift();
-			//console.log("fetch 2nd : " + current);
 			download(current, function(data2){
 				if(data2){
-					//console.log(data2);
 					$ = cheerio.load(data2);
 					$("p.car-name > a").each(function(i,e){
 						x = $(e).attr("href");
-						//console.log(x);
+						////console.log(x);
 						queue2.push(url+x);
 					});
-					//console.log("== done 2! ==");
 					/*the 3rd level*/
-					//console.log("queue2.length = " + queue2.length);
 					for(var i = 0, _len = queue2.length; i < _len; i++){
 						var current = queue2.shift();
-						//console.log("fetch 3rd : " + current);
 						download(current, function(data3){
 							if(data3){
 								$ = cheerio.load(data3);
 								if($("h4").length){
-									var carBrand = $("h2").attr("title");
-									console.log("carBrand : " + carBrand);
-									//var carModels = $(".carTab").text();
-									//console.log("carModels : " + carModels);
-									var bigSalePrice = $("dd.sc_jia > strong").text();
-									console.log("bigSalePrice : " + bigSalePrice);
-									var mallPrice = $("dd.sc_jia > span > del").text();
-									console.log("mallPrice : " + mallPrice);
-									var factoryPrice = $("dd.sc_jia > del > span").text();
-									console.log("factoryPrice : " + factoryPrice);
-									//var saleArea = $("");	
+
+									//fs.appendFileSync('../result/yichemall.txt', "--- [BigSale] --- \t");
+
+									//var carBrand = "品牌 : " + $("h2").attr("title");
+									var carBrand = $("h2").attr("title").split(/\s+/);
+									fs.appendFileSync('../result/yichemall.txt', carBrand[0] + ',' + carBrand[1] + ',');
+
+									if(carBrand == "undefined"){
+										console.log(data3);
+									}
+									var carModels = $("#carTab").text().trim();
+									fs.appendFileSync('../result/yichemall.txt', carModels + ',');
+									
+									//var bigSalePrice = "大促价 : " + $("dd.sc_jia > strong").text().trim();
+									var bigSalePrice = $("div.cont > dl > dd.sc_jia > strong").text().trim();
+									fs.appendFileSync('../result/yichemall.txt', bigSalePrice + ',');
+									
+									//var mallPrice = "商城价 : " + $("#MallPrice").text().trim();
+									var mallPrice = $("#MallPrice").text().trim();
+									fs.appendFileSync('../result/yichemall.txt', mallPrice + ',');
+									
+									//var factoryPrice = "厂商指导价 : " + $("dd.sc_jia > del > span").text().trim();
+									var factoryPrice = $("#FactoryPrice").text().trim();
+									fs.appendFileSync('../result/yichemall.txt', factoryPrice + ',');
+									
+									//var carBrand = "品牌 : " + $("h2").attr("title");
+									var saleArea = $("#StockNumber").text().trim();
+									fs.appendFileSync('../result/yichemall.txt', saleArea + '\n');
+									
 								}else{
+
+									//fs.appendFileSync('../result/yichemall.txt', "--- [Normal Price] --- \t");
+
+									//var carBrand = "品牌 : " + $("h2").attr("title");
 									var carBrand = $("h2").attr("title");
-									console.log("carBrand : " + carBrand);
-									var mallPrice = $("dd.sc_jia > strong").text();
-									console.log("mallPrice : " + mallPrice);
-									var factoryPrice = $("dd.sc_jia > del > span").text();
-									console.log("factoryPrice : " + factoryPrice);
-									//var saleArea = $("div.ddlProvince")
+									if(carBrand == "undefined"){
+										console.log(data3);
+									}else{
+										try{
+											carBrand = carBrand.split(/\s+/);
+											fs.appendFileSync('../result/yichemall.txt', carBrand[0] + ',' + carBrand[1] + ',');	
+										}catch(error){
+											console.log(error);
+										}
+									}
+									
+
+									//var carModels = $("#carTab").text().trim();
+									var carModels = $("#carTab").text().trim();
+									fs.appendFileSync('../result/yichemall.txt', carModels + ',');
+
+									fs.appendFileSync('../result/yichemall.txt', ',');
+
+									//var mallPrice = "商城价 : " + $("#MallPrice").text().trim();
+									var mallPrice = $("#MallPrice").text().trim();
+									fs.appendFileSync('../result/yichemall.txt', mallPrice + ',');
+									
+									//var factoryPrice = "厂商指导价 : " + $("dd.sc_jia > del > span").text().trim();
+									var factoryPrice = $("#FactoryPrice").text().trim();
+									fs.appendFileSync('../result/yichemall.txt', factoryPrice + ',');
+									
+									//var saleArea = "售卖地区 : " + $("#currentProvince").text().trim() + "  " + $("#currentCity").text().trim() + "  " + $("#currentDealer").text().trim();
+									var saleArea = $("#currentProvince").text().trim() + "," + $("#currentCity").text().trim() + "," + $("#currentDealer").text().trim();
+									fs.appendFileSync('../result/yichemall.txt', saleArea + '\n');
 								}
 								
 							}else{
-								console.log("error 3");
+								console.log("error 3 : " + current);
 							}
 						});
 						//break;
 					}//for x in queue2
 				}else{
-					console.log("error 2");
+					console.log("error 2 : " + current);
 				}
 			});
 			//break;
