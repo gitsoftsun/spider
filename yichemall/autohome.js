@@ -1,4 +1,4 @@
-	/*
+		/*
 	filename :
 	Author   : Mark    e-mail: bda20141107@gmail.com(Only when i work in BDA Inc.)
 	Date     : 2014/11/10
@@ -15,7 +15,7 @@
 	var fs = require("fs");
 
 	var queue = [];
-	var queue_pp = [];
+	
 	function download(url, callback){
 		http.get(url, function(res){
 			var data = "";
@@ -40,29 +40,27 @@
 			var pplist = $("dl.ssy-filter-pp > dd > div > a").each(function(i,e ){
 				var url = basicURL + $(e).attr("href");
 				queue.push(url);
-				queue_pp.push($(e).text());
 			});
 
 			//delete the first url->itself
 			queue.shift();
 			for(var i = 1, _len = queue.length; i <= _len; i++){
 				var x = queue.shift();
-				var pp = queue_pp.shift();
-
-				console.log("pp = " + pp + "[fetch] " + i + 'th url : ' + x);
+				console.log("[fetch] " + i + 'th url : ' + x);
 				download(x, function(data){
 					if(data){
 						//analysis 1st page
 						var $ = cheerio.load(data);
+						var pp = $("div.ssy-filter-box > a.current").text();
 						var list = $("div.ssy-list > ul > li > a").each(function(i, e){
 							var Model = $("h2", this).text().trim();
-							fs.appendFileSync('../result/autohome.txt',pp + " " +  Model + ",");
+							fs.appendFileSync('../result/autohome_11_11.txt',pp + " " +  Model + ",");
 							var MarketPrice = $("div.ssy-list-price2 > span > del", this).text().trim();
-							fs.appendFileSync('../result/autohome.txt', MarketPrice + ",");
+							fs.appendFileSync('../result/autohome_11_11.txt', MarketPrice + ",");
 							var Price_11_11 = $("div.ssy-list-price1 > b", this).text().trim();
-							fs.appendFileSync('../result/autohome.txt', Price_11_11 + ",");
+							fs.appendFileSync('../result/autohome_11_11.txt', Price_11_11 + ",");
 							var AreaDealer = $("div.ssy-list-bottom", this).text().trim();
-							fs.appendFileSync('../result/autohome.txt', AreaDealer + "\n");
+							fs.appendFileSync('../result/autohome_11_11.txt', AreaDealer + "\n");
 						});
 						var $ = cheerio.load(data);
 						var index;
@@ -71,6 +69,7 @@
 							index = $(e).text();
 							urlnext = $(e).attr("href");
 						});
+						console.log("num of all pages : " + index);
 
 						for(var j = 2; j <= index; j++){
 							//how to makeup URL?
@@ -78,25 +77,33 @@
 							download(url, function(data){
 								if(data){
 									var $ = cheerio.load(data);
+									$("span.ssy-pager-pageindex > a").each(function(i,e){
+										index = $(e).text();
+									});
+									var pp = $("div.ssy-filter-box > a.current").text();
+									console.log('list-length = ' + $("div.ssy-list > ul > li > a").length);
 									var list = $("div.ssy-list > ul > li > a").each(function(i, e){
 										var Model = $("h2", this).text().trim();
-										fs.appendFileSync('../result/autohome.txt', pp + " " + Model + ",");
+										fs.appendFileSync('../result/autohome_11_11.txt', pp + " " + Model + ",");
 										var MarketPrice = $("div.ssy-list-price2 > span > del", this).text().trim();
-										fs.appendFileSync('../result/autohome.txt', MarketPrice + ",");
+										fs.appendFileSync('../result/autohome_11_11.txt', MarketPrice + ",");
 										var Price_11_11 = $("div.ssy-list-price1 > b", this).text().trim();
-										fs.appendFileSync('../result/autohome.txt', Price_11_11 + ",");
+										fs.appendFileSync('../result/autohome_11_11.txt', Price_11_11 + ",");
 										var AreaDealer = $("div.ssy-list-bottom", this).text().trim();
-										fs.appendFileSync('../result/autohome.txt', AreaDealer + "\n");
+										fs.appendFileSync('../result/autohome_11_11.txt', AreaDealer + "\n");
 									});
 								}else{
 									console.log('[failed] to fetch url : ' + url);
 								}
 							});
 						}
+					}else{
+						console.log('=== [failed] to fetch url : ' + x);
 					}
 				});
-}
-}else{
-	console.log('[this page false] : ' + url);
-}
-});
+				//break;
+			}
+		}else{
+		console.log('[this page false] : ' + url);
+		}
+	});

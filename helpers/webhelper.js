@@ -149,7 +149,7 @@ exports.CookieInstance = new exports.HttpCookie();
 
 exports.request_data=function(opts,data,fn,args){
     if(!opts || !fn) throw "argument null 'opt' or 'data'";
-
+    
     var strData = data;
     if(typeof strData != 'string'  )
     {

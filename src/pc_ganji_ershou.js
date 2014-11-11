@@ -32,7 +32,7 @@ Rent.prototype.init = function(){
 	    }
 	}
     }
-    
+    console.log("[INFO] task total: %d",this.tasks.length);
     var arguments = process.argv.splice(2);
     var start = Number(arguments[0]);
     var len = Number(arguments[1]);
@@ -77,7 +77,7 @@ Rent.prototype.processList = function(data,args,res){
 	var link = $("div.list-mod2 div.info-title>a",this);
 	var top = $("a em.ico-stick-yellow",link).length;
 	var adTop = $("a em.ico-stick-red",link).length;
-	var jing = $("span.ico-hot",link).length;
+	var jing = $("span.ico-jing",link).length;
 	
 	var name = link.attr("title").trim().replace(/[\s,，]/g,"");
 	var url = link.attr("href");
