@@ -77,7 +77,7 @@ Agent.prototype.wgetOneAgent = function () {
 
 Agent.prototype.processOneAgent = function (data, args, res) {
     if(!data){
-	console.log("no data.");
+	console.log("[ERROR] no data.");
 	setTimeout(function () {
             that.wgetOneAgent();
 	}, (Math.random() * 1 + 2) * 1000);
@@ -87,6 +87,7 @@ Agent.prototype.processOneAgent = function (data, args, res) {
 
     }
     if(res.statusCode==404){
+	console.log("[WARN] page not found");
 	setTimeout(function () {
             that.wgetOneAgent();
 	}, (Math.random() * 1 + 2) * 1000);
