@@ -20,7 +20,8 @@ function getData(data) {
     var k = $('strong').html();
     console.log(k);
     var now = new Date();
-    var t = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate();
+    var mn = now.getMonth() + 1;
+    var t = now.getFullYear() + '-' + mn + '-' + now.getDate();
     var o = t + '\t' + k + '\n';
     var fs = require('fs'); 
     fs.appendFile('/home/bda/Projects/spider/result/huimaiche.txt', o, 'utf8', function(err) {

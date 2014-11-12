@@ -19,7 +19,7 @@ var cheerio = require("cheerio");
 var http = require("http");
 var fs = require("fs");
 
-var url = "http://www.yichemall.com";//the root page url
+var url = "http://59.151.102.205" || "http://www.yichemall.com";//the root page url
 /*website tree
 			index
 			  |
@@ -48,7 +48,8 @@ function download(url, callback){
 		res.on('end', function(){
 			callback(data);
 		});
-	}).on("error", function(){
+	}).on("error", function(err){
+		console.log(err + url + '\n\n');
 		callback(null);
 	});
 }
@@ -162,6 +163,6 @@ download(url, function(data){
 		}//for x in queue
 
 	}else{
-		console.log("error");
+		console.log("error 1 : " + url);
 	}
 });
