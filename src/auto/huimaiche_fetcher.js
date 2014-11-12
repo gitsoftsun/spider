@@ -17,18 +17,14 @@ function download(url, callback) {
 
 function getData(data) {
     $ = cheerio.load(data);
-    var k = $('strong').html();
+    var k = $('p.topp strong').text();
     console.log(k);
     var now = new Date();
     var mn = now.getMonth() + 1;
     var t = now.getFullYear() + '-' + mn + '-' + now.getDate();
     var o = t + '\t' + k + '\n';
     var fs = require('fs'); 
-    fs.appendFile('/home/bda/Projects/spider/result/huimaiche.txt', o, 'utf8', function(err) {
-        if (err) {
-            console.log(err);
-	}
-    });
+    fs.appendFileSync('/home/bda/Projects/spider/result/huimaiche.txt', o, 'utf8');
 }
 
 download('http://beijing.huimaiche.com', getData);
