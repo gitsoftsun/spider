@@ -1,7 +1,6 @@
 var http = require('http')
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
-//var cp = require('child_process')
 var cheerio = require('cheerio')
 function Job() {
     this.dataDir = '../appdata/';

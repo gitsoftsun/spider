@@ -35,7 +35,6 @@ Agent.prototype.init = function () {
         return pre;
     },this.cities);
     
-    
     console.log("init done.");
     this.tasks = [];
     fs.readFileSync(this.resultDir + this.rentFile).toString().split("\n").forEach(function (line) {
