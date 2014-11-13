@@ -1,6 +1,7 @@
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
 var cheerio = require('cheerio')
+var http = require('http')
 
 function Agent() {
     this.resultDir = "../result/";
@@ -9,25 +10,16 @@ function Agent() {
     this.cityFile = "ganji.city.txt";
     this.cities = {};
     this.rentFile = "ganji_rent.txt";
-    this.doneAgents = {};
+    this.done = {};
 }
-/*
-{ name: '酒店诚聘男女服务员包食宿',
-  jing: '否',
-  top: '否',
-  cmpName: '北京酷乐嘉华休闲健身娱乐有限公司',
-  time: '今天',
-  cmpUrl: 'http://qy.58.com/15278344077830/',
-  fileName: '生活 | 服务业,餐饮,服务员,北京,1.html'
-};
-*/
+
 Agent.prototype.init = function () {
     if (fs.existsSync(this.resultDir + this.agentFile)) {
         fs.readFileSync(this.resultDir + this.agentFile).toString().split('\n').forEach(function (line) {
             if (!line || line=='\r') return;
             line = line.replace('\r', '');
             var vals = line.split(',');
-            that.doneAgents[vals[2]+vals[4]] = true;
+            that.done[vals[0]] = true;
         });
     } else {
         console.log("[WARN] Agent File not found");
@@ -67,12 +59,16 @@ Agent.prototype.wgetOneAgent = function () {
         console.log("[DONE] job done.");
         return;
     }
-    var t = this.tasks.shift();
+    var t = {};
+    do{
+	t = this.tasks.shift();
+    }while(!t || (t&&this.done[t.postPath]))
     
     console.log("[GET ] %s",JSON.stringify(t));
     var code = this.cities[t.city].code;
     var opt = new helper.basic_options(code+'.ganji.com',t.postPath);
-    opt.agent = {maxSockets:1};
+    opt.agent = new http.Agent();
+    opt.agent.maxSockets=1;
     //opt.agent = false;
     helper.request_data(opt, null, function (data, args,res) {
         that.processOneAgent(data,args,res);
@@ -81,15 +77,23 @@ Agent.prototype.wgetOneAgent = function () {
 
 Agent.prototype.processOneAgent = function (data, args, res) {
     if(!data){
-	console.log("no data.");
+	console.log("[ERROR] no data.");
 	setTimeout(function () {
             that.wgetOneAgent();
 	}, (Math.random() * 1 + 2) * 1000);
+	this.done[args[0].postPath] = true;
+	fs.appendFileSync(this.resultDir + this.agentFile,args[0].postPath+"\n");
+	return;
+
     }
     if(res.statusCode==404){
+	console.log("[WARN] page not found");
 	setTimeout(function () {
             that.wgetOneAgent();
 	}, (Math.random() * 1 + 2) * 1000);
+	this.done[args[0].postPath] = true;
+	fs.appendFileSync(this.resultDir + this.agentFile,args[0].postPath+'\n');
+	return;
     }
     if(data.search("您的访问速度太快了")>-1){
 	console.log("[ERROR] IP banned.");
@@ -106,9 +110,9 @@ Agent.prototype.processOneAgent = function (data, args, res) {
 	args[0].id = matches[1];
     }
     
-    var record = (args[0].id||"") + ','+args[0].city + ',' + args[0].name + ',' + (args[0].member) + ',' + args[0].cmp + '\n';
+    var record = args[0].postPath+','+(args[0].id||"") + ','+args[0].city + ',' + args[0].name + ',' + (args[0].member) + ',' + args[0].cmp + '\n';
     fs.appendFileSync(this.resultDir + this.agentFile,record);
-    this.doneAgents[args[0].name+args[0].cmp] = true;
+    this.done[args[0].postPath] = true;
     console.log("[DONE] %s",record);
     setTimeout(function () {
         that.wgetOneAgent();
