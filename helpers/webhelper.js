@@ -152,15 +152,6 @@ exports.request_data=function(opts,data,fn,args){
     var request_timer = setTimeout(function() {
 	req.abort();
 	console.log('Request Timeout.');
-	if(args==undefined){
-	    fn(null,[data]);
-	}
-	else if(Array.isArray(args)){
-	    args.push(opts.data||data);
-	    fn(null,args);
-	}else{
-	    fn(null,[args,opts.data||data]);
-	}
     }, 5000);
     
     req = http.request(opts, function(res) {
@@ -293,7 +284,7 @@ exports.request_data=function(opts,data,fn,args){
     });
     req.on('error', function(e) {
 	// 响应头有错误
-	clearTimeout(request_timer);	
+	clearTimeout(request_timer);
 	console.log(e.message);
         //retry
         //exports.request_data(opts,data,fn,args);
