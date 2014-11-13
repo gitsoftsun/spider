@@ -32,21 +32,9 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
     if(method=="POST")
 	   this.headers["Content-Type"] = "application/x-www-form-urlencoded";
     if(method=="GET"&&data&&data instanceof Object){
-        /*var sb = new exports.StringBuffer();
-        sb.append('?');
-        for(var k in data){
-            sb.append(k);
-            sb.append('=');
-            //sb.append(encodeURIComponent(data[k]));
-			sb.append(data[k]);
-            sb.append('&');
-        }
-        sb.removeLast();
-        this.path+=(sb.toString());
-        sb=null;*/
 	this.path += "?"+qs.stringify(data);
     }
-
+    
     if(isApp){
 	this.headers['User-Agent']= 'Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch)';
     }
@@ -158,7 +146,30 @@ exports.request_data=function(opts,data,fn,args){
     if(opts.method=='POST')
         opts.headers['Content-Length']=Buffer.byteLength(strData,'utf8');
     opts.headers["Cookie"] = exports.CookieInstance.toString();
-    var req = http.request(opts, function(res) {
+
+    var req;
+    // 请求5秒超时
+    var request_timer = setTimeout(function() {
+	req.abort();
+	console.log('Request Timeout.');
+	if(args==undefined){
+	    fn(null,[data]);
+	}
+	else if(Array.isArray(args)){
+	    args.push(opts.data||data);
+	    fn(null,args);
+	}else{
+	    fn(null,[args,opts.data||data]);
+	}
+    }, 5000);
+    
+    req = http.request(opts, function(res) {
+	clearTimeout(request_timer);
+	// 等待响应60秒超时
+	var response_timer = setTimeout(function() {
+            res.destroy();
+            console.log('Response Timeout.');
+	}, 20000);
 	//console.log(res.headers["set-cookie"]);
 	var cookiesToSet = res.headers["set-cookie"] || res.headers["Set-Cookie"];
 	if(cookiesToSet instanceof Array){
@@ -168,22 +179,22 @@ exports.request_data=function(opts,data,fn,args){
 	}
 	//console.log(exports.CookieInstance.toString());
 	if (res.statusCode > 300 && res.statusCode < 400&& res.headers.location) {
-
-        if (url.parse(res.headers.location).hostname){
-	    console.log("%s Redirecting to %s",opts.path,res.headers.location);
-	    opts.host = url.parse(res.headers.location).host;
-	    opts.path = url.parse(res.headers.location).path;
-	    exports.request_data(opts,data,fn,args);
+            if (url.parse(res.headers.location).hostname){
+		console.log("%s Redirecting to %s",opts.path,res.headers.location);
+		opts.host = url.parse(res.headers.location).host;
+		opts.path = url.parse(res.headers.location).path;
+		exports.request_data(opts,data,fn,args);
+	    }
+            else {
+		
+            }
 	}
-        else {
-	    
-        }
-    }
-    var chunks=[];
-    res.on('data', function (chunk) {
-        chunks.push(chunk);
-    });
+	var chunks=[];
+	res.on('data', function (chunk) {
+            chunks.push(chunk);
+	});
     res.on('end',function(){
+	clearTimeout(response_timer);
 	if(res.statusCode>300&&res.statusCode<400) return;
         if(res.headers['content-encoding']=='gzip'){
             var buffer = Buffer.concat(chunks);
@@ -281,22 +292,12 @@ exports.request_data=function(opts,data,fn,args){
     });
     });
     req.on('error', function(e) {
-//	if(opts.path && opts.path.indexOf('list.jsp')!=-1){
-//		console.log("page :"+opts.data.pageNum+"got error-"+e.message);
-//		fs.appendFile("app_qunar_hotel_failed.txt","p:"+ JSON.stringify(opts.data)+'\r\n');
-//	}else{
-//		console.log("page of hotel:"+opts.data.seq+" got error-"+e.message);
-//		fs.appendFile("app_qunar_hotel_failed.txt","h:"+JSON.stringify(opts.data)+'\r\n');
-//	}
-    //console.log(e.message);
-	//var proxy = exports.randomip(proxys);
-    //            if(proxy.host&&proxy.port){
-    //                opts.port = proxy.port;
-    //                opts.host = proxy.host;    
-    //            }
-                
-                //retry
-                exports.request_data(opts,data,fn,args);
+	// 响应头有错误
+	clearTimeout(request_timer);	
+	console.log(e.message);
+        //retry
+        //exports.request_data(opts,data,fn,args);
+	fn(null,[args,opts.data||data]);
     });
     if(opts.method=='POST')
         req.write(strData);

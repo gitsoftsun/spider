@@ -5,15 +5,21 @@ var http = require('http')
 
 function Agent() {
     this.resultDir = "../result/";
-    this.agentFile = "ganji_agent.txt";
+
     this.dataDir = '../appdata/';
     this.cityFile = "ganji.city.txt";
     this.cities = {};
-    this.rentFile = "ganji_rent.txt";
+
     this.done = {};
 }
 
 Agent.prototype.init = function () {
+    var arguments = process.argv.splice(2);
+    var start = Number(arguments[0]);
+    var len = Number(arguments[1]);
+    this.recordFile = arguments[2] || "ganji_rent.txt";
+    this.agentFile = this.recordFile+"_agent.txt";
+    
     if (fs.existsSync(this.resultDir + this.agentFile)) {
         fs.readFileSync(this.resultDir + this.agentFile).toString().split('\n').forEach(function (line) {
             if (!line || line=='\r') return;
@@ -37,7 +43,7 @@ Agent.prototype.init = function () {
     
     console.log("init done.");
     this.tasks = [];
-    fs.readFileSync(this.resultDir + this.rentFile).toString().split("\n").forEach(function (line) {
+    fs.readFileSync(this.resultDir + this.recordFile).toString().split("\n").forEach(function (line) {
         if (!line) return;
         var fields = line.split(',');
 	if(fields[5]>0){
@@ -46,9 +52,6 @@ Agent.prototype.init = function () {
 	}
     },this);
     
-    var arguments = process.argv.splice(2);
-    var start = Number(arguments[0]);
-    var len = Number(arguments[1]);
     //前闭后开区间
     this.tasks = this.tasks.slice(start,start+len);
     
@@ -80,7 +83,7 @@ Agent.prototype.processOneAgent = function (data, args, res) {
 	console.log("[ERROR] no data.");
 	setTimeout(function () {
             that.wgetOneAgent();
-	}, (Math.random() * 1 + 2) * 1000);
+	}, (Math.random() * 3 + 2) * 1000);
 	this.done[args[0].postPath] = true;
 	fs.appendFileSync(this.resultDir + this.agentFile,args[0].postPath+"\n");
 	return;
@@ -90,7 +93,7 @@ Agent.prototype.processOneAgent = function (data, args, res) {
 	console.log("[WARN] page not found");
 	setTimeout(function () {
             that.wgetOneAgent();
-	}, (Math.random() * 1 + 2) * 1000);
+	}, (Math.random() * 3 + 2) * 1000);
 	this.done[args[0].postPath] = true;
 	fs.appendFileSync(this.resultDir + this.agentFile,args[0].postPath+'\n');
 	return;
