@@ -83,7 +83,7 @@ Agent.prototype.processOneAgent = function (data, args, res) {
 	console.log("[ERROR] no data.");
 	setTimeout(function () {
             that.wgetOneAgent();
-	}, (Math.random() * 3 + 2) * 1000);
+	}, (Math.random() * 3 + 4) * 1000);
 	this.done[args[0].postPath] = true;
 	fs.appendFileSync(this.resultDir + this.agentFile,args[0].postPath+"\n");
 	return;
@@ -93,7 +93,7 @@ Agent.prototype.processOneAgent = function (data, args, res) {
 	console.log("[WARN] page not found");
 	setTimeout(function () {
             that.wgetOneAgent();
-	}, (Math.random() * 3 + 2) * 1000);
+	}, (Math.random() * 3 + 4) * 1000);
 	this.done[args[0].postPath] = true;
 	fs.appendFileSync(this.resultDir + this.agentFile,args[0].postPath+'\n');
 	return;
@@ -119,7 +119,7 @@ Agent.prototype.processOneAgent = function (data, args, res) {
     console.log("[DONE] %s",record);
     setTimeout(function () {
         that.wgetOneAgent();
-    }, (Math.random() * 3 + 2) * 1000);
+    }, (Math.random() * 3 + 4) * 1000);
 }
 
 Agent.prototype.startEach = function () {
