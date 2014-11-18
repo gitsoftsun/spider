@@ -8,15 +8,12 @@ var fs = require("fs");
 function getUrl(fileText, callback) {
     var list = fileText.split("  \n");
     for (var index in list) {
-//    var index = 0;
         var s = list[index];
         var l = s.split("\t");
         var brand = l[0];
         var url = l[1];
         callback(brand, url);
-  //      console.log(brand + "\n" + url);
     }
-//    callback(true, null, null);
 }
 
 function shopType(i) {
@@ -37,17 +34,12 @@ function start() {
         }
         getUrl(data, function(brand, subUrl) {
             for (var i = 1; i < 4; ++ i) {
-                //console.log(i);
-//                var url = rootUrl + subUrl + "?BizModes=" + i;
-  //              console.log(brand + "\t" + subUrl);
                 var h = brand + "\t" + shopType(i);
-                //console.log(url);
-//                var s = shopType(i);
                 getBrandData(h, rootUrl + subUrl + "?BizModes=" + i, function(hh, data) {
                     var now = new Date();
                     var mn = now.getMonth() + 1;
                     var t = now.getFullYear() + "-" + mn + "-" + now.getDate();
-                    fs.appendFile(outputFileRoot + "yicheShop.txt",t + "\t" + hh + "\t" + data + "\n", "utf8", function(err) {
+                    fs.appendFile("yicheShop.txt",t + "\t" + hh + "\t" + data + "\n", "utf8", function(err) {
                         if (err) {
                             console.log("file");
                         }
@@ -60,50 +52,39 @@ function start() {
 
 function getBrandData(h, url, callback) {
     function getNextData(hh, subUrl) {
-        //console.log(rootUrl + subUrl);
         getBrandData(hh, rootUrl + subUrl, callback);
     }
-//    console.log(url);
     download(h, url, function(u, hh, html) {
         parseHtml(u, hh, html, getNextData, callback);
     });
 }
 
 function parseHtml(u, hh, html, callback1, callback2) {
-//    console.log(html);   
-    //count = count + 1;
-    //console.log(count);
-    //console.log(html);
     var $ = cheerio.load(html);
     var list = $("span.next_off");
-   // console.log(list.length);
+
     if (list.length == 0) {
         var subUrl = $(".the_pages").find("a").last().attr("href");
-        //console.log(u);
-        //console.log(subUrl);
-        //console.log("\n");
+	
         var sul = "" + subUrl;
         if (sul != "undefined") {
             callback1(hh, sul);
         }
-    }// else {
-     //   console.log("abc");
-   // }
+    }
     var dt = $(".clearfix");
     dt.each(function(i, e) {
-        //if (i == 0) {
-            var data = "";
-            $("b.qg-ico-box", this).replaceWith("");
-            data = data + $("span.phone-sty", this).text().trim();
-            data = data + "\t" + $("div.p-tit a", this).text().trim();
-            data = data + "\t" + $("div.infor-box", this).text().trim();
-            callback2(hh, data);
-        //}
+        var data = "";
+        $("b.qg-ico-box", this).replaceWith("");
+        data = data + $("span.phone-sty", this).text().trim();
+        data = data + "\t" + $("div.p-tit a", this).text().trim();
+        data = data + "\t" + $("div.infor-box", this).text().trim();
+	console.log(data);
+        callback2(hh, data);
     });
 }
 
 function download(h, url, callback) {
-//    console.log(url);
+    console.log(url);
     var http = require("http");
     http.get(url, function(res) {
         var data = "";
@@ -114,10 +95,12 @@ function download(h, url, callback) {
             callback(url, h, data);
         });
     }).on("error", function(e) {
-      //  callback(null);
-//        console.log("fail to get " + url);
-        //console.log("fail to get " + url + " error " + e.message);
-        download(h, url, callback);
+
+        fs.appendFile("errorurl.txt", url + "\n", "utf8", function(err) {
+            if (err) {
+                console.log("file");
+            }
+        });
     });
 }
 

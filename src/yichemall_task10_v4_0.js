@@ -35,7 +35,7 @@ var path = require("path");
 var url = require("url");
 
 var root = "http://59.151.102.205" || "http://www.yichemall.com";//the root page url
-var filename = 'huimaiche-com-Task10 @' + Date().split(/\s+/).join('-') + '.txt';
+var filename = 'huimaiche-com-Task10@' + Date().split(/\s+/).join('-') + '.txt';
 var count = 0;
 var mcount = 0;
 

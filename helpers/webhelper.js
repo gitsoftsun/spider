@@ -30,7 +30,7 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
     };
     //there are some problems in below code.
     if(method=="POST")
-	   this.headers["Content-Type"] = "application/x-www-form-urlencoded";
+	this.headers["Content-Type"] = "application/x-www-form-urlencoded";
     if(method=="GET"&&data&&data instanceof Object){
 	this.path += "?"+qs.stringify(data);
     }
@@ -38,8 +38,10 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
     if(isApp){
 	this.headers['User-Agent']= 'Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch)';
     }
-    else
-	this.headers['User-Agent'] = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36";
+    else{
+	this.headers['User-Agent'] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36"
+	//"Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36";
+    }
     if(isAjax)
 	this.headers["X-Requested-With"]="XMLHttpRequest";
 };
@@ -256,13 +258,18 @@ exports.request_data=function(opts,data,fn,args){
             }
             var buffer = Buffer.concat(chunks);
             var obj=null;
-            if(encode=="gb2312"||encode=="GBK"){
+	    if(encode=="utf-8"){
+		obj = buffer.toString();
+	    }
+	    if(!obj){
 		//obj = decodeFromGb2312(obj);
 		var gbk_to_utf8_iconv = new Iconv('GBK', 'UTF-8//TRANSLIT//IGNORE');
 		obj = gbk_to_utf8_iconv.convert(buffer).toString();
-            }
-	    if(!obj)
-		obj = buffer.toString();
+	    }
+            //if(encode=="gb2312"||encode=="GBK"){
+		
+            //}
+	    
             if(res.headers['content-type']&&res.headers['content-type'].indexOf('application/json')!=-1){
 		try{
 		    obj =JSON.parse(obj.toString());
