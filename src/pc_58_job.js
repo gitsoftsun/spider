@@ -16,7 +16,7 @@ function Job() {
     this.cateIdx = -1;
     this.resultFile = '58_jobs.txt';
     //this.cmpIdFile = "58cmpId.txt";
-    this.pagePerCategory = 100;
+    this.pagePerCategory = 1;
 }
 
 Job.prototype.init = function () {

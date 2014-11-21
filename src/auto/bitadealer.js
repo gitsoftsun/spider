@@ -14,7 +14,7 @@ var brands = [{"brand":"奥迪","path":"/audi/"},
 {"brand":"宝骏","path":"/bj/"},
 {"brand":"北京汽车","path":"/bjqc/"},
 {"brand":"北汽威旺","path":"/ww/"},
-{"brand":"北汽制造","path":"jeep/"},
+{"brand":"北汽制造","path":"/beijingjeep/"},
 {"brand":"宾利","path":"/bentley/"},
 {"brand":"布加迪","path":"/bugatti/"},
 {"brand":"巴博斯","path":"/barbus/"},
@@ -181,7 +181,7 @@ Dealer.prototype.init = function(){
     for(var i=0;i<brands.length;i++){
 	var brand = brands[i];
 	for(var j=1;j<4;j++){
-	    this.tasks.push({path:brand.path,name:brand.brand,page:1,mode:j,id:undefined});
+	    this.tasks.push({path:brand.path,name:brand.brand,page:1,mode:j,id:undefined,audit:true});
 	}
     }
     console.log("[INFO] task count: %d",this.tasks.length);
@@ -261,15 +261,31 @@ Dealer.prototype.processList = function(data,args,res){
     }
     
     var records = [""];
+    var idx = -1;
+    if(args[0].audit == true){
+	$("ul.jxs-list li.no-car-list").each(function(i){
+	    if($(this).attr('style') == "display: block;"){
+		args[0].audit = false;
+		idx=i;
+		return false;
+	    }
+	});
+    }
     
-    $("ul.jxs-list li.clearfix").each(function(){
+    $("ul.jxs-list li.clearfix").each(function(j){
 	var name = $("div.intro-box .p-tit a",this).attr('title');
 	name = name && name.replace(/[,，]/g,"");
 	var brand = $(".intro-box .p-intro .add-sty",this).first().text();
 	var city = $(".infor-box .price-city",this).text().trim().split(/\s+/)[0];
-	var phone = $(".intro-box .p-intro span.phone-sty span.tel400",this).text()|| "无";
-	records.push([args[0].name,name,brand,city,phone,args[0].mode==2?"4S":args[0].mode==1?"综合店":"特许店"].join('\t'));
+	var phone = $(".intro-box .p-intro span.phone-sty span.tel400",this).text();
+	if(!phone){
+	    phone = $(".intro-box .p-intro span.phone-sty",this).contents().first().text().trim()||"无";
+	}
+	var audit = $(".intro-box .p-intro span.phone-sty b.rz-phone",this).length;
+	var shopAudit = (args[0].audit || j<idx)?"Y":"N";
+	records.push([args[0].name,name,brand,city,phone,audit?"Y":"N",shopAudit,args[0].mode==2?"4S":args[0].mode==1?"综合店":"特许店"].join('\t'));
     });
+    
     fs.appendFileSync(this.resultDir+this.resultFile,records.join('\n'));
     
     if(args[0].page<args[0].maxPage){

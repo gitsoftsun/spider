@@ -1,12 +1,13 @@
 var fs = require('fs')
 var helper = require('../../helpers/webhelper.js')
 var cheerio = require('cheerio')
+var url = require('url')
 
 var Dealer = function(){
     this.resultDir = "../../result/";
     this.dataDir = '../../appdata/';
     this.resultFile = "athmec.txt";
-    this.processFile = "athmec_progress.txt";
+    this.progressFile = "athmec_progress.txt";
     this.done = {};
     this.curPageIdx = 1;
     this.cities = [];
@@ -14,19 +15,19 @@ var Dealer = function(){
 //http://deal.autohome.com.cn/china/?k=2, 综合经销商
 
 Dealer.prototype.init = function(){
-    if(fs.existsSync(this.resultDir+this.processFile)){
-	fs.readFileSync(this.resultDir+this.processFile).toString().split('\n').reduce(function(pre,cur){
+    if(fs.existsSync(this.resultDir+this.progressFile)){
+	fs.readFileSync(this.resultDir+this.progressFile).toString().split('\n').reduce(function(pre,cur){
 	    if(cur){
 		pre[cur]=true;
 	    }
 	    return pre;
-	});
+	},this.done);
     }
     this.getCity();
 }
 
 Dealer.prototype.getCity = function(){
-    var opt = new helper.basic_options();
+    var opt = new helper.basic_options("mall.autohome.com.cn","/home/changecity");
     helper.request_data(opt,null,function(data,args,res){
 	if(!data){
 	    console.log("[ERROR] error while getting city list.");
@@ -41,26 +42,35 @@ Dealer.prototype.getCity = function(){
 	    var name = $(this).text().trim();
 	    that.cities.push({"name":name,"path":path});
 	});
+	console.log("[INFO] city count:%d",that.cities.length);
+	that.wgetList();
     });
 }
 
 Dealer.prototype.start = function(){
     this.init();
-    this.wgetList();
+    //this.wgetList();
 }
 
 Dealer.prototype.wgetList = function(){
-    var host = "dealer.autohome.com.cn";
-    var path = "/china/";
-    if(this.curPageIdx>1){
-	path += "0_0_0_0_"+this.curPageIdx+".html";
+    var host = "mall.autohome.com.cn";
+    var path = "/home/changecity";
+    var c = null;
+    do{
+	c = this.cities.shift();
     }
-    var opt = new helper.basic_options(host,path);
+    while(c&&this.done[c.name] && this.cities.length);
+    if(!c){
+	console.log("[DONE] job done.");
+	return;
+    }
+    var q = url.parse("http://mall.autohome.com.cn"+c.path,true).query;
+    var opt = new helper.basic_options(host,path,'GET',false,false,q);
     opt.agent = false;
-    console.log("[GET ] %s",this.curPageIdx);
+    console.log("[GET ] %s",c.name);
     helper.request_data(opt,null,function(data,args,res){
 	that.processList(data,args,res);
-    });
+    },c);
 }
 
 Dealer.prototype.processList = function(data,args,res){
@@ -73,28 +83,32 @@ Dealer.prototype.processList = function(data,args,res){
     }
     var $ = cheerio.load(data);
     var records = [""];
-    $("div.dealer-cont").each(function(){
-	var titleLink = $("h3.dealer-cont-title a",this).last();
-	var name = titleLink.text();
-	name = name && name.replace(/[,，]/g,"");
-	var brand = $(titleLink).attr("js-dbrand");
-	var sName = $(titleLink).attr("js-dname");
-	var city = $(titleLink).attr('js-darea');
-	var phone = $("span.dealer-api-phone",this).text()|| "无";
-	records.push([name,sName,brand,city,phone].join());
+    $("ul.auto-box li a.links").each(function(){
+	var name = $("h4",this).text().trim();
+	name = name && name.replace(/[\s]/g,'');
+	var price = $("div.rotate-wrap strong",this).text().trim();
+	var delta = $("div.rotate-wrap em",this).text().trim();
+	var matches = $("p span",this).eq(0).text().match(/\d+/);
+	var leftCount = matches && matches[0];
+	var leftTime = $("p span",this).eq(1).text().trim();
+	var promo = $("p.auto-boxst").text().trim();
+	promo = promo && promo.replace(/[\s]/g,'');
+	var record = [args[0].name,name,price,delta,leftCount,leftTime,promo].join('\t');
+	console.log(record);
+	records.push(record);
     });
     
     fs.appendFileSync(this.resultDir+this.resultFile,records.join('\n'));
-    fs.appendFileSync(this.resultDir+this.processFile,this.curPageIdx+"\n");
-    var nextPage = $("div.page a").last();
-    var nextPageClass = nextPage && nextPage.attr('class');
-    if(nextPageClass && nextPageClass.indexOf("page-disabled")>-1){
+    //fs.appendFileSync(this.resultDir+this.progressFile,this.curPageIdx+"\n");
+    //var nextPage = $("div.page a").last();
+    //var nextPageClass = nextPage && nextPage.attr('class');
+    //if(nextPageClass && nextPageClass.indexOf("page-disabled")>-1){
 	//no more pages.
-	console.log("[DONE]job done");
-	return;
-    }else{
-	this.curPageIdx++;
-    }
+        //console.log("[DONE]job done");
+	//return;
+    //}else{
+//	this.curPageIdx++;
+//    }
     this.wgetList();
 }
 

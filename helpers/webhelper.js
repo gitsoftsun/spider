@@ -99,19 +99,30 @@ exports.StringBuffer.prototype.removeLast = function(){
     var result = this.data.length>0 && this.data.splice(-1,1);
     return result;
 }
+/* cookie:{"key":{"name":"session_id","value":"xxx","httponly":true,"expirs":213,"domain":"www.baidu.com","path":'/'}}
+ *
+ *
+ *
+ */
+exports.HttpCookie = Object;
 
-exports.HttpCookie = Array;
-
+//In reponse header, first "=" pair must be cookie-pair according to RFC 6265,
+//and querystring seems parse string in sequential order.
+//
 exports.HttpCookie.parse = function(data){
     if(typeof data == "string"){
-	return qs.parse(data,";","=");
+	return qs.parse(data,"; ","=");
     }
 }
 
 exports.HttpCookie.prototype.toString = function(){
-    return this.map(function(c){
-	return qs.stringify(c,",","=");
-    }).join(";");
+    var buf = [];
+    for(var key in this){
+	if(this.hasOwnProperty(key)){
+	    buf.push([this[key].name,this[key].value].join('='));
+	}
+    }
+    return buf.join(';');
 }
 
 exports.HttpCookie.prototype.add = function(cookie,val){
@@ -121,19 +132,24 @@ exports.HttpCookie.prototype.add = function(cookie,val){
 	    arguments.callee.call(this, cookie[i]);
 	}
     }else if(cookie && typeof cookie == "string"){
-	ck[cookie] = val || "";
-	this.push(ck);
+	ck.name = cookie;
+	ck.value = val || "";
+	this[cookie] = ck;
     }else if(typeof cookie == "object"){
 	for(var k in cookie){
-	    if(cookie.hasOwnProperty(k))
-		var kk = k.trim();
-		if(kk!="path" && kk!="domain" && kk!="expires" && kk!="max-age"){
+	    if(cookie.hasOwnProperty(k)){
+		k=k.trim();
+		var kk = k.toLowerCase();
+		if(kk!="httponly"&&kk!="path" && kk!="domain" && kk!="expires" && kk!="max-age"){
+		    ck.name = k;
+		    ck.value = cookie[k];
+		}else{
 		    ck[k]=cookie[k];
+		}
 	    }
 	}
-	this.push(ck);
+	this[ck.name]=ck;
     }
-    
 }
 exports.CookieInstance = new exports.HttpCookie();
 
@@ -150,19 +166,18 @@ exports.request_data=function(opts,data,fn,args){
     opts.headers["Cookie"] = exports.CookieInstance.toString();
 
     var req;
-    // 请求5秒超时
     var request_timer = setTimeout(function() {
 	req.abort();
 	console.log('Request Timeout.');
-    }, 5000);
+    }, 15000);
     
     req = http.request(opts, function(res) {
 	clearTimeout(request_timer);
-	// 等待响应60秒超时
 	var response_timer = setTimeout(function() {
             res.destroy();
             console.log('Response Timeout.');
-	}, 20000);
+	}, 6000);
+	
 	//console.log(res.headers["set-cookie"]);
 	var cookiesToSet = res.headers["set-cookie"] || res.headers["Set-Cookie"];
 	if(cookiesToSet instanceof Array){
@@ -171,16 +186,18 @@ exports.request_data=function(opts,data,fn,args){
 	    }
 	}
 	//console.log(exports.CookieInstance.toString());
+	//console.log(exports.CookieInstance);
 	if (res.statusCode > 300 && res.statusCode < 400&& res.headers.location) {
+	    console.log("%s Redirecting to %s",opts.path,res.headers.location);
             if (url.parse(res.headers.location).hostname){
-		console.log("%s Redirecting to %s",opts.path,res.headers.location);
 		opts.host = url.parse(res.headers.location).host;
 		opts.path = url.parse(res.headers.location).path;
-		exports.request_data(opts,data,fn,args);
 	    }
             else {
-		
+		opts.path = url.parse(res.headers.location).path;
             }
+	    
+	    exports.request_data(opts,data,fn,args);
 	}
 	var chunks=[];
 	res.on('data', function (chunk) {
@@ -188,12 +205,14 @@ exports.request_data=function(opts,data,fn,args){
 	});
     res.on('end',function(){
 	clearTimeout(response_timer);
-	if(res.statusCode>300&&res.statusCode<400) return;
+	if(res.statusCode>300&&res.statusCode<400) {
+	    //reponse of redirecting, no need to process
+	    return;
+	}
         if(res.headers['content-encoding']=='gzip'){
             var buffer = Buffer.concat(chunks);
 	    if(buffer.length==157){
 		console.log("current ip has been forbidden.");
-		
 		//process.exit();
 	    }
             zlib.gunzip(buffer,function(err,decoded){
