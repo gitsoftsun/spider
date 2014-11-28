@@ -1,7 +1,6 @@
 var fs = require('fs')
 var cheerio = require("cheerio")
 var helper = require('../../helpers/webhelper.js')
-var entity = require('../../models/entity.js')
 
 function Dp(){
     this.resultDir = "../../result/";

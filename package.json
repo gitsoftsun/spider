@@ -10,8 +10,6 @@
       "sprintf-js":"*",
       "iconv":"*",
       "cheerio":"*",
-      "mongodb":"*",
-      "selenium-webdriver":"*",
       "nodemailer":"0.7.1"
   }
 }
