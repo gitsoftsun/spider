@@ -30,28 +30,18 @@ exports.basic_options=function(host,path,method,isApp,isAjax,data,port){
     };
     //there are some problems in below code.
     if(method=="POST")
-	   this.headers["Content-Type"] = "application/x-www-form-urlencoded";
+	this.headers["Content-Type"] = "application/x-www-form-urlencoded";
     if(method=="GET"&&data&&data instanceof Object){
-        /*var sb = new exports.StringBuffer();
-        sb.append('?');
-        for(var k in data){
-            sb.append(k);
-            sb.append('=');
-            //sb.append(encodeURIComponent(data[k]));
-			sb.append(data[k]);
-            sb.append('&');
-        }
-        sb.removeLast();
-        this.path+=(sb.toString());
-        sb=null;*/
 	this.path += "?"+qs.stringify(data);
     }
-
+    
     if(isApp){
 	this.headers['User-Agent']= 'Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch)';
     }
-    else
-	this.headers['User-Agent'] = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36";
+    else{
+	this.headers['User-Agent'] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36"
+	//"Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.117 Safari/537.36";
+    }
     if(isAjax)
 	this.headers["X-Requested-With"]="XMLHttpRequest";
 };
@@ -109,19 +99,30 @@ exports.StringBuffer.prototype.removeLast = function(){
     var result = this.data.length>0 && this.data.splice(-1,1);
     return result;
 }
+/* cookie:{"key":{"name":"session_id","value":"xxx","httponly":true,"expirs":213,"domain":"www.baidu.com","path":'/'}}
+ *
+ *
+ *
+ */
+exports.HttpCookie = Object;
 
-exports.HttpCookie = Array;
-
+//In reponse header, first "=" pair must be cookie-pair according to RFC 6265,
+//and querystring seems parse string in sequential order.
+//
 exports.HttpCookie.parse = function(data){
     if(typeof data == "string"){
-	return qs.parse(data,";","=");
+	return qs.parse(data,"; ","=");
     }
 }
 
 exports.HttpCookie.prototype.toString = function(){
-    return this.map(function(c){
-	return qs.stringify(c,",","=");
-    }).join(";");
+    var buf = [];
+    for(var key in this){
+	if(this.hasOwnProperty(key)){
+	    buf.push([this[key].name,this[key].value].join('='));
+	}
+    }
+    return buf.join(';');
 }
 
 exports.HttpCookie.prototype.add = function(cookie,val){
@@ -131,25 +132,30 @@ exports.HttpCookie.prototype.add = function(cookie,val){
 	    arguments.callee.call(this, cookie[i]);
 	}
     }else if(cookie && typeof cookie == "string"){
-	ck[cookie] = val || "";
-	this.push(ck);
+	ck.name = cookie;
+	ck.value = val || "";
+	this[cookie] = ck;
     }else if(typeof cookie == "object"){
 	for(var k in cookie){
-	    if(cookie.hasOwnProperty(k))
-		var kk = k.trim();
-		if(kk!="path" && kk!="domain" && kk!="expires" && kk!="max-age"){
+	    if(cookie.hasOwnProperty(k)){
+		k=k.trim();
+		var kk = k.toLowerCase();
+		if(kk!="httponly"&&kk!="path" && kk!="domain" && kk!="expires" && kk!="max-age"){
+		    ck.name = k;
+		    ck.value = cookie[k];
+		}else{
 		    ck[k]=cookie[k];
+		}
 	    }
 	}
-	this.push(ck);
+	this[ck.name]=ck;
     }
-    
 }
 exports.CookieInstance = new exports.HttpCookie();
 
 exports.request_data=function(opts,data,fn,args){
     if(!opts || !fn) throw "argument null 'opt' or 'data'";
-
+    
     var strData = data;
     if(typeof strData != 'string'  )
     {
@@ -158,7 +164,20 @@ exports.request_data=function(opts,data,fn,args){
     if(opts.method=='POST')
         opts.headers['Content-Length']=Buffer.byteLength(strData,'utf8');
     opts.headers["Cookie"] = exports.CookieInstance.toString();
-    var req = http.request(opts, function(res) {
+
+    var req;
+    var request_timer = setTimeout(function() {
+	req.abort();
+	console.log('Request Timeout.');
+    }, 15000);
+    
+    req = http.request(opts, function(res) {
+	clearTimeout(request_timer);
+	var response_timer = setTimeout(function() {
+            res.destroy();
+            console.log('Response Timeout.');
+	}, 6000);
+	
 	//console.log(res.headers["set-cookie"]);
 	var cookiesToSet = res.headers["set-cookie"] || res.headers["Set-Cookie"];
 	if(cookiesToSet instanceof Array){
@@ -167,29 +186,33 @@ exports.request_data=function(opts,data,fn,args){
 	    }
 	}
 	//console.log(exports.CookieInstance.toString());
+	//console.log(exports.CookieInstance);
 	if (res.statusCode > 300 && res.statusCode < 400&& res.headers.location) {
-
-        if (url.parse(res.headers.location).hostname){
 	    console.log("%s Redirecting to %s",opts.path,res.headers.location);
-	    opts.host = url.parse(res.headers.location).host;
-	    opts.path = url.parse(res.headers.location).path;
+            if (url.parse(res.headers.location).hostname){
+		opts.host = url.parse(res.headers.location).host;
+		opts.path = url.parse(res.headers.location).path;
+	    }
+            else {
+		opts.path = url.parse(res.headers.location).path;
+            }
+	    
 	    exports.request_data(opts,data,fn,args);
 	}
-        else {
-	    
-        }
-    }
-    var chunks=[];
-    res.on('data', function (chunk) {
-        chunks.push(chunk);
-    });
+	var chunks=[];
+	res.on('data', function (chunk) {
+            chunks.push(chunk);
+	});
     res.on('end',function(){
-	if(res.statusCode>300&&res.statusCode<400) return;
+	clearTimeout(response_timer);
+	if(res.statusCode>300&&res.statusCode<400) {
+	    //reponse of redirecting, no need to process
+	    return;
+	}
         if(res.headers['content-encoding']=='gzip'){
             var buffer = Buffer.concat(chunks);
 	    if(buffer.length==157){
 		console.log("current ip has been forbidden.");
-		
 		//process.exit();
 	    }
             zlib.gunzip(buffer,function(err,decoded){
@@ -254,13 +277,18 @@ exports.request_data=function(opts,data,fn,args){
             }
             var buffer = Buffer.concat(chunks);
             var obj=null;
-            if(encode=="gb2312"||encode=="GBK"){
+	    if(encode=="utf-8"){
+		obj = buffer.toString();
+	    }
+	    if(!obj){
 		//obj = decodeFromGb2312(obj);
 		var gbk_to_utf8_iconv = new Iconv('GBK', 'UTF-8//TRANSLIT//IGNORE');
 		obj = gbk_to_utf8_iconv.convert(buffer).toString();
-            }
-	    if(!obj)
-		obj = buffer.toString();
+	    }
+            //if(encode=="gb2312"||encode=="GBK"){
+		
+            //}
+	    
             if(res.headers['content-type']&&res.headers['content-type'].indexOf('application/json')!=-1){
 		try{
 		    obj =JSON.parse(obj.toString());
@@ -281,22 +309,12 @@ exports.request_data=function(opts,data,fn,args){
     });
     });
     req.on('error', function(e) {
-//	if(opts.path && opts.path.indexOf('list.jsp')!=-1){
-//		console.log("page :"+opts.data.pageNum+"got error-"+e.message);
-//		fs.appendFile("app_qunar_hotel_failed.txt","p:"+ JSON.stringify(opts.data)+'\r\n');
-//	}else{
-//		console.log("page of hotel:"+opts.data.seq+" got error-"+e.message);
-//		fs.appendFile("app_qunar_hotel_failed.txt","h:"+JSON.stringify(opts.data)+'\r\n');
-//	}
-    //console.log(e.message);
-	//var proxy = exports.randomip(proxys);
-    //            if(proxy.host&&proxy.port){
-    //                opts.port = proxy.port;
-    //                opts.host = proxy.host;    
-    //            }
-                
-                //retry
-                exports.request_data(opts,data,fn,args);
+	// 响应头有错误
+	clearTimeout(request_timer);
+	console.log(e.message);
+        //retry
+        //exports.request_data(opts,data,fn,args);
+	fn(null,[args,opts.data||data]);
     });
     if(opts.method=='POST')
         req.write(strData);

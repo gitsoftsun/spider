@@ -32,13 +32,13 @@ Rent.prototype.init = function(){
 	    if(district.regions.length==0){
 		var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":district.name,"districtPinyin":district.pinyin};
 		this.tasks.push(tmp);
-		//fs.appendFileSync(this.resultDir+"tasksout.txt",JSON.stringify(tmp)+'\n');
+		//fs.appendFileSync(this.resultDir+"tasksout.ganji.txt",JSON.stringify(tmp)+'\n');
 	    }else{
 		for(var k=0;k<district.regions.length;k++){
 		    var region = district.regions[k];
 		    var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":district.name,"districtPinyin":district.pinyin,"regionName":region.name,"regionPinyin":region.pinyin}
 		    this.tasks.push(tmp);
-		    //fs.appendFileSync(this.resultDir+"tasksout.txt",JSON.stringify(tmp)+'\n');
+		    //fs.appendFileSync(this.resultDir+"tasksout.ganji.txt",JSON.stringify(tmp)+'\n');
 		}
 	    }
 	}
