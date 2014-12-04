@@ -70,7 +70,7 @@ Rent.prototype.wgetList = function(t){
     }
     var pinyin = t.regionPinyin || t.districtPinyin;
     var name = t.regionName || t.districtName;
-    var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat3_enname+"/pn"+t.pn+"/");
+    var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_enname+"/");
     opt.agent = false;
     console.log("[GET ] %s, %s, %d",t.cityName,t.cat_name,t.pn);
     helper.request_data(opt,null,function(data,args,res){
@@ -79,48 +79,33 @@ Rent.prototype.wgetList = function(t){
 }
 
 Rent.prototype.processList = function(data,args,res){
-    var $ = cheerio.load(data);
-    var memberCount = 0;
-    var end_flag = 0;
     if(!data){
         console.log("data empty.");
     } else {
-    $("div#infolist > table.tbimg tr").each(function(){
-        if($(this).text().indexOf("以上本地信息更新较少") >= 0){
-            end_flag = 1;
-            return false;
-        }
-        if($(this).attr("logr") == undefined)
-            return true;
-	var td = $("td.t",this);
-	var title = $("a.t",td).text().replace(/[\n\r,，]/g,";");
-        var post_time = $("span.post_time",td).text()
-        var description = $("p",td).eq(1).text().trim().replace(/[\n\r,，]/g,";");
-	//var user = $("a.u",td).text().replace(/[\n\r,，]/g,";");
-	var url_title = $("a.t",td).attr("href");
-	//var url_user = $("a.u",td).attr("href");
-	var wlt = $("span[class^='wlt']",td);
-	var member = 0;
-	if(wlt.length>0){
-	    member = wlt.attr("class").replace(/wlt-ico wlt/,"");
-	}
-	if(member)
-	    memberCount++;
-	var jing = $("span.jingpin",td).length;
-	var top = $("a.ico.ding",td).length;
-    //var personal = $("h1 span.qj-renttitgr",td).text();
-	//personal = personal && personal.trim().replace(/[\(\)]/g,"");
-	//var houseName = $("div.qj-listleft>a",td).text().trim().replace(/[\s]/g,"").replace(/[,，]/g,";");
-
-	//var pubDate = $("div.qj-listleft span.qj-listjjr",td).contents().last().text().trim();
-
-	var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,args[0].cat3_name,member,jing,top,title,post_time,description,url_title,"\n"].join();
-	fs.appendFileSync(that.resultDir+that.resultFile,record);
-	//console.log("[DONE] %s",record);
-    });
+        var $ = cheerio.load(data);
+        var memberCount = 0;
+        var end_flag = 0;
+        $("div#infolist > table.tbimg tr").each(function(){
+            var td = $("td.t",this);
+            var title = $("a.t",td).text().replace(/[\n\r,，]/g,";");
+                var post_time = $("span.post_time",td).text()
+                var description = $("p",td).eq(1).text().trim().replace(/[\n\r,，]/g,";");
+            var url_title = $("a.t",td).attr("href");
+            var wlt = $("span[class^='wlt']",td);
+            var member = 0;
+            if(wlt.length>0){
+                member = wlt.attr("class").replace(/wlt-ico wlt/,"");
+            }
+            if(member)
+                memberCount++;
+            var jing = $("span.jingpin",td).length;
+            var top = $("a.ico.ding",td).length;
+            var record = [args[0].cityName,args[0].cat_name,args[0].cat2_name,args[0].cat3_name,member,jing,top,title,post_time,description,url_title,"\n"].join();
+            fs.appendFileSync(that.resultDir+that.resultFile,record);
+        });
     }
 
-    console.log("[DONE] Category: " + args[0].cat3_name);
+    console.log("[DONE] Category: " + args[0].cat_name);
     setTimeout(function () {
         that.wgetList();
     }, (Math.random() * 2 + 2) * 1000);

@@ -32,7 +32,7 @@ Rent.prototype.init = function(){
         if(!line) return;
         line = line.replace('\r', '');
         var vals = line.split(',');
-        return {"cat1_name": vals[0], "cat2_name": vals[1], "cat3_name": vals[2], "cat1_ename": vals[3], "cat3_enname": vals[4]};
+        return {"cat_name": vals[0], "cat_ename": vals[1], "class": vals[2]};
     });
 
     //add service task
@@ -42,7 +42,7 @@ Rent.prototype.init = function(){
         for(var j=0;j<this.services.length;j++){
             var service = this.services[j];
             if (!service) continue;
-            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat2_name":service.cat2_name,"cat3_name":service.cat3_name,"cat1_ename":service.cat1_ename,"cat3_enname":service.cat3_enname};
+            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat_name":service.cat_name,"cat_ename":service.cat_ename,"class":service.class};
             this.tasks.push(tmp);
         }
     }

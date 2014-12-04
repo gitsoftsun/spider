@@ -10,7 +10,7 @@ function Rent() {
     this.cities = [];
     this.cityFile = 'ganji.city.txt';
     this.services = [];
-    this.serviceFile = "ganji.service.category.txt";
+    this.serviceFile = "ganji.service.txt";
     this.resultFile = 'ganji_service.txt';
     this.pagePerTask = 100;
 }
@@ -32,7 +32,7 @@ Rent.prototype.init = function(){
         if(!line) return;
         line = line.replace('\r', '');
         var vals = line.split(',');
-        return {"cat1_name": vals[0], "cat2_name": vals[1], "cat3_name": vals[2], "cat3_enname": vals[3]};
+        return {"cat1_name": vals[0], "cat2_name": vals[1], "cat2_ename": vals[2], "class": vals[3]};
     });
 
     //add service task
@@ -42,7 +42,7 @@ Rent.prototype.init = function(){
         for(var j=0;j<this.services.length;j++){
             var service = this.services[j];
             if (!service) continue;
-            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat2_name":service.cat2_name,"cat3_name":service.cat3_name,"cat3_enname":service.cat3_enname};
+            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat2_name":service.cat2_name,"cat2_ename":service.cat2_ename,"class":service.class};
             this.tasks.push(tmp);
         }
     }
@@ -50,7 +50,6 @@ Rent.prototype.init = function(){
     var arguments = process.argv.splice(2);
     var start = Number(arguments[0]);
     var len = Number(arguments[1]);
-    this.resultFile = this.resultFile + '.' + start + '.' + (start + len);
     //前闭后开区间
     this.tasks = this.tasks.slice(start,start+len);
     console.log("[INFO] task count: %d",this.tasks.length);
@@ -73,9 +72,9 @@ Rent.prototype.wgetList = function(t){
     }
     var pinyin = t.regionPinyin || t.districtPinyin;
     var name = t.regionName || t.districtName;
-    var opt = new helper.basic_options(t.cityPinyin+".ganji.com","/"+t.cat3_enname+"/o"+t.pn+"/");
+    var opt = new helper.basic_options(t.cityPinyin+".ganji.com","/"+t.cat2_ename+"/o"+t.pn+"/");
     opt.agent = false;
-    console.log("[GET ] %s, %s, %s, %s, %d",t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,t.pn);
+    console.log("[GET ] %s, %s, %s, %d",t.cityName,t.cat1_name,t.cat2_name,t.pn);
     helper.request_data(opt,null,function(data,args,res){
     	that.processList(data,args,res);
     },t);
@@ -84,6 +83,17 @@ Rent.prototype.wgetList = function(t){
 Rent.prototype.processList = function(data,args,res){
     if(!data){
         console.log("data empty.");
+        if(t.class== '1') {
+            console.log("[DONE] Category: " + t.category);
+            setTimeout(function () {
+                that.wgetList();
+            }, (Math.random() * 4 + 2) * 1000);
+        } else {
+            t.pn++;
+            setTimeout(function () {
+                that.wgetList(t);
+            }, (Math.random() * 4 + 2) * 1000);
+        }
     }
     t = args[0]
 
@@ -159,26 +169,45 @@ Rent.prototype.processAjaxTasks = function(t){
 
 Rent.prototype.processAjaxRequest = function(chunks,t,res){
     if(!chunks){
-        console.log("data empty.");
-        return;
-    }
-    var buffer = chunks.join('');
-    ajax_task = t['ajax_tasks'].shift();
-    t['user_info'].push(buffer);
-    if(t['ajax_tasks'].length > 0){
-        that.processAjaxTasks(t);
+        console.log("chunk empty.");
+        if(t.class== '1') {
+            console.log("[DONE] Category: " + t.category);
+            setTimeout(function () {
+                that.wgetList();
+            }, (Math.random() * 4 + 2) * 1000);
+        } else {
+            t.pn++;
+            setTimeout(function () {
+                that.wgetList(t);
+            }, (Math.random() * 4 + 2) * 1000);
+        }
     } else {
-        that.processData(t);
+        var buffer = chunks.join('');
+        ajax_task = t['ajax_tasks'].shift();
+        t['user_info'].push(buffer);
+        if(t['ajax_tasks'].length > 0){
+            that.processAjaxTasks(t);
+        } else {
+            that.processData(t);
+        }
     }
 }
 
 
 Rent.prototype.processData = function(t){
     if(t['user_info'].length == 0){
-        console.log("[DONE] less info,Region: " + t.regionName);
-        setTimeout(function () {
-            that.wgetList();
-        }, (Math.random() * 2 + 2) * 1000);
+        console.log("userinfo empty.");
+        if(t.class== '1') {
+            console.log("[DONE] Category: " + t.category);
+            setTimeout(function () {
+                that.wgetList();
+            }, (Math.random() * 4 + 2) * 1000);
+        } else {
+            t.pn++;
+            setTimeout(function () {
+                that.wgetList(t);
+            }, (Math.random() * 4 + 2) * 1000);
+        }
     } else {
         for (var i = 0; i < t['user_info'].length; i++){
             t['user_info'][i] = JSON.parse(t['user_info'][i]);
@@ -203,15 +232,18 @@ Rent.prototype.processData = function(t){
                             if(t.cat1_name == '教育培训')
                                 member = ua[user_id].bang_auth_year;
                             else
-                                for (x in ua[user_id].bang_auth_year)
+                                for (x in ua[user_id].bang_auth_year) {
                                     member = ua[user_id].bang_auth_year[x];
+                                    break;
+                                }
                         }
                     }
                 }
 
                 var top = $("a em.ico-stick-yellow",div).length;
                 var adTop = $("a em.ico-stick-red",div).length;
-                var jing = $("span.ico-hot",div).length;
+                var hot = $("span.ico-hot",this).length;
+                var jing = $("span.ico-jing",this).length;
                 var pub_date = $("span.fc9",div).eq(0).text().replace(/[\n\r,，]/g,";");
                 var title = $("p.t a.f14",div).text().trim().replace(/[\n\r,，]/g,";");
                 var url_title = $("p.t a.f14",div).attr("href");
@@ -219,7 +251,7 @@ Rent.prototype.processData = function(t){
 
                 if(member)
                     memberCount++;
-                var record = [t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,member,jing,top,adTop,pub_date,title,user,url_title,url_user,"\n"].join();
+                var record = [t.cityName,t.cat2_name,t.class,member,hot,jing,top,adTop,pub_date,title,user,url_title,url_user,"\n"].join();
                 fs.appendFileSync(that.resultDir+that.resultFile,record);
             }
         });
@@ -236,15 +268,18 @@ Rent.prototype.processData = function(t){
                         if(ua[user_id].biz_name)
                             user = ua[user_id].biz_name.replace(/[\n\r,，]/g,";");
                         if(ua[user_id].bang_auth_year){
-                            for (x in ua[user_id].bang_auth_year)
+                            for (x in ua[user_id].bang_auth_year) {
                                 member = ua[user_id].bang_auth_year[x];
+                                break;
+                            }
                         }
                     }
                 }
 
                 var top = $("a em.ico-stick-yellow",div).length;
                 var adTop = $("a em.ico-stick-red",div).length;
-                var jing = $("span.ico-hot",div).length;
+                var hot = $("span.ico-hot",this).length;
+                var jing = $("span.ico-jing",this).length;
                 var pub_date = $("span.fc9",div).eq(0).text().replace(/[\n\r,，]/g,";");
                 var title = $("p a.f14",div).text().trim().replace(/[\n\r,，]/g,";");
                 var url_title = $("p a.f14",div).attr("href");
@@ -252,28 +287,34 @@ Rent.prototype.processData = function(t){
 
                 if(member)
                     memberCount++;
-                var record = [t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,member,jing,top,adTop,pub_date,title,user,url_title,url_user,"\n"].join();
+                var record = [t.cityName,t.cat2_name,t.class,member,hot,jing,top,adTop,pub_date,title,user,url_title,url_user,"\n"].join();
                 fs.appendFileSync(that.resultDir+that.resultFile,record);
             }
         });
 
-
-        if ($("div.leftBox div.list ul li").length<10 || memberCount<=4) {
-            console.log("[DONE] less info,Region: " + t.regionName);
+        if(t.class== '1') {
+            console.log("[DONE] Category: " + t.cat2_name);
             setTimeout(function () {
                 that.wgetList();
-            }, (Math.random() * 2 + 2) * 1000);
-        } else if ($('.pageLink li a').last().attr("class") == "next" && t.pn < this.pagePerTask) {
-            data = null;
-            t.pn++;
-            setTimeout(function () {
-                that.wgetList(t);
-            }, (Math.random() * 2 + 2) * 1000);
+            }, (Math.random() * 4 + 2) * 1000);
         } else {
-            console.log("[DONE] Region: " + t.regionName);
-            setTimeout(function () {
-                that.wgetList();
-            }, (Math.random() * 2 + 2) * 1000);
+            if ($("div.leftBox div.list ul li").length<10 || memberCount<=4) {
+                console.log("[DONE] less info,Category: " + t.cat2_name);
+                setTimeout(function () {
+                    that.wgetList();
+                }, (Math.random() * 4 + 2) * 1000);
+            } else if ($('.pageLink li a').last().attr("class") == "next" && t.pn < this.pagePerTask) {
+                data = null;
+                t.pn++;
+                setTimeout(function () {
+                    that.wgetList(t);
+                }, (Math.random() * 4 + 2) * 1000);
+            } else {
+                console.log("[DONE] Category: " + t.cat2_name);
+                setTimeout(function () {
+                    that.wgetList();
+                }, (Math.random() * 4 + 2) * 1000);
+            }
         }
     }
 
