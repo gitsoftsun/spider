@@ -163,12 +163,20 @@ exports.request_data=function(opts,data,fn,args){
     {
         strData = JSON.stringify(strData);
     }
+    if(typeof opts == "string"){
+	var u = url.parse(opts);
+	opts = {host:u.host,path:u.path};
+    }
+    if(!opts.headers){
+	opts.headers = {};
+    }
     if(opts.method=='POST')
         opts.headers['Content-Length']=Buffer.byteLength(strData,'utf8');
-    opts.headers["Cookie"] = exports.CookieInstance.toString();
 
-    var req;
-    var request_timer = setTimeout(function() {
+    opts.headers["Cookie"] = exports.CookieInstance.toString();
+    
+    var req,request_timer,timeout=false;
+    request_timer = setTimeout(function() {
 	req.abort();
 	console.log('Request Timeout.');
     }, 15000);
@@ -176,9 +184,10 @@ exports.request_data=function(opts,data,fn,args){
     req = http.request(opts, function(res) {
 	clearTimeout(request_timer);
 	var response_timer = setTimeout(function() {
+	    timeout = true;
             res.destroy();
             console.log('Response Timeout.');
-	}, 16000);
+	}, 30000);
 	
 	//console.log(res.headers["set-cookie"]);
 	var cookiesToSet = res.headers["set-cookie"] || res.headers["Set-Cookie"];
@@ -206,6 +215,9 @@ exports.request_data=function(opts,data,fn,args){
             chunks.push(chunk);
 	});
     res.on('end',function(){
+	if(timeout){
+	    chunks=[];//response timeout, set stream empty.
+	}
 	clearTimeout(response_timer);
 	if(res.statusCode>300&&res.statusCode<400) {
 	    //reponse of redirecting, no need to process
@@ -213,10 +225,6 @@ exports.request_data=function(opts,data,fn,args){
 	}
         if(res.headers['content-encoding']=='gzip'){
             var buffer = Buffer.concat(chunks);
-	    if(buffer.length==157){
-		console.log("current ip has been forbidden.");
-		//process.exit();
-	    }
             zlib.gunzip(buffer,function(err,decoded){
 		if(decoded){
 		    try{
@@ -228,16 +236,16 @@ exports.request_data=function(opts,data,fn,args){
 			    fn(obj,[data],res);
 			}
 			else if(Array.isArray(args)){
-			    args.push(opts.data||data);
+			    var d = opts.data||data;
+			    if(d)
+				args.push(d);
 			    fn(obj,args,res);
 			}else{
 			    fn(obj,[args,opts.data||data],res);
 			}
-			
 		    }
 		    catch(e){
 			console.log(e.message);
-			
 		    }
 		}
             });
@@ -254,8 +262,10 @@ exports.request_data=function(opts,data,fn,args){
 			    fn(obj,[data],res);
 			}
 			else if(Array.isArray(args)){
-			    args.push(opts.data||data,res);
-			    fn(obj,args);
+			    var d = opts.data || data;
+			    if(d)
+				args.push(d);
+			    fn(obj,args,res);
 			}else{
 			    fn(obj,[args,opts.data||data],res);
 			}
@@ -271,10 +281,11 @@ exports.request_data=function(opts,data,fn,args){
 	    var buffer = Buffer.concat(chunks);
             if(res.headers['content-type']){
 		var cty = res.headers['content-type'].split(';');
-		if(cty.length>1&&cty[0].trim().toLowerCase()=="text/html"){
+		var tp = cty[0].trim().toLowerCase();
+		
+		if(cty.length>1&&(tp=="text/html"||tp=="application/json")){
                     if(cty[1].trim()!=''){
 			encode = cty[1].trim().split('=')[1];
-			//if(encode=="gb2312") encode="ascii";
                     }
 		}
             }
@@ -306,14 +317,20 @@ exports.request_data=function(opts,data,fn,args){
 	    }
             
             var obj=null;
-
+	    
 	    if(encode.toLowerCase()=="utf-8"){
 		obj = buffer.toString();
 	    }
 	    if(encode=="gb2312"||encode=="GBK"){
-		//obj = decodeFromGb2312(obj);
 		var gbk_to_utf8_iconv = new Iconv('GBK', 'UTF-8//TRANSLIT//IGNORE');
-		obj = gbk_to_utf8_iconv.convert(buffer).toString();
+		if(buffer.length>0){
+		    try{
+			obj = gbk_to_utf8_iconv.convert(buffer).toString();
+		    }catch(e){
+			console.log("[ERROR] %s",e.message);
+			buffer.length=0;
+		    }
+		}
             }
 	    if(!obj){
 		obj = buffer.toString();
@@ -331,7 +348,9 @@ exports.request_data=function(opts,data,fn,args){
 		fn(obj,[opts.data],res);
             }
             else if(Array.isArray(args)){
-		args.push(opts.data||data);
+		var d = opts.data||data;
+		if(d)
+		    args.push(d);
 		fn(obj,args,res);
             }else{
 		fn(obj,[args,opts.data||data],res);

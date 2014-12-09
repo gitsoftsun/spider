@@ -161,8 +161,8 @@ var url = require('url')
 var Dealer = function(){
     this.resultDir = "../../result/";
     this.dataDir = '../../appdata/';
-    this.resultFile = "bitadealer.txt";
-    this.progressFile = "bitadealer_progress.txt";
+    this.resultFile = "bitadealer_"+new Date().toString()+".txt";
+    this.progressFile = "bitadealer_progress_"+new Date().toString()+".txt";
     this.done = {};
     this.curPageIdx = 1;
     this.tasks = [];
@@ -184,6 +184,7 @@ Dealer.prototype.init = function(){
 	    this.tasks.push({path:brand.path,name:brand.brand,page:1,mode:j,id:undefined,audit:true});
 	}
     }
+    
     console.log("[INFO] task count: %d",this.tasks.length);
 }
 

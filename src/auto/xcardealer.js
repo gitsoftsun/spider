@@ -139,8 +139,8 @@ var cheerio = require('cheerio')
 var Dealer = function(){
     this.resultDir = "../../result/";
     this.dataDir = '../../appdata/';
-    this.resultFile = "xcardealer.txt";
-    this.processFile = "xcardealer_process.txt";
+    this.resultFile = "xcardealer_"+new Date().toString()+".txt";
+    this.processFile = "xcardealer_process_"+new Date().toString()+".txt";
     this.done = {};
     this.curPageIdx = 1;
 }
@@ -244,7 +244,7 @@ Dealer.prototype.processList = function(data,args,res){
 	args[0].pageIdx++;
 	setTimeout(function(){
 	    that.wgetList(args[0]);
-	},1000);
+	},100);
     }else{
 	//no more pages.
 	console.log("[DONE] %s, %d",args[0].brand,args[0].type);
@@ -254,12 +254,12 @@ Dealer.prototype.processList = function(data,args,res){
 	    args[0].maxPage = undefined;
 	    setTimeout(function(){
 		that.wgetList(args[0]);
-	    },1000);
+	    },100);
 	}else{
 	    fs.appendFileSync(this.resultDir+this.processFile,args[0].path+"\n");
 	    setTimeout(function(){
 		that.wgetList();
-	    },1000);
+	    },100);
 	}	
     }
 }
