@@ -4,7 +4,7 @@ var cheerio = require('cheerio')
 
 function Car() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/auto/';
     this.host = '.58.com';
     this.lastSendTime = new Date();
     this.cities = [];

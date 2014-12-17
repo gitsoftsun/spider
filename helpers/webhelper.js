@@ -104,7 +104,7 @@ exports.StringBuffer.prototype.removeLast = function(){
  *
  *
  */
-exports.HttpCookie = Object;
+exports.HttpCookie = function(){};
 
 //In reponse header, first "=" pair must be cookie-pair according to RFC 6265,
 //and querystring seems parse string in sequential order.
@@ -156,7 +156,7 @@ exports.HttpCookie.prototype.add = function(cookie,val){
 exports.CookieInstance = new exports.HttpCookie();
 
 exports.request_data=function(opts,data,fn,args){
-    if(!opts || !fn) throw "argument null 'opt' or 'data'";
+    if(!opts || !fn) throw "argument null 'opt' or 'fn'";
     
     var strData = data;
     if(typeof strData != 'string'  )
@@ -364,7 +364,12 @@ exports.request_data=function(opts,data,fn,args){
 	console.log(e.message);
         //retry
         //exports.request_data(opts,data,fn,args);
-	fn(null,[args,opts.data||data]);
+	var obj=null,res=null,
+	d = opts.data||data,
+	params=[];
+	args = args?(Array.isArray(args)?args:[args]):[];
+	if(d) args.push(d);
+	fn(obj,args,res);
     });
     if(opts.method=='POST')
         req.write(strData);
@@ -719,6 +724,10 @@ Date.prototype.toYYMMDD = function () {
     return this.getFullYear() + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
     //return this.getFullYear()+"-"+month+"-"+day;
 };
+
+Date.prototype.toDatetime = function(){
+    return this.toYYMMDD();
+}
 
 Date.prototype.toString = function (format) {
     var month = this.getMonth() < 9?("0" + (this.getMonth() + 1)):(this.getMonth() + 1);

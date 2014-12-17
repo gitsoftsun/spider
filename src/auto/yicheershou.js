@@ -220,7 +220,7 @@ var brands = [{"name":"安驰","path":"/anchi-116/"},
 	      {"name":"中兴","path":"/zxauto/"}];
 
 var ershou = function(){
-    this.resultDir = "../../result/";
+    this.resultDir = "../../result/auto/";
     this.dataDir = '../../appdata/';
     this.resultFile = "yicheershou_"+new Date().toString()+".txt";
     this.progressFile = "yicheershou_progress_"+new Date().toString()+".txt";
@@ -265,7 +265,7 @@ ershou.prototype.wgetList = function(t){
     var host = "www.taoche.com";
     var path = t.path;
     
-    var opt = null;
+p    var opt = null;
     opt = new helper.basic_options(host,path,"GET",false,false,{"onsale":1,"page":t.page});
     opt.agent = false;
     

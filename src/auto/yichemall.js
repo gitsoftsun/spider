@@ -4,7 +4,7 @@ var cheerio = require('cheerio')
 var http = require("http");
 var qs = require("querystring");
 var Mall = function(){
-    this.resultDir = "../../result/";
+    this.resultDir = "../../result/auto/";
     this.dataDir = '../../appdata/';
     this.resultFile = "yichemall_"+new Date().toString()+".txt";
     this.resultItemsFile = "yichemall_items_"+new Date().toString()+".txt";
@@ -47,7 +47,7 @@ Mall.prototype.getMaxPage = function(fn){
 	}
 	var $ = cheerio.load(data);
 	that.maxPage = Number($(".pagin a").last().text());
-
+	
 	console.log("[DATA] max page: %d",that.maxPage);
 	
     });*/
@@ -120,7 +120,7 @@ Mall.prototype.listEnd = function(){
 Mall.prototype.wgetDetail = function(t){
     if(this.items==null){
 	this.items=fs.readFileSync(this.resultDir+this.resultItemsFile).toString().split('\n');
-	console.log("[INFO] total items: %d",this.items);
+	console.log("[INFO] total items: %d",this.items.length);
     }
     if(!t){
 	var t = null;

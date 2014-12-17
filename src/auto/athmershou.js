@@ -138,7 +138,7 @@ var fs = require('fs')
 var helper = require('../../helpers/webhelper.js')
 
 var ershou = function(){
-    this.resultDir = "../../result/";
+    this.resultDir = "../../result/auto/";
     this.dataDir = '../../appdata/';
     this.resultFile = "athmershou_"+new Date().toString()+".txt";
     this.progressFile = "athmershou_progress_"+new Date().toString()+".txt";

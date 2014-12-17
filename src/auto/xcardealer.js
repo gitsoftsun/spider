@@ -137,7 +137,7 @@ var helper = require('../../helpers/webhelper.js')
 var cheerio = require('cheerio')
 
 var Dealer = function(){
-    this.resultDir = "../../result/";
+    this.resultDir = "../../result/auto/";
     this.dataDir = '../../appdata/';
     this.resultFile = "xcardealer_"+new Date().toString()+".txt";
     this.processFile = "xcardealer_process_"+new Date().toString()+".txt";

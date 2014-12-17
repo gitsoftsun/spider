@@ -159,7 +159,7 @@ var cheerio = require('cheerio')
 var url = require('url')
 
 var Dealer = function(){
-    this.resultDir = "../../result/";
+    this.resultDir = "../../result/auto/";
     this.dataDir = '../../appdata/';
     this.resultFile = "bitadealer_"+new Date().toString()+".txt";
     this.progressFile = "bitadealer_progress_"+new Date().toString()+".txt";

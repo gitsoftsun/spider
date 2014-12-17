@@ -23,6 +23,10 @@ lefeng.prototype.start = function(){
 }
 
 lefeng.prototype.init = function(){
+    if(!fs.existsSync(this.resultDir+this.resultFile)){
+	fs.appendFileSync(this.resultDir+this.resultFile,['日期','分类','标题','商品编号','市场价','乐蜂价','购买人数','品牌','规格','\n'].join('\t'));
+    };
+    
     this.categories = fs.readFileSync(this.dataDir + this.categoryFile).toString().split("\n").filter(function(line){
 	if(!line || !line.trim())
 	    return false;
@@ -55,9 +59,6 @@ lefeng.prototype.init = function(){
 	    }
 	},category);
     });
-    if(!fs.existsSync(this.resultDir+this.resultFile)){
-	fs.appendFileSync(this.resultDir+this.resultFile,['日期','分类','标题','商品编号','市场价','乐蜂价','购买人数','品牌','规格','\n'].join('\t'));
-    };
 }
 
 lefeng.prototype.wgetList = function(t){

@@ -59,7 +59,7 @@ Worker.prototype.wgetPromotion = function(){
 	    that.promos[cate.name]=[];
 	}
 	helper.request_data(opt,null,function(data,args,res){
-	    console.log("[INFO] got promotion: %s",args[0].name);
+	    console.log("[INFO] %s got promotion: %s",new Date().toDatetime(),args[0].name);
 	    var $ = cheerio.load(data);
 	    var filter = function(){
 		var link = $(this).attr('href');
@@ -88,10 +88,10 @@ Worker.prototype.wgetList = function(t){
     var matches = objUrl.pathname.match(/\d*_\d+_(\d+)/);
     var promoId = matches && matches.length>1 && matches[1];
     if(!promoId){
-	console.log("[ERROR] cannot get promoId: %s",t.link);
+	console.log("[ERROR] %s cannot get promoId: %s",new Date().toDatetime(),t.link);
 	wgetList(t);
     }
-    console.log("[INFO] GET: %s,%d/%d",t.name,t.pageIdx,t.total);
+    console.log("[INFO] %s GET: %s,%d/%d",new Date().toDatetime(),t.name,t.pageIdx,t.total);
     var opt = new helper.basic_options("pop.jumei.com","/ajax_details-"+promoId+"-"+t.pageIdx+"-sales_desc-0-0.html","GET",false,true);
     helper.request_data(opt,null,function(data,args,res){
 	that.processList(data,args,res);
@@ -125,7 +125,7 @@ Worker.prototype.parseList = function(data,args){
 
 Worker.prototype.processList = function(data,args,res){
     if(!data){
-	console.log("[ERROR] data empty.");
+	console.log("[ERROR] %s data empty.",new Date().toDatetime());
 	this.wgetList(args[0]);
     }
     if(typeof data =='string'){

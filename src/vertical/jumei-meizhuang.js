@@ -36,7 +36,7 @@ Worker.prototype.init = function(){
 	process.exit(1);
     }
     if(!fs.existsSync(this.resultDir+this.resultFile)){
-	fs.appendFileSync(['URL','商品编号','标题','价格','折扣','品牌','分类','规格','是否特卖','是否抢光','购买人数','结束日期','\n'].join('\t'));
+	fs.appendFileSync(this.resultDir+this.resultFile,['URL','商品编号','标题','价格','折扣','品牌','分类','规格','是否特卖','是否抢光','购买人数','结束日期','\n'].join('\t'));
     }
 }
 
@@ -53,6 +53,7 @@ Worker.prototype.wget = function(){
 	    console.log("[INFO] got category: %s",args[0].name);
 	    var $ = cheerio.load(data);
 	    $("#classification").first().find("ul li a").each(function(){
+		if(!$(this).attr('href')) return;
 		that.tasks.push({
 		    'url':$(this).attr('href'),
 		    'brand':$(this).attr('title'),
@@ -77,7 +78,7 @@ Worker.prototype.wgetList = function(t){
 	t.pageIdx = 1;
     }
     
-    console.log("[INFO] GET: %s,%d/%d",t.brand,t.pageIdx,t.total);
+    console.log("[INFO] %s GET: %s,%d/%d",new Date().toDatetime(),t.brand,t.pageIdx,t.total);
     //var opt = new helper.basic_options("pop.jumei.com","/ajax_details-"+promoId+"-"+t.pageIdx+"-sales_desc-0-0.html","GET",false,true);
     helper.request_data(t.url,null,function(data,args,res){
 	that.processList(data,args,res);
@@ -86,8 +87,9 @@ Worker.prototype.wgetList = function(t){
 
 Worker.prototype.processList = function(data,args,res){
     if(!data){
-	console.log("[ERROR] data empty.");
+	console.log("[ERROR] %s data empty.",new Date().toDatetime());
 	this.wgetList(args[0]);
+	return;
     }
     var $ = cheerio.load(data);
     if(!args[0].total){
@@ -134,7 +136,7 @@ Worker.prototype.processList = function(data,args,res){
 	}
     });
     fs.appendFileSync(this.resultDir+this.resultFile,records.join('\n'));
-    console.log("[INFO] product of %s,%d/%d done.",args[0].brand,args[0].pageIdx,args[0].total);
+    console.log("[INFO] %s,%d/%d done.",args[0].brand,args[0].pageIdx,args[0].total);
     if(args[0].products.length>0){
 	console.log("[INFO] mall deal starting, total :%d",args[0].products.length);
 	this.wgetDetail(args);
@@ -152,7 +154,7 @@ Worker.prototype.wgetDetail = function(args,p){
 	p = args[0].products.shift();
     }
     if(!p){
-	console.log("[INFO] brand %s of %d/%d complete.",args[0].brand,args[0].pageIdx,args[0].total);
+	console.log("[INFO] %s brand %s of %d/%d complete.",new Date().toDatetime(),args[0].brand,args[0].pageIdx,args[0].total);
 	if(args[0].done.length>1){
 	    fs.appendFileSync(this.resultDir+this.resultFile,args[0].done.join('\n'));
 	}
@@ -160,13 +162,17 @@ Worker.prototype.wgetDetail = function(args,p){
 	    ++args[0].pageIdx;
 	    this.wgetList(args[0]);
 	}else{
-	    console.log("[INFO] %s done.",args[0].brand);
+	    console.log("[INFO] %s %s done.",new Date().toDatetime(),args[0].brand);
 	    this.wgetList();
 	}
     }else{
+	if(!p[1]){
+	    this.wgetDetail(args);
+	    return;
+	}
 	args.push(p);
-	console.log("[INFO] GET %s",p);
-	helper.request_data(p[0],null,function(data,a){
+	console.log("[INFO] %s GET %s",new Date().toDatetime(),p);
+	helper.request_data(p[1],null,function(data,a){
 	    var r = that.processDetail(data,a)
 	    if(r){
 		args[0].done.push(r.join('\t'));
