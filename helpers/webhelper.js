@@ -179,7 +179,7 @@ exports.request_data=function(opts,data,fn,args){
     request_timer = setTimeout(function() {
 	req.abort();
 	console.log('Request Timeout.');
-    }, 15000);
+    }, 20000);
     
     req = http.request(opts, function(res) {
 	clearTimeout(request_timer);
