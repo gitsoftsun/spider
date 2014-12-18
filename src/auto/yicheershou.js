@@ -265,7 +265,7 @@ ershou.prototype.wgetList = function(t){
     var host = "www.taoche.com";
     var path = t.path;
     
-p    var opt = null;
+    var opt = null;
     opt = new helper.basic_options(host,path,"GET",false,false,{"onsale":1,"page":t.page});
     opt.agent = false;
     

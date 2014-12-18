@@ -83,17 +83,25 @@ Dealer.prototype.processList = function(data,args,res){
     }
     var $ = cheerio.load(data);
     var records = [""];
-    $("ul.auto-box li a.links").each(function(){
-	var name = $("h4",this).text().trim();
-	name = name && name.replace(/[\s]/g,'');
-	var price = $("div.rotate-wrap strong",this).text().trim();
-	var delta = $("div.rotate-wrap em",this).text().trim();
-	var matches = $("p span",this).eq(0).text().match(/\d+/);
+    $("ul.card-list li.card a").each(function(){
+	var name = $("h2",this).text().trim();
+	name = name && name.replace(/\s/g,'');
+	var price = $("strong.promotion-bigcard-price",this).text().trim();
+	if(!price)
+	    return;
+	
+	var delta = $("strong.promotion-bigcard-info",this).text().trim();
+	var matches = $("p.promotion-bigcard-leftnumber",this).eq(0).text().match(/\d+/);
 	var leftCount = matches && matches[0];
-	var leftTime = $("p span",this).eq(1).text().trim();
-	var promo = $("p.auto-boxst").text().trim();
+	var leftTime = $("label.mallTimer",this).attr("data-seconds");
+	var started = true;
+	if(!leftTime){
+	    leftTime = $("p.promotion-bigcard-lefttime label",this).text();
+	    started = false;
+	}
+	var promo = $("div.promotion-bigcard-footer",this).text().trim();
 	promo = promo && promo.replace(/[\s]/g,'');
-	var record = [args[0].name,name,price,delta,leftCount,leftTime,promo].join('\t');
+	var record = [args[0].name,name,price,delta,leftCount,leftTime,promo,started?"Y":"N"].join('\t');
 	console.log(record);
 	records.push(record);
     });
