@@ -213,7 +213,7 @@ Task.prototype.add = function(ts){
 Task.prototype.invoke = function(){
     
 }
-    
+
 ershou.prototype.processList = function(data,args,res){
     if(!data){
 	console.log("[ERROR] data empty");
@@ -253,11 +253,13 @@ ershou.prototype.processList = function(data,args,res){
 	args[0].page++;
 	setTimeout(function(){
 	    that.wgetList(args[0]);
-	},0);
+	},2000);
     }else{
 	console.log("[DONE] %s",args[0].name);
 	fs.appendFileSync(this.resultDir+this.progressFile,args[0].name+"\n");
-	this.wgetList();
+	setTimeout(function(){
+	    that.wgetList();
+	},3000);
     }
 }
 
