@@ -110,6 +110,7 @@ Rent.prototype.processList = function(data,args,res){
             var url_user = $("a.u",td).attr("href");
             var wlt = $("span[class^='wlt']",td);
             var member = 0;
+            var pubDate = '';
             if(wlt.length>0){
                 member = wlt.attr("class").replace(/wlt/,"");
             }
@@ -121,13 +122,16 @@ Rent.prototype.processList = function(data,args,res){
             //personal = personal && personal.trim().replace(/[\(\)]/g,"");
             //var houseName = $("div.qj-listleft>a",td).text().trim().replace(/[\s]/g,"").replace(/[,，]/g,";");
 
-            //var pubDate = $("div.qj-listleft span.qj-listjjr",td).contents().last().text().trim();
+            var div_text = $("td.t",this).text().trim().replace(/[\s]/g,"").replace(/[,，]/g,";");
+            var exec_result = /\((今天|\d{1,2}分钟|\d{1,2}小时|\d{1,2}-\d{1,2})\)/.exec(div_text);
+            if(exec_result)
+                pubDate = exec_result[1];
 
-            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,member,jing,top,title,user,url_title,url_user,"\n"].join();
+            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,member,jing,top,pubDate,title,user,url_title,url_user,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
             //console.log("[DONE] %s",record);
         });
-        
+
         if(args[0].class == '1') {
             console.log("[DONE] Category: " + args[0].cat1_name);
             setTimeout(function () {
