@@ -16,11 +16,11 @@ Rent.prototype.init = function(){
     this.tasks = [];
     for(var i=0; i< this.cities.length;i++){
         var city = this.cities[i];
-        var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"category":city.cname,"class":'1'};
+        var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":"全部","regionName":"全部","category":city.cname,"class":'1'};
         this.tasks.push(tmp);
         for(var j=0;j<city.districts.length;j++){
             var district = city.districts[j];
-            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":district.name,"districtPinyin":district.pinyin,"category":district.name,"class":'2'};
+            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":district.name,"districtPinyin":district.pinyin,"regionName":"全部","category":district.name,"class":'2'};
             this.tasks.push(tmp);
             if(district.regions.length!=0){
                 for(var k=0;k<district.regions.length;k++){
@@ -116,7 +116,7 @@ Rent.prototype.processList = function(data,args,res){
         	var hot = $("span.ico-hot",this).length;
             var jing = $("span.ico-jing",this).length;
         	//jjrName||"",jjcmp||"",jjbranchcmp||""
-        	var record = [args[0].cityName,args[0].category,args[0].class,member,hot,jing,top,adTop,name,houseName||"",pubDate||"",url,"\n"].join();
+        	var record = [args[0].cityName,args[0].districtName,args[0].regionName,member,hot,jing,top,adTop,name,houseName||"",pubDate||"",url,"\n"].join();
         	fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
         

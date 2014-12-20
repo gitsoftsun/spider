@@ -30,7 +30,7 @@ Rent.prototype.init = function(){
         if(!line) return;
         line = line.replace('\r', '');
         var vals = line.split(',');
-        return {"cat_name": vals[0], "cat_ename": vals[1], "class": vals[2]};
+        return {"class": vals[0], "cat1_name": vals[1], "cat2_name": vals[2], "cat3_name": vals[3],"cat_ename": vals[4], };
     });
 
     //add service task
@@ -40,7 +40,7 @@ Rent.prototype.init = function(){
         for(var j=0;j<this.services.length;j++){
             var service = this.services[j];
             if (!service) continue;
-            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat_name":service.cat_name,"cat_ename":service.cat_ename,"class":service.class};
+            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat2_name":service.cat2_name,"cat3_name":service.cat3_name,"cat_ename":service.cat_ename,"class":service.class};
             this.tasks.push(tmp);
         }
     }
@@ -72,7 +72,7 @@ Rent.prototype.wgetList = function(t){
     var name = t.regionName || t.districtName;
     var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_ename+"/pn"+t.pn+"/");
     opt.agent = false;
-    console.log("[GET ] %s, %s, %d",t.cityName,t.cat_name,t.pn);
+    console.log("[GET ] %s, %s, %s, %s, %d",t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,t.pn);
     helper.request_data(opt,null,function(data,args,res){
     	that.processList(data,args,res);
     },t);
@@ -82,7 +82,7 @@ Rent.prototype.processList = function(data,args,res){
     if(!data){
         console.log("data empty.");
         if(args[0].class == '1' || args[0].class == '2') {
-            console.log("[DONE] Category: " + args[0].cat_name);
+            console.log("[DONE] Category: %s, %s", args[0].cat1_name, args[0].cat2_name);
             setTimeout(function () {
                 that.wgetList();
             }, (Math.random() * 2 + 2) * 1000);
@@ -107,7 +107,6 @@ Rent.prototype.processList = function(data,args,res){
             var td = $("td.t",this);
             var title = $("a.t",td).text().replace(/[\n\r,，]/g,";");
             var post_time = $("span.post_time",td).text()
-            var description = $("p",td).eq(1).text().trim().replace(/[\n\r,，]/g,";");
             var url_title = $("a.t",td).attr("href");
             var wlt = $("span[class^='wlt']",td);
             var member = 0;
@@ -119,18 +118,18 @@ Rent.prototype.processList = function(data,args,res){
             var jing = $("span.jingpin",td).length;
             var top = $("a.ico.ding",td).length;
 
-            var record = [args[0].cityName,args[0].cat_name,args[0].class,member,jing,top,title,post_time,description,url_title,"\n"].join();
+            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,args[0].cat3_name,member,jing,top,title,post_time,url_title,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
 
         if(args[0].class == '1' || args[0].class == '2') {
-            console.log("[DONE] Category: " + args[0].cat_name);
+            console.log("[DONE] Category: %s, %s", args[0].cat1_name, args[0].cat2_name);
             setTimeout(function () {
                 that.wgetList();
             }, (Math.random() * 2 + 2) * 1000);
         } else {
             if (end_flag || $("div#infolist > table.tbimg tr").length<10 || memberCount<4) {
-                console.log("[DONE] less info,Category: " + args[0].cat_name);
+                console.log("[DONE] less info,Category: " + args[0].cat3_name);
                 setTimeout(function () {
                     that.wgetList();
                 }, (Math.random() * 2 + 2) * 1000);
@@ -141,7 +140,7 @@ Rent.prototype.processList = function(data,args,res){
                     that.wgetList(args[0]);
                 }, (Math.random() * 2 + 2) * 1000);
             } else {
-                console.log("[DONE] Category: " + args[0].cat_name);
+                console.log("[DONE] Category: " + args[0].cat3_name);
                 setTimeout(function () {
                     that.wgetList();
                 }, (Math.random() * 2 + 2) * 1000);

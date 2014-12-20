@@ -32,7 +32,7 @@ Rent.prototype.init = function(){
         if(!line) return;
         line = line.replace('\r', '');
         var vals = line.split(',');
-        return {"cat_name": vals[0], "cat_ename": vals[1], "class": vals[2]};
+        return {"class":vals[0],"cat1_name":vals[1],"cat1_ename":vals[2],"cat2_name":vals[3],"cat3_name":vals[4],"cat_ename": vals[5]};
     });
 
     //add service task
@@ -42,7 +42,7 @@ Rent.prototype.init = function(){
         for(var j=0;j<this.services.length;j++){
             var service = this.services[j];
             if (!service) continue;
-            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat_name":service.cat_name,"cat_ename":service.cat_ename,"class":service.class};
+            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat1_ename":service.cat1_ename,"cat2_name":service.cat2_name,"cat3_name":service.cat3_name,"cat_ename":service.cat_ename,"class":service.class};
             this.tasks.push(tmp);
         }
     }
@@ -50,7 +50,6 @@ Rent.prototype.init = function(){
     var arguments = process.argv.splice(2);
     var start = Number(arguments[0]);
     var len = Number(arguments[1]);
-    this.resultFile = this.resultFile + '.' + start + '.' + (start + len);
     //前闭后开区间
     this.tasks = this.tasks.slice(start,start+len);
     console.log("[INFO] task count: %d",this.tasks.length);
@@ -73,10 +72,10 @@ Rent.prototype.wgetList = function(t){
     }
     var pinyin = t.regionPinyin || t.districtPinyin;
     var name = t.regionName || t.districtName;
-    if(t.cat1_ename)
-        var opt = new helper.basic_options(t.cityPinyin+".ganji.com","/"+t.cat3_enname+"/o"+t.pn+t.cat1_ename+"/");
+    if(t.class == 3)
+        var opt = new helper.basic_options(t.cityPinyin+".ganji.com","/"+t.cat_ename+"/o"+t.pn+t.cat1_ename+"/");
     else
-        var opt = new helper.basic_options(t.cityPinyin+".ganji.com","/"+t.cat3_enname+"/o"+t.pn+"/");
+        var opt = new helper.basic_options(t.cityPinyin+".ganji.com",t.cat_ename);
     opt.agent = false;
     console.log("[GET ] %s, %s, %s, %s, %d",t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,t.pn);
     helper.request_data(opt,null,function(data,args,res){
@@ -85,8 +84,20 @@ Rent.prototype.wgetList = function(t){
 }
 
 Rent.prototype.processList = function(data,args,res){
-    if(!data)
-        console.log('data empty');
+    if(!data) {
+        console.log("data empty.");
+        if(args[0].class == '1' || args[0].class == '2') {
+            console.log("[DONE] Category: %s, %s", args[0].cat1_name, args[0].cat2_name);
+            setTimeout(function () {
+                that.wgetList();
+            }, (Math.random() * 4 + 2) * 1000);
+        } else {
+            args[0].pn++;
+            setTimeout(function () {
+                that.wgetList(args[0]);
+            }, (Math.random() * 4 + 2) * 1000);
+        }
+    }
     else {
         t = args[0];
         var $ = cheerio.load(data);
@@ -110,24 +121,30 @@ Rent.prototype.processList = function(data,args,res){
             var record = [t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,member,hot,top,adTop,pub_date,title,user,url_title,url_user,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
-    }
-
-    if (!data || $("div.leftBox div.layoutlist dl.list-pic").length<10 || memberCount<=4) {
-        console.log("[DONE] less info,Region: " + t.regionName);
-        setTimeout(function () {
-            that.wgetList();
-        }, (Math.random() * 2 + 2) * 1000);
-    } else if ($('.pageLink li a').last().attr("class") == "next" && t.pn < this.pagePerTask) {
-        data = null;
-        t.pn++;
-        setTimeout(function () {
-            that.wgetList(t);
-        }, (Math.random() * 2 + 2) * 1000);
-    } else {
-        console.log("[DONE] Region: " + t.regionName);
-        setTimeout(function () {
-            that.wgetList();
-        }, (Math.random() * 2 + 2) * 1000);
+        if(args[0].class == '1' || args[0].class == '2') {
+            console.log("[DONE] Category: %s, %s", args[0].cat1_name, args[0].cat2_name);
+            setTimeout(function () {
+                that.wgetList();
+            }, (Math.random() * 4 + 2) * 1000);
+        } else {
+            if (!data || $("div.leftBox div.layoutlist dl.list-pic").length<10 || memberCount<=4) {
+                console.log("[DONE] less info,Category: " + t.cat3_name);
+                setTimeout(function () {
+                    that.wgetList();
+                }, (Math.random() * 4 + 2) * 1000);
+            } else if ($('.pageLink li a').last().attr("class") == "next" && t.pn < this.pagePerTask) {
+                data = null;
+                t.pn++;
+                setTimeout(function () {
+                    that.wgetList(t);
+                }, (Math.random() * 4 + 2) * 1000);
+            } else {
+                console.log("[DONE] Category: " + t.cat3_name);
+                setTimeout(function () {
+                    that.wgetList();
+                }, (Math.random() * 4 + 2) * 1000);
+            }
+        }
     }
 }
 

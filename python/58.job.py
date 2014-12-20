@@ -17,8 +17,15 @@ def get_category():
     for i in range(len(htmlPq) - 1):
         cat1_name = htmlPq.eq(i)("dt a").text()
         cat1_ename = htmlPq.eq(i)("dt a").attr['href'].strip('/')
-        entity = cat1_name + ',' + cat1_ename + ',' + '1' + '\n'
+        entity = '1,' + cat1_name + u',全部' + ',' + cat1_ename + '\n'
         fw.write(entity.encode('utf8'))
+
+        dd = htmlPq.eq(i)("dd a")
+        for j in range(len(dd)):
+            cat2_name = dd.eq(j).text()
+            cat2_ename = dd.eq(j).attr['href'].strip('/')
+            entity = '2,' + cat1_name + ',' + cat2_name + ',' + cat2_ename + '\n'
+            fw.write(entity.encode('utf8'))
     fw.close()
 
 def get_sub_category():

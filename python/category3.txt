@@ -560,6 +560,7 @@
 商务服务,建筑维修,窗口加固,chuankoujg
 商务服务,建筑维修,粘钢加固,zhangangjg
 商务服务,建筑维修,高空防腐,gkff
+商务服务,建筑维修,混凝土切割加固,hntjg
 商务服务,工商注册,内资公司注册,gongsizhuce
 商务服务,工商注册,海外公司注册,haiwaizhuce
 商务服务,工商注册,外资公司注册,waizizhuce
@@ -1199,6 +1200,7 @@
 招商加盟,网络服务加盟,淘宝代理,taobaodaili
 招商加盟,特色加盟,移动通讯,yidongtxjm
 招商加盟,特色加盟,数码电子,shumadzjm
+招商加盟,特色加盟,技术转让,jishuzhuanrang
 招商加盟,特色加盟,其他,qitajm
 招商加盟,生活服务加盟,快递物流,kuaidijm
 招商加盟,生活服务加盟,旅游/票务,lvyoujm
@@ -1413,7 +1415,9 @@
 批发采购,灯具照明,冷光源,lengguangyuan
 批发采购,灯具照明,插头插座,chaotouchazuo
 批发采购,灯具照明,灯具配件,dengjupeijian
-批发采购,原材料,原材料,yuanliao
+批发采购,原材料,冶金,yejincailiao
+批发采购,原材料,化工原料,huagongyl
+批发采购,原材料,橡胶制品,xiangjiaolei
 批发采购,机械加工,钣金加工,banjinjg
 批发采购,机械加工,模具加工,mujujg
 批发采购,机械加工,管件加工,guanjianjg

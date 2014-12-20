@@ -30,7 +30,7 @@ Rent.prototype.init = function(){
         if(!line) return;
         line = line.replace('\r', '');
         var vals = line.split(',');
-        return {"cat1_name": vals[0], "cat2_name": vals[1], "cat2_ename": vals[2], "class": vals[3]};
+        return {"class": vals[0], "cat1_name": vals[1], "cat2_name": vals[2], "cat_ename": vals[3]};
     });
 
     //add service task
@@ -40,7 +40,7 @@ Rent.prototype.init = function(){
         for(var j=0;j<this.services.length;j++){
             var service = this.services[j];
             if (!service) continue;
-            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat2_name":service.cat2_name,"cat2_ename":service.cat2_ename,"class":service.class};
+            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat2_name":service.cat2_name,"cat_ename":service.cat_ename,"class":service.class};
             this.tasks.push(tmp);
         }
     }
@@ -70,7 +70,7 @@ Rent.prototype.wgetList = function(t){
     }
     var pinyin = t.regionPinyin || t.districtPinyin;
     var name = t.regionName || t.districtName;
-    var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat2_ename+"/pn"+t.pn+"/");
+    var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_ename+"/pn"+t.pn+"/");
     opt.agent = false;
     console.log("[GET ] %s, %s, %s, %d",t.cityName,t.cat1_name,t.cat2_name,t.pn);
     helper.request_data(opt,null,function(data,args,res){
@@ -82,7 +82,7 @@ Rent.prototype.processList = function(data,args,res){
     if(!data){
         console.log("data empty.");
         if(args[0].class == '1') {
-            console.log("[DONE] Category: " + args[0].cat2_name);
+            console.log("[DONE] Category: " + args[0].cat1_name);
             setTimeout(function () {
                 that.wgetList();
             }, (Math.random() * 4 + 2) * 1000);
@@ -123,13 +123,13 @@ Rent.prototype.processList = function(data,args,res){
 
             //var pubDate = $("div.qj-listleft span.qj-listjjr",td).contents().last().text().trim();
 
-            var record = [args[0].cityName,args[0].cat2_name,args[0].class,member,jing,top,title,user,url_title,url_user,"\n"].join();
+            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,member,jing,top,title,user,url_title,url_user,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
             //console.log("[DONE] %s",record);
         });
         
         if(args[0].class == '1') {
-            console.log("[DONE] Category: " + args[0].cat2_name);
+            console.log("[DONE] Category: " + args[0].cat1_name);
             setTimeout(function () {
                 that.wgetList();
             }, (Math.random() * 2 + 2) * 1000);

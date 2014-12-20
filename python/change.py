@@ -1,14 +1,18 @@
-fr1 = open("ganjijob.txt", 'r')
-fr2 = open("ganji.job1.txt", 'r')
-fw = open("ganji.job0.txt", 'w')
 
-for line in fr2:
-    fw.write(line)
-for line in fr1:
-    line = line.strip().split(',')
-    del line[0]
-    del line[0]
-    line.append('2')
-    entity = ','.join(line) + '\n'
-    fw.write(entity)
-fw.close()
+fr = open("ganji.ershouche.txt", 'r')
+fw = open("tmp.txt", 'w')
+
+for line in fr:
+    tmp = line.strip().split(',')
+    tmp1 = ''
+    if len(tmp) == 5:
+        tmp1 += tmp[0] + ','
+        tmp1 += tmp[1] + ','
+        tmp1 += ','
+        tmp1 += tmp[2] + ','
+        tmp1 += tmp[3] + ','
+        tmp1 += tmp[4] + '\n'
+        print tmp1
+        fw.write(tmp1)
+    else:
+        fw.write(line)

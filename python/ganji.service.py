@@ -12,16 +12,22 @@ def get_category():
     category = []
     html = urllib2.urlopen(URL + '/huangye/').read()
     htmlPq = pq(html)("#wrapper div.left-nav-list div.item");
-    fw = open('ganji.service1.txt', 'w')
+    fw = open('ganji.service.txt', 'w')
     for i in range(len(htmlPq)):
         cat1_pq = htmlPq.eq(i)('p.tit.fb a')
         cat1_name = cat1_pq.text()
         cat2_pq = htmlPq.eq(i)('div.s-class dl')
-        for i in range(len(cat2_pq)):
-            cat2_name = cat2_pq.eq(i)("dt a").text()
-            cat2_ename = cat2_pq.eq(i)("dt a").attr['href'].strip('/')
-            entity = cat1_name + ',' + cat2_name + ',' + cat2_ename + ',' + '1' + '\n'
+        for j in range(len(cat2_pq)):
+            cat2_name = cat2_pq.eq(j)("dt a").text()
+            cat2_ename = cat2_pq.eq(j)("dt a").attr['href'].strip('/')
+            entity = '1,' + cat2_name + ',' + u'全部,' + cat2_ename + '\n'
             fw.write(entity.encode('utf8'))
+            cat3_pq = cat2_pq.eq(j)("dd a")
+            for k in range(len(cat3_pq)):
+                cat3_name = cat3_pq.eq(k).text()
+                cat3_ename = cat3_pq.eq(k).attr['href'].strip('/')
+                entity = '2,' + cat2_name + ',' + cat3_name + ',' + cat3_ename + '\n'
+                fw.write(entity.encode('utf8'))
     fw.close()
 
 def get_sub_category():
@@ -69,7 +75,7 @@ def get_min_category():
 
 def main():
     get_category()
-    get_sub_category()
-    get_min_category()
+    #get_sub_category()
+    #get_min_category()
 
 main()

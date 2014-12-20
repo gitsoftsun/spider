@@ -13,7 +13,7 @@ def get_category():
     category = []
     html = urllib2.urlopen(URL + '/ershouche/').read()
     htmlPq = pq(html)("#seltion div.seltion-cont dl.selitem.lh24.clearfix").eq(0)("a");
-    fw = open('category1.txt', 'w')
+    fw = open('category4.txt', 'w')
     for i in range(1, len(htmlPq)):
         url = htmlPq.eq(i).attr['href']
         cname = htmlPq.eq(i).text()
@@ -22,8 +22,8 @@ def get_category():
     fw.close()
 
 def get_sub_category():
-    fr = open('category1.txt', 'r')
-    fw = open('category2.txt', 'w')
+    fr = open('category4.txt', 'r')
+    fw = open('category5.txt', 'w')
     for line in fr:
         (name, url) = line.strip().split(',')
         print 'processing ', name
@@ -45,8 +45,8 @@ def get_sub_category():
     fw.close()
 
 def get_min_category():
-    fr = open('category2.txt', 'r')
-    fw = open('category3.txt', 'w')
+    fr = open('category5.txt', 'r')
+    fw = open('category6.txt', 'w')
     for line in fr:
         (name, sub_name, url) = line.strip().split(',')
         print 'processing ', name, sub_name
@@ -72,7 +72,7 @@ def get_min_category():
 def get_pinyin():
     fr1 = open('category1.txt', 'r')
     fr3 = open('category3.txt', 'r')
-    fw = open('ganji.ershouche.txt', 'w')
+    fw = open('ganji.ershouche.txt', 'a')
     name_dic = {}
     for line in fr1:
         name, ename = line.strip().split(',')
@@ -90,9 +90,9 @@ def get_pinyin():
 
 
 def main():
-    get_category()
+    #get_category()
     #get_sub_category()
-    #get_min_category()
+    get_min_category()
     #get_pinyin()
 
 

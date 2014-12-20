@@ -39,12 +39,13 @@ def get_sub_category():
     fw.close()
 
 def get_min_category():
-    fr = open('category2.txt', 'r')
+    fr1 = open('category1.txt', 'r')
+    fr2 = open('category2.txt', 'r')
     fw = open('category3.txt', 'w')
-    for line in fr:
-        target = "http://api.58.com/comm/cmcs/all/all/cityid-1/cateid-29/?api_marktarget=false&api_listname=%s&api_retparameterid=5867&api_callback=jsonp9228&api_type=json"
+    for line in fr2:
+        target = "http://api.58.com/comm/cmcs/all/all/cityid-531/cateid-29/?api_marktarget=false&api_listname=%s&api_retparameterid=5867&api_callback=jsonp5383&api_type=json"
         (name, sub_name, url) = line.strip().split(',')
-        pinyin = url
+        pinyin = url.split('/')[3]
         target = target % pinyin
         print 'processing ', name, sub_name
 
@@ -65,7 +66,7 @@ def get_min_category():
                     for i in range(1, len(atag)):
                         min_name = atag.eq(i).text().encode('utf8')
                         min_url = atag.eq(i).attr['href']
-                        min_ename = min_url
+                        min_ename = min_url.split('/')[3]
                         entity = name + ',' + sub_name + ',' + min_name + ',' + min_ename + '\n'
                         fw.write(entity)
             #return
@@ -82,14 +83,43 @@ def get_min_category():
             entity = name + ',' + sub_name + ',' + min_name + ',' + min_ename + '\n'
             fw.write(entity)
         time.sleep(3)
-    fr.close()
+    fr1.close()
+    fr2.close()
     fw.close()
 
+def get_ershouche_category():
+    fr1 = open('category4.txt', 'r')
+    fr2 = open('category5.txt', 'r')
+    fr3 = open('category6.txt', 'r')
+    fw = open('ganji.ershouche.txt', 'w')
+
+    for line in fr1:
+        (name, url) = line.strip().split(',')
+        ename = url
+        entity = '1,' + name.decode('utf8') + ',' + u'全部,全部,' + ename + '\n'
+        fw.write(entity.encode('utf8'))
+    for line in fr2:
+        (name1, name2, url) = line.strip().split(',')
+        ename = url
+        entity = '2,' + name1.decode('utf8') + ',' + name2.decode('utf8') + u',全部,' + ename + '\n'
+        fw.write(entity.encode('utf8'))
+    for line in fr3:
+        (name1, url1, name2, name3, url) = line.strip().split(',')
+        ename1 = url1.split('/')[2]
+        ename = url.split('/')[1]
+        entity = '3,' + name1.decode('utf8') + ',' + ename1 + ',' + name2.decode('utf8') + ',' + name3.decode('utf8') + ',' + ename + '\n'
+        fw.write(entity.encode('utf8'))
+
+    fr1.close()
+    fr2.close()
+    fr3.close()
+    fw.close()
 
 def main():
-    get_category()
-    get_sub_category()
-    get_min_category()
+    #get_category()
+    #get_sub_category()
+    #get_min_category()
+    get_ershouche_category()
 
 
 if __name__ == "__main__":

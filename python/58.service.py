@@ -22,7 +22,7 @@ def get_category():
 
 def get_sub_category():
     fr = open('category1.txt', 'r')
-    fw = open('58.service1.txt', 'w')
+    fw = open('category2.txt', 'w')
     for line in fr:
         (name, url) = line.strip().split(',')
         print 'processing ', name
@@ -31,7 +31,7 @@ def get_sub_category():
         for i in range(len(htmlPq)):
             sub_name = htmlPq.eq(i).text().encode('utf8')
             sub_ename = htmlPq.eq(i).attr['href'].split('/')[3].encode('utf8')
-            entity = sub_name + ',' + sub_ename + ',' + '2' + '\n'
+            entity = name + ',' + sub_name + ',' + sub_ename + '\n'
             fw.write(entity)
         time.sleep(3)
     fr.close()
@@ -66,6 +66,6 @@ def get_min_category():
 def main():
     get_category()
     get_sub_category()
-    #get_min_category()
+    get_min_category()
 
 main()

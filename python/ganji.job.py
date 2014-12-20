@@ -11,13 +11,24 @@ URL = 'http://bj.ganji.com'
 def get_category():
     category = []
     html = urllib2.urlopen(URL + '/zhaopin/').read()
-    htmlPq = pq(html)("div.f-all-news dl dt a");
+    htmlPq = pq(html)("div.f-all-news dl");
     fw = open('ganji.job1.txt', 'w')
     for i in range(len(htmlPq)):
-        cat1_name = htmlPq.eq(i).text()
-        cat1_ename = htmlPq.eq(i).attr['href'].strip('/')
-        entity = cat1_name + ',' + cat1_ename + ',' + '1' + '\n'
-        fw.write(entity.encode('utf8'))
+        cat1_name = htmlPq.eq(i)("dt a").text()
+        if cat1_name:
+            cat1_ename = htmlPq.eq(i)("dt a").attr['href'].strip('/')
+            entity = '1,' + cat1_name + u',全部,' + cat1_ename + '\n'
+            fw.write(entity.encode('utf8'))
+        else:
+            cat1_name = u'其他'
+
+        dd = htmlPq.eq(i)("dd a")
+        for j in range(len(dd)):
+            cat2_name = dd.eq(j).text()
+            cat2_ename = dd.eq(j).attr['href'].strip('/')
+            entity = '2,' + cat1_name + ',' + cat2_name + ',' + cat2_ename + '\n'
+            fw.write(entity.encode('utf8'))
+
     fw.close()
 
 def get_sub_category():
