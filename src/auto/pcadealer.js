@@ -140,10 +140,10 @@ var cheerio = require('cheerio')
 var url = require('url')
 
 var Dealer = function(){
-    this.resultDir = "../../result/";
+    this.resultDir = "../../result/auto/";
     this.dataDir = '../../appdata/';
-    this.resultFile = "pcadealer.txt";
-    this.progressFile = "pcadealer_progress.txt";
+    this.resultFile = "pcadealer_"+new Date().toString()+".txt";
+    this.progressFile = "pcadealer_progress_"+new Date().toString()+".txt";
     this.done = {};
     this.curPageIdx = 1;
     this.tasks = [];

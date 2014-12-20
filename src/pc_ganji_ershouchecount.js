@@ -4,12 +4,12 @@ var cheerio = require('cheerio')
 
 function Car() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/auto/';
     this.host = '.ganji.com';
     this.lastSendTime = new Date();
     this.cities = [];
     this.cityFile = "ganji.city.all.txt";
-    this.resultFile = 'ganji_ershouche.txt';
+    this.resultFile = 'ganji_ershouche_'+new Date().toString()+'.txt';
     this.done={};
     //this.pagePerTask = 100;
 }
@@ -56,8 +56,13 @@ Car.prototype.wgetList = function(t){
 }
 
 Car.prototype.processList = function(data,args,res){
+    if(!data){
+	console.log("[ERROR] data empty.");
+	this.wgetList();
+	return;
+    }
     var $ = cheerio.load(data);
-
+    
     var t = $("div.crumbs span.fr strong").text();
     var matches = t && t.match(/\d+/);
     var count = Number(matches && matches[0]);

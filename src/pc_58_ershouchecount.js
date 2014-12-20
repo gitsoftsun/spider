@@ -4,12 +4,12 @@ var cheerio = require('cheerio')
 
 function Car() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/auto/';
     this.host = '.58.com';
     this.lastSendTime = new Date();
     this.cities = [];
     this.cityFile = "58.city.all.txt";
-    this.resultFile = '58_ershouche.txt';
+    this.resultFile = '58_ershouche_'+new Date().toString()+'.txt';
     this.done={};
     //this.pagePerTask = 100;
 }
@@ -22,6 +22,11 @@ Car.prototype.init = function(){
 	var vals = line.split(',');
 	return {name:vals[0],code:vals[1]};
     });
+    var arguments = process.argv.splice(2);
+    var start = Number(arguments[0]);
+    var count = Number(arguments[1]);
+    this.cities = this.cities.slice(start,start+count);
+    console.log("[INFO] task count: %d",this.cities.length);
 }
 
 Car.prototype.start = function(){
@@ -56,8 +61,15 @@ Car.prototype.wgetList = function(t){
 }
 
 Car.prototype.processList = function(data,args,res){
+    if(!data){
+	console.log();
+	setTimeout(function(){
+	    that.wgetList();
+	},3000);
+	return;
+    }
+    
     var $ = cheerio.load(data);
-
     var count = $(".car_tbfilter tr td .cancelhand .red").text();
     if(args[0].done==0){
 	args[0].total = count;

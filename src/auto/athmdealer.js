@@ -3,10 +3,10 @@ var helper = require('../../helpers/webhelper.js')
 var cheerio = require('cheerio')
 
 var Dealer = function(){
-    this.resultDir = "../../result/";
+    this.resultDir = "../../result/auto/";
     this.dataDir = '../../appdata/';
-    this.resultFile = "athmdealer.txt";
-    this.processFile = "athmdealer_process.txt";
+    this.resultFile = "athmdealer_"+new Date().toString()+".txt";
+    this.processFile = "athmdealer_process_"+new Date().toString()+".txt";
     this.done = {};
     this.curPageIdx = 1;
 }
