@@ -988,7 +988,6 @@
 3,轿车,巴博斯,巴博斯 S级,brabussji
 3,轿车,巴博斯,巴博斯 CLS级,brabuscls
 3,轿车,观致,观致3,guanzhisan
-3,轿车,华泰,路盛E70,lushengeql
 3,轿车,华泰,元田B11,yuantian
 3,轿车,华泰,元田B21,ytbey
 3,轿车,吉林通田,阁萝,gluo
