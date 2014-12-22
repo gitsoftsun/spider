@@ -8,8 +8,8 @@ function Rent() {
     this.cities = [];
     this.cityFile = '58.city.txt';
     this.services = [];
-    this.serviceFile = "58.job.txt";
-    this.resultFile = '58_job.txt';
+    this.serviceFile = "58.ershouche.txt";
+    this.resultFile = '58_ershouche.txt';
     this.pagePerTask = 100;
 }
 
@@ -30,7 +30,7 @@ Rent.prototype.init = function(){
         if(!line) return;
         line = line.replace('\r', '');
         var vals = line.split(',');
-        return {"class": vals[0],"cat1_name": vals[1],"cat2_name": vals[2],"cat_enname": vals[3]};
+        return {"class": vals[0], "cat1_name": vals[1], "cat2_name": vals[2], "cat3_name": vals[3],"cat_ename": vals[4], };
     });
 
     //add service task
@@ -40,7 +40,7 @@ Rent.prototype.init = function(){
         for(var j=0;j<this.services.length;j++){
             var service = this.services[j];
             if (!service) continue;
-            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat2_name":service.cat2_name,"cat_enname":service.cat_enname, "class":service.class};
+            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat2_name":service.cat2_name,"cat3_name":service.cat3_name,"cat_ename":service.cat_ename,"class":service.class};
             this.tasks.push(tmp);
         }
     }
@@ -70,13 +70,9 @@ Rent.prototype.wgetList = function(t){
     }
     var pinyin = t.regionPinyin || t.districtPinyin;
     var name = t.regionName || t.districtName;
-    if(t.class == '1')
-        var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_enname+"/");
-    else
-        var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_enname+"/pn"+t.pn+"/");
-
+    var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_ename+"/pn"+t.pn+"/");
     opt.agent = false;
-    console.log("[GET ] %s, %s, %s, %d",t.cityName,t.cat1_name,t.cat2_name,t.pn);
+    console.log("[GET ] %s, %s, %s, %s, %d",t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,t.pn);
     helper.request_data(opt,null,function(data,args,res){
     	that.processList(data,args,res);
     },t);
@@ -85,8 +81,8 @@ Rent.prototype.wgetList = function(t){
 Rent.prototype.processList = function(data,args,res){
     if(!data){
         console.log("data empty.");
-        if(args[0].class == '1') {
-            console.log("[DONE] Category: " + args[0].cat1_name);
+        if(args[0].class == '1' || args[0].class == '2') {
+            console.log("[DONE] Category: %s, %s", args[0].cat1_name, args[0].cat2_name);
             setTimeout(function () {
                 that.wgetList();
             }, (Math.random() * 2 + 2) * 1000);
@@ -98,36 +94,42 @@ Rent.prototype.processList = function(data,args,res){
         }
     } else {
         var $ = cheerio.load(data);
+        var memberCount = 0;
         var end_flag = 0;
-        $("div#infolist dl").each(function(){
-            if($(this).text().indexOf("以上本地信息更新较少") >= 0) {
-                end_flag = 1;
-                return false;
-            }
-            if($(this).text().indexOf("新信息较少，我们为您推荐以下相关信息") >= 0) {
-                end_flag = 1;
-                return false;
-            }
 
-            var title = $("dt a.t",this).text().replace(/[\n\r,，]/g,";");
-            var url_title = $("dt a.t",this).attr("href");
-            var user = $("dd.w271 a.fl",this).text().replace(/[\n\r,，]/g,";");
-            var url_user = $("dd.w271 a.fl",this).attr("href");
-            var post_time = $("dd.w68",this).text()
-            var jing = $("a.ico.jingpin",this).length;
-            var top = $("a.ico.ding1",this).length;
-            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,jing,top,title,user,post_time,url_title,url_user,"\n"].join();
+        $("div#infolist > table.tbimg tr").each(function(){
+            if($(this).text().indexOf("以上本地信息更新较少") >= 0){
+                end_flag = 1;
+                return false;
+            }
+            if($(this).attr("logr") == undefined)
+                return true;
+            var td = $("td.t",this);
+            var title = $("a.t",td).text().replace(/[\n\r,，]/g,";");
+            var post_time = $("span.post_time",td).text()
+            var url_title = $("a.t",td).attr("href");
+            var wlt = $("span[class^='wlt']",td);
+            var member = 0;
+            if(wlt.length>0){
+                member = wlt.attr("class").replace(/wlt-ico wlt/,"");
+            }
+            if(member)
+                memberCount++;
+            var jing = $("span.jingpin",td).length;
+            var top = $("a.ico.ding",td).length;
+
+            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,args[0].cat3_name,member,jing,top,title,post_time,url_title,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
 
-        if(args[0].class == '1') {
-            console.log("[DONE] Category: " + args[0].cat1_name);
+        if(args[0].class == '1' || args[0].class == '2') {
+            console.log("[DONE] Category: %s, %s", args[0].cat1_name, args[0].cat2_name);
             setTimeout(function () {
                 that.wgetList();
             }, (Math.random() * 2 + 2) * 1000);
         } else {
-            if (end_flag || $("div#infolist dl").length<10) {
-                console.log("[DONE] less info,Category: " + args[0].cat2_name);
+            if (end_flag || $("div#infolist > table.tbimg tr").length<10 || memberCount<4) {
+                console.log("[DONE] less info,Category: " + args[0].cat3_name);
                 setTimeout(function () {
                     that.wgetList();
                 }, (Math.random() * 2 + 2) * 1000);
@@ -138,7 +140,7 @@ Rent.prototype.processList = function(data,args,res){
                     that.wgetList(args[0]);
                 }, (Math.random() * 2 + 2) * 1000);
             } else {
-                console.log("[DONE] Category: " + args[0].cat2_name);
+                console.log("[DONE] Category: " + args[0].cat3_name);
                 setTimeout(function () {
                     that.wgetList();
                 }, (Math.random() * 2 + 2) * 1000);
