@@ -87,8 +87,10 @@ Worker.prototype.processList = function(data,args,res){
 	var detail = $("div.s-r-list-detail div.s-r-list-info",this);
 	var price = $("div.price span",detail).text();
 	var tit = $("h3 > a",detail).attr('title');
+	tit = tit && tit.replace(/\s/g,'');
 	//var point = $("div.pf div.fn-left.tea_degree_num",detail).text();
 	var major = $("p",detail).eq(0).find("span").eq(0).text();
+	major = major && major.replace(/\s/g,'');
 	var dt = $("p",detail).eq(1).find("span");
 	var start = dt.eq(0).text();
 	var time = dt.eq(1).text();
@@ -99,7 +101,6 @@ Worker.prototype.processList = function(data,args,res){
 	
 	var record = [tname,turl,price,tit,major,args[0].grade,start,time,addr,classType,left,args[0].city,that.today,"\n"].join("\t");
 	fs.appendFileSync(that.resultDir+that.resultFile,record);
-	console.log("[DONE]");
     });
 
     var curPage = $(".pagination span");
