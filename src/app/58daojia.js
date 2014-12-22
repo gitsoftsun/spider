@@ -16,9 +16,12 @@ function App(){
 }
 
 App.prototype.init = function(){
-    var datepoints = fs.readFileSync(this.dataDir+this.datepointFile).toString().split('\n').filter(function(line){
-	return line.trim();
-    });
+    var ticks = new Date(this.today).getTime()+7200000+86400000;
+    var datepoints = [ticks];
+    for(var i=1;i<=7;i++){
+	datepoints[i]=datepoints[i-1]+86400000;
+    }
+    
     var addrpoints = fs.readFileSync(this.dataDir+this.cityFile).toString().split('\n').filter(function(line){return line.trim();});
     for(var i=0;i<datepoints.length;i++){
 	for(var j=0;j<addrpoints.length;j++){
@@ -57,7 +60,7 @@ App.prototype.hash = function(obj,salt){
 	}
     }
     //console.log(str);
-
+    
     return this.crypto(str+salt);
 }
 
@@ -86,7 +89,7 @@ App.prototype.wget = function(t){
 	t.page = 1;
     }
     
-    var q = {r:0.5888942128016578,pagesize:10,duration:2,address:'长寿路89号',page:t.page,lng:t.lng,type:1,date:t.appointment,lat:t.lat,cityid:t.cityid};
+    var q = {r:0.5888942128016578,pagesize:10,duration:2,address:'长寿路89号',page:t.page,lng:t.lng,type:1,date:new Date(t.appointment).toDatetime(),lat:t.lat,cityid:t.cityid};
     
     var opt = new helper.basic_options(this.host,path,'GET',false,false,q);
     
@@ -102,6 +105,8 @@ App.prototype.wget = function(t){
     opt.headers["User-Agent"]="58daojiaandroid";
     opt.agent = false;
     console.log("[INFO] GET %s,%s,%s",t.city,t.region,t.direction);
+    //console.log(opt);
+    
     helper.request_data(opt,null,function(data,args,res){
 	that.process(data,args,res);
     },t);
@@ -168,7 +173,7 @@ App.prototype.process = function(data,args,res){
 	    r.push(args[0].region);
 	    r.push(args[0].direction);
 	    r.push(that.today);
-	    r.push(args[0].appointment);
+	    r.push(new Date(args[0].appointment).toDatetime());
 	    return r.join('\t');
 	}));
 	fs.appendFileSync(this.resultDir+this.resultFile,records.join("\n"));

@@ -721,7 +721,7 @@ Date.prototype.toYYMMDD = function () {
     var hour = this.getHours();
     var minute = this.getMinutes();
     var second = this.getSeconds();
-    return this.getFullYear() + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+    return this.getFullYear() + "-" + month + "-" + day + " " + (hour<10?'0'+hour:hour) + ":" + (minute<10?'0'+minute:minute) + ":" + (second<10?'0'+second:second);
     //return this.getFullYear()+"-"+month+"-"+day;
 };
 
