@@ -310,14 +310,14 @@ ershou.prototype.processList = function(data,args,res){
 	var model='',config='';
 	if(vals){
 	    if(vals.length>0){
-		var model = vals[0];
+		model = vals[0];
 	    }
 	    if(vals.length>1){
 		vals.shift();
-		var config = vals.join(" ");
+		config = vals.join(" ");
 	    }
 	}
-	
+	config = config && config.replace(/\t/g,'');
 	var price = $(".cary-infor > p > em",this).text();
 	var audit = $(".zizhi.aCarIconBox span.iconbox a.icon.changs",this).length;
 	var provider = $(".zizhi.aCarIconBox span a",this).last().text().trim();

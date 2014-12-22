@@ -133,6 +133,39 @@ var brands = [{"name":"奥迪","path":"/china/aodi/a0_0msdgscncgpi1lt1ocspex/"},
 {"name":"众泰","path":"/china/zhongtai/a0_0msdgscncgpi1lt1ocspex/"},
 {"name":"知豆","path":"/china/zhidou/a0_0msdgscncgpi1lt1ocspex/"}]
 
+
+var cities = ["安徽,/anhui/",
+	      "北京,/beijing/",
+	      "重庆,/chongqing/",
+	      "福建,/fujian/",
+	      "广东,/guangdong/",
+	      "广西,/guangxi/",
+	      "贵州,/guizhou/",
+	      "甘肃,/gansu/",
+	      "海南,/hainan/",
+	      "河南,/henan/",
+	      "湖北,/hubei/",
+	      "湖南,/hunan/",
+	      "河北,/hebei/",
+	      "黑龙江,/heilongjiang/",
+	      "江苏,/jiangsu/",
+	      "江西,/jiangxi/",
+	      "吉林,/jilin/",
+	      "辽宁,/liaoning/",
+	      "内蒙古,/namenggu/",
+	      "宁夏,/ningxia/",
+	      "青海,/qinghai/",
+	      "陕西,/shan_xi/",
+	      "四川,/sichuan/",
+	      "上海,/shanghai/",
+	      "山西,/shanxi/",
+	      "山东,/shandong/",
+	      "天津,/tianjin/",
+	      "新疆,/xinjiang/",
+	      "西藏,/xizang/",
+	      "云南,/yunnan/",
+	      "浙江,/zhejiang/"];
+
 var cheerio = require('cheerio')
 var fs = require('fs')
 var helper = require('../../helpers/webhelper.js')
@@ -145,6 +178,7 @@ var ershou = function(){
     this.done = {};
     this.curPageIdx = 1;
     this.tasks = [];
+    this.pageLimit = 300;
 }
 
 ershou.prototype.init = function(){
@@ -156,8 +190,13 @@ ershou.prototype.init = function(){
 	    return pre;
 	},this.done);
     }
+    
     for(var i=0;i<brands.length;i++){
-	this.tasks.push({path:brands[i].path,name:brands[i].name,page:1});
+	for(var j=0;j<cities.length;j++){
+	    var vals = cities[j].split(',');
+	    this.tasks.push({path:brands[i].path.replace(/\/china\//,vals[1]),name:brands[i].name,page:1,city:vals[0]});
+	}
+
     }
     console.log("[INFO] task count: %d",this.tasks.length);
 }
@@ -189,7 +228,7 @@ ershou.prototype.wgetList = function(t){
     opt = new helper.basic_options(host,strArray.join(""));
     opt.agent = false;
     
-    console.log("[GET ] %s,%d,%s",t.name,t.page,opt.path);
+    console.log("[GET ] %s,%d,%s,%s",t.name,t.page,opt.path,t.city);
     helper.request_data(opt,null,function(data,args,res){
 	that.processList(data,args,res);
     },t);
@@ -244,12 +283,12 @@ ershou.prototype.processList = function(data,args,res){
 	if(!provider){
 	    provider = "个人";
 	}
-	var city = $(".pic-big-tx .com-name span.city",this).text().trim();
-	records.push([args[0].name,model,config,price,audit?"Y":"N",provider,city].join('\t'));
+	//var city = $(".pic-big-tx .com-name span.city",this).text().trim();
+	records.push([args[0].name,model,config,price,audit?"Y":"N",provider,args[0].city].join('\t'));
     });
     fs.appendFileSync(this.resultDir+this.resultFile,records.join("\n"));
     
-    if($("div.page a.page-item-next").length){
+    if($("div.page a.page-item-next").length && args[0].page<this.pageLimit){
 	args[0].page++;
 	setTimeout(function(){
 	    that.wgetList(args[0]);
