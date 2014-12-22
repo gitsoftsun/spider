@@ -11,3 +11,5 @@ ssh root@120.27.39.51 "cd spider;git pull https://github.com/mike442144/spider.g
 ssh root@120.27.39.47 "cd spider;git pull https://github.com/mike442144/spider.git"&
 ssh root@121.41.114.220 "cd spider;git pull https://github.com/mike442144/spider.git"&
 ssh root@121.40.172.199 "cd spider;git pull https://github.com/mike442144/spider.git"&
+ssh root@114.215.80.125 "cd spider;git pull https://github.com/mike442144/spider.git"&
+ssh root@114.215.80.120 "cd spider;git pull https://github.com/mike442144/spider.git"&
