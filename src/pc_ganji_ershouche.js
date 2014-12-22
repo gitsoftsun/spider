@@ -46,7 +46,6 @@ Rent.prototype.init = function(){
             this.tasks.push(tmp);
         }
     }
-
     var arguments = process.argv.splice(2);
     var start = Number(arguments[0]);
     var len = Number(arguments[1]);
@@ -115,10 +114,14 @@ Rent.prototype.processList = function(data,args,res){
             var url_title = $("a.infor-title",div).attr("href");
             var url_user = $("a.fc-999",div).attr("href");
             var member = $('span.ico-bang-new',this).first().text() || 0;
-
+	    var personal = $("p.infor-gs em",div).text();
+	    personal = personal && personal.indexOf("个人")>-1;
+	    personal = !!personal;
+	    var price = $("dd div.v-Price",this).text().trim();
+	    
             if(member)
                 memberCount++;
-            var record = [t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,member,hot,top,adTop,pub_date,title,user,url_title,url_user,"\n"].join();
+            var record = [t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,member,hot,top,adTop,pub_date,title,user,url_title,url_user,personal?"Y":"N",price,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
         if(args[0].class == '1' || args[0].class == '2') {

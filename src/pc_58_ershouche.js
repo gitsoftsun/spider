@@ -44,7 +44,6 @@ Rent.prototype.init = function(){
             this.tasks.push(tmp);
         }
     }
-
     var arguments = process.argv.splice(2);
     var start = Number(arguments[0]);
     var len = Number(arguments[1]);
@@ -109,6 +108,9 @@ Rent.prototype.processList = function(data,args,res){
             var post_time = $("span.post_time",td).text()
             var url_title = $("a.t",td).attr("href");
             var wlt = $("span[class^='wlt']",td);
+	    var personal = $(".shenfencon",td).length>0;
+	    var price = $("td.tc",this).text();
+	    price = price && price.replace(/\s/g,'');
             var member = 0;
             if(wlt.length>0){
                 member = wlt.attr("class").replace(/wlt-ico wlt/,"");
@@ -117,11 +119,11 @@ Rent.prototype.processList = function(data,args,res){
                 memberCount++;
             var jing = $("span.jingpin",td).length;
             var top = $("a.ico.ding",td).length;
-
-            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,args[0].cat3_name,member,jing,top,title,post_time,url_title,"\n"].join();
+	    
+            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,args[0].cat3_name,member,jing,top,title,post_time,personal?"Y":"N",price,url_title,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
-
+	
         if(args[0].class == '1' || args[0].class == '2') {
             console.log("[DONE] Category: %s, %s", args[0].cat1_name, args[0].cat2_name);
             setTimeout(function () {
