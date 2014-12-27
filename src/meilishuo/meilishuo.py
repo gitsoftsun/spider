@@ -1,4 +1,5 @@
 import re
+import os
 import sys
 import math
 import json
@@ -20,6 +21,16 @@ class Meilishuo:
         self.dealid_file = "result/%s.dealid.txt" % self.name
 
         self.breakpoint = self.get_breakpoint()
+
+        self.check_dir()
+
+    def check_dir(self):
+        if not os.path.exists("log"):
+            os.makedirs("log")
+        if not os.path.exists("result"):
+            os.makedirs("result")
+        if not os.path.exists("breakpoint"):
+            os.makedirs("breakpoint")
 
     def get_nids(self):
         nids = []
