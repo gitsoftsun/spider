@@ -7,8 +7,6 @@ import time
 import socket
 import urllib2
 
-from pyquery import PyQuery as pq
-
 TIMEOUT = 10
 
 class Meilishuo:
