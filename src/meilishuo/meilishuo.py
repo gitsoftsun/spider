@@ -173,5 +173,6 @@ class Meilishuo:
 
 
 if __name__ == "__main__":
-    meilishuo = Meilishuo('dress')
+    category = sys.argv[1]
+    meilishuo = Meilishuo(category)
     meilishuo.run()
