@@ -88,7 +88,7 @@ Meilishuo.prototype.getFirstDealRecord = function(data,args,res) {
             var page_total = Math.ceil(deal_total_num / 15) - 1;
             if(page_total == 0) {
                 item_info = c_info.pop();
-                if "time" in item_info:
+                if("time" in item_info)
                     t.first_deal_time = c_info.pop()['time'];
                 else
                     t.first_deal_time = '';
@@ -114,7 +114,7 @@ Meilishuo.prototype.parseFirstDealTime = function(data,args,res) {
         var deal_info = JSON.parse(data);
         var c_info = deal_info['cInfos'];
         item_info = c_info.pop();
-        if "time" in item_info:
+        if("time" in item_info)
             t.first_deal_time = c_info.pop()['time'];
         else
             t.first_deal_time = '';
