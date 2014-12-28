@@ -86,8 +86,12 @@ Meilishuo.prototype.getFirstDealRecord = function(data,args,res) {
             that.processData(t);
         } else {
             var page_total = Math.ceil(deal_total_num / 15) - 1;
-            if(page_total == 0) {
-                t.first_deal_time = c_info.pop()['time'];
+            if(page_total == 0) {\
+                item_info = c_info.pop();
+                if "time" in item_info:
+                    t.first_deal_time = c_info.pop()['time'];
+                else
+                    t.first_deal_time = '';
                 that.processData(t);
             } else {
                 var opt = new helper.basic_options("www.meilishuo.com", "/aj/getComment/deal?tid="+t.dealid+"&page="+page_total.toString());
@@ -109,7 +113,11 @@ Meilishuo.prototype.parseFirstDealTime = function(data,args,res) {
     } else {
         var deal_info = JSON.parse(data);
         var c_info = deal_info['cInfos'];
-        t.first_deal_time = c_info.pop()['time'];
+        item_info = c_info.pop();
+        if "time" in item_info:
+            t.first_deal_time = c_info.pop()['time'];
+        else
+            t.first_deal_time = '';
         that.processData(t);
     }
 }
@@ -144,8 +152,10 @@ Meilishuo.prototype.processData = function(t){
 
         var item = [item_id,item_price,item_sale_num,item_category,shop_id,item_first_deal_time,item_title,"\n"].join();
         var shop = [shop_id,shop_name,shop_region,shop_product_num,shop_sale_num,shop_create_time,"\n"].join();
-        fs.appendFileSync(that.resultDir+that.itemFile,item);
-        fs.appendFileSync(that.resultDir+that.shopFile,shop);
+        if(item_title && shop_id) {
+            fs.appendFileSync(that.resultDir+that.itemFile,item);
+            fs.appendFileSync(that.resultDir+that.shopFile,shop);
+        }
 
         setTimeout(function () {
             that.wgetItemHtml();
