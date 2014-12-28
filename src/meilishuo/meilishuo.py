@@ -150,7 +150,7 @@ class Meilishuo:
                     if not continue_flag:
                         print "\t\tpage: %d, dealid_num: %d, page_total:%d, dealid_total_in_this_page: %s" \
                                 % (page_num, len(deal_ids), page_total, total_num)
-                        time.sleep(2)
+                        #time.sleep(2)
                     page_num += 1
 
         dealid_writer.close()
