@@ -9,7 +9,7 @@ import socket
 import urllib
 import urllib2
 
-TIMEOUT = 10
+TIMEOUT = 30
 SLEEP_TIME = 1
 
 class Meilishuo:
@@ -211,10 +211,11 @@ class Meilishuo:
                             break
                         for item in item_list:
                             deal_id = item.get('tradeItemId')
+                            sale_num = item.get('sale')
                             #print deal_id,
                             if deal_id and deal_id not in deal_ids:
                                 deal_ids.add(deal_id)
-                                dealid_writer.write(deal_id + '\n')
+                                dealid_writer.write(deal_id + ',' + str(sale_num) + '\n')
                         #print '\n'
 
                         if section_end:
