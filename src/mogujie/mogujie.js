@@ -166,10 +166,6 @@ Mogujie.prototype.processData = function(t){
         var shop = $("div.header.clearfix");
         var shop_url = $("div.shop-name.fl span a", shop).attr("href");
         var shop_name = $("div.shop-name.fl span a", shop).text();
-        var exec_res = /http:\/\/(.*?)\.mogujie.com/.exec(shop_url);
-        var shop_id = ''
-        if(exec_res)
-            shop_id = exec_res[1];
 
         var shop_info = $("div.shop-info.clearfix");
         var shop_region = $("div.info-box.fl ol.li.li3 li",shop_info).eq(0).text().replace(/[所在地区："]/g, '');
@@ -180,8 +176,8 @@ Mogujie.prototype.processData = function(t){
         var shop_deliver_time = $("ol.li.li4 li span",shop_info).eq(0).text()
         var shop_return_rate = $("ol.li.li4 li span",shop_info).eq(1).text()
 
-        var item = [item_id,item_price,item_sale_num,item_category,shop_id,item_first_deal_time,item_title,"\n"].join();
-        var shop = [shop_id,shop_name,shop_region,shop_product_num,shop_sale_num,shop_create_time,shop_deliver_time,shop_return_rate,"\n"].join();
+        var item = [item_id,item_price,item_sale_num,item_category,shop_url,item_first_deal_time,item_title,"\n"].join();
+        var shop = [shop_url,shop_name,shop_region,shop_product_num,shop_sale_num,shop_create_time,shop_deliver_time,shop_return_rate,"\n"].join();
         if(item_title && shop_id) {
             fs.appendFileSync(that.resultDir+that.itemFile,item);
             fs.appendFileSync(that.resultDir+that.shopFile,shop);
