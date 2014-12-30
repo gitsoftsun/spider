@@ -159,7 +159,7 @@ Mogujie.prototype.processData = function(t){
         var item_id = t.dealid;
         var item_title = $("h1.goods-title",div).text().replace(/[\n\r,，]/g,";");
         var item_price = $("#J_NowPrice").text()||$("p.price.fl span.price-n",div).text();
-        var item_sale_num = t.sale_num; 
+        var item_sale_num = t.sale_num;
         var item_category = this.name;
         var item_first_deal_time = t.first_deal_time;
 
@@ -178,7 +178,7 @@ Mogujie.prototype.processData = function(t){
 
         var item = [item_id,item_price,item_sale_num,item_category,shop_url,item_first_deal_time,item_title,"\n"].join();
         var shop = [shop_url,shop_name,shop_region,shop_product_num,shop_sale_num,shop_create_time,shop_deliver_time,shop_return_rate,"\n"].join();
-        if(item_title && shop_id) {
+        if(item_title && shop_url) {
             fs.appendFileSync(that.resultDir+that.itemFile,item);
             fs.appendFileSync(that.resultDir+that.shopFile,shop);
         }
