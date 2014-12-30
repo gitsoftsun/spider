@@ -5,11 +5,12 @@
     "start": "node app.js"
   },
   "dependencies": {
-      "xmlhttprequest" : "*",
-      "request" : "*",
-      "sprintf-js":"*",
-      "iconv":"*",
-      "cheerio":"*",
-      "nodemailer":"0.7.1"
+    "cheerio": "*",
+    "iconv": "*",
+    "iconv-lite": "^0.4.5",
+    "nodemailer": "0.7.1",
+    "request": "*",
+    "sprintf-js": "*",
+    "xmlhttprequest": "*"
   }
 }
