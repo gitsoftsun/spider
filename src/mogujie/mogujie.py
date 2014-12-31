@@ -101,20 +101,20 @@ class Meilishuo:
 
     def request_data(self, request, param={}):
         param = urllib.urlencode(param)
-        try:
-            response = urllib2.urlopen(request, param, timeout=TIMEOUT)
-            #response = urllib2.urlopen(request, param)
-        except urllib2.URLError, e:
-            self.error_record("URLError", request.get_full_url())
-            return ''
-        except socket.timeout, e:
-            self.error_record("TIMEOUT", request.get_full_url())
-            return ''
-        else:
-            data = response.read()
+        retry = 10
+        data = ''
+        for _ in range(retry):
             if not data:
-                self.error_record("EMPTY DATA", request.get_full_url())
-            return data
+                try:
+                    response = urllib2.urlopen(request, param, timeout=TIMEOUT)
+                    data = response.read()
+                except urllib2.URLError, e:
+                    pass
+                    #self.error_record("URLError", request.get_full_url())
+                except socket.timeout, e:
+                    pass
+                    #self.error_record("TIMEOUT", request.get_full_url())
+        return data
 
     def get_deal_id(self):
         nids = self.get_nids()
@@ -154,7 +154,7 @@ class Meilishuo:
                 html = self.request_data(request)
                 #返回数据为空，则爬取下一页
                 if not html:
-                    time.sleep(SLEEP_TIME)
+                    self.error_record("HTML EMPTY", request.get_full_url())
                     continue
                 #匹配script中的book参数，匹配不成功，则爬取下一页
                 pattern = re.compile(r'",book:"(.*?)",')
@@ -181,7 +181,7 @@ class Meilishuo:
                     json_string = self.request_data(request, param)
                     #返回数据为空，则爬取下一个section
                     if not json_string:
-                        time.sleep(SLEEP_TIME)
+                        self.error_record("JSON DATA EMPTY", request.get_full_url())
                         continue
                     else:
                         try:
