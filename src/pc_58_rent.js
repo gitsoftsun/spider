@@ -15,10 +15,9 @@ Rent.prototype.init = function(){
     this.cities = JSON.parse(fs.readFileSync(this.dataDir+this.cityFile).toString());
     this.tasks = [];
     for(var i=0; i< this.cities.length;i++){
-<<<<<<< HEAD
-	    var city = this.cities[i];
-		var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":"全部","regionName":"全部","category":city.cname,"class":'1'};
-		this.tasks.push(tmp);
+	var city = this.cities[i];
+	var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":"全部","regionName":"全部","category":city.cname,"class":'1'};
+	this.tasks.push(tmp);
         for(var j=0;j<city.districts.length;j++){
             var district = city.districts[j];
             var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":district.name,"districtPinyin":district.pinyin,"regionName":"全部","category":district.name,"class":'2'};
@@ -31,7 +30,7 @@ Rent.prototype.init = function(){
                 }
             }
         }
-=======
+/*
 	var city = this.cities[i];
 	for(var j=0;j<city.districts.length;j++){
 	        var district = city.districts[j];
@@ -50,7 +49,7 @@ Rent.prototype.init = function(){
 				}
 			        }
 	    }
->>>>>>> 18c815166a58da90dbe00b9d191181233019be7c
+*/
     }
 
     var arguments = process.argv.splice(2);

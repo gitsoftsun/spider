@@ -74,7 +74,7 @@ Rent.prototype.wgetList = function(t){
         var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_enname+"/");
     else
         var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_enname+"/pn"+t.pn+"/");
-
+    
     opt.agent = false;
     console.log("[GET ] %s, %s, %s, %d",t.cityName,t.cat1_name,t.cat2_name,t.pn);
     helper.request_data(opt,null,function(data,args,res){
@@ -108,7 +108,7 @@ Rent.prototype.processList = function(data,args,res){
                 end_flag = 1;
                 return false;
             }
-
+	    
             var title = $("dt a.t",this).text().replace(/[\n\r,，]/g,";");
             var url_title = $("dt a.t",this).attr("href");
             var user = $("dd.w271 a.fl",this).text().replace(/[\n\r,，]/g,";");

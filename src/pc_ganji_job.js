@@ -26,7 +26,7 @@ Rent.prototype.init = function(){
         var vals = line.split(',');
         return { cname: vals[0], cen: vals[1] };
     });
-
+    
     //load service category file
     this.services = fs.readFileSync(this.dataDir+this.serviceFile).toString().split('\n').map(function (line) {
         if(!line) return;
