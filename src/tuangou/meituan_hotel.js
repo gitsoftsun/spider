@@ -105,7 +105,6 @@ Meituan.prototype.wgetDetail = function(data,args,res) {
             }, (Math.random() * 1 + 2) * 1000);
         }
     } else {
-        console.log(data);
         var $ = cheerio.load(data);
         var if_empty = $("div.filter-label-list.filter-section.category-filter-wrapper").length;
         if(if_empty) {
@@ -133,19 +132,26 @@ Meituan.prototype.wgetDetail = function(data,args,res) {
                 var params = {};
                 var acms = asyncPageviewData['acms'];
                 if(acms) {
-                    params['params'] = '{"mteventParams":'+$("div#content").attr('data-mteventnd')+'}';
-                    params['geotype'] = 'all';
-                    params['areaid'] = 'all';
-                    params['offset'] = 0;
-                    params['dealids'] = asyncPageviewData['deals'];
-                    params['acms'] = asyncPageviewData['acms'].join();
-                    post_data = require('querystring').stringify(params);
+                    json_string = $("div.J-scrollloader.cf").attr('data-async-params');
+                    json_data = JSON.parse(json_string);
+                    if('data' in json_data) {
+                        params = json_data['data'];
+                        params['offset'] = 0;
+                        params['dealids'] = asyncPageviewData['deals'];
+                        params['acms'] = asyncPageviewData['acms'].join();
+                        post_data = require('querystring').stringify(params);
 
-                    var opt = new helper.basic_options(t.cityUrl.replace("http://",''),"/index/deallist","POST",0,1);
-                    opt.agent = false;
-                    helper.request_data(opt,post_data,function(data1,args,res){
-                        that.processData(data1,args,res);
-                    },t);
+                        var opt = new helper.basic_options("www.meituan.com","/index/deallist","POST",0,1);
+                        opt.agent = false;
+                        helper.request_data(opt,post_data,function(data1,args,res){
+                            that.processData(data1,args,res);
+                        },t);
+                    } else {
+                        console.log("params empty");
+                        setTimeout(function () {
+                            that.wgetList();
+                        }, (Math.random() * 2 + 1) * 1000);
+                    }
                 } else {
                     console.log("acms empty");
                     setTimeout(function () {
@@ -181,7 +187,7 @@ Meituan.prototype.processData = function(data,args,res) {
                 var price = $("p.deal-tile__detail strong",this).text();
                 var sale_num = $("div.deal-tile__extra p.extra-inner span.sales strong.num",this).text();
                 var rate_num = $("div.deal-tile__extra p.extra-inner a.rate-info span.rate-info__count",this).text().replace("人评价",'')||0;
-                var item = [title,description,price,sale_num,rate_num,url,"\n"].join();
+                var item = [t.cityName,t.cat1_name,t.cat2_name,price,sale_num,rate_num,title,description,url,"\n"].join();
                 if(title)
                     fs.appendFileSync(that.resultDir+that.resultFile,item);
             });
