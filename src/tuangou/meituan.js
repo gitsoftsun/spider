@@ -49,7 +49,7 @@ Meituan.prototype.init = function(){
         }
     }
     var arguments = process.argv.splice(2);
-    var start = Number(arguments[0]);
+    var start = this.breakpoint[0] || Number(arguments[0]);
     var len = Number(arguments[1]);
     //前闭后开区间
     this.tasks = this.tasks.slice(this.breakpoint[0],start+len);
