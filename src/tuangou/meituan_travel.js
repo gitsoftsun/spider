@@ -106,7 +106,14 @@ Meituan.prototype.wgetDetail = function(data,args,res) {
         }
     } else {
         var $ = cheerio.load(data);
-        var if_empty = $("div.filter-label-list.filter-section.category-filter-wrapper ul.inline-block-list.J-filter-list.filter-list--fold").length;
+        var main_category = $("div.filter-label-list.filter-section.category-filter-wrapper").text();
+        if(main_category.indexOf('美食') > 0 ||
+            main_category.indexOf('电影') > 0 ||
+            main_category.indexOf('休闲娱乐') > 0 ||
+            main_category.indexOf('购物') > 0)
+            var if_empty = 1;
+        else
+            var if_empty = 0;
         if(if_empty) {
             console.log("category empty");
             setTimeout(function () {
