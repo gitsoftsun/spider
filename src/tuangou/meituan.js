@@ -186,7 +186,7 @@ Meituan.prototype.processData = function(data,args,res) {
                 var price = $("p.deal-tile__detail strong",this).text();
                 var sale_num = $("div.deal-tile__extra p.extra-inner span.sales strong.num",this).text();
                 var rate_num = $("div.deal-tile__extra p.extra-inner a.rate-info span.rate-info__count",this).text().replace("人评价",'')||0;
-                var item = [title,description,price,sale_num,rate_num,url,"\n"].join();
+                var item = [t.cityName,t.cat1_name,t.cat2_name,price,sale_num,rate_num,title,description,url,"\n"].join();
                 if(title)
                     fs.appendFileSync(that.resultDir+that.resultFile,item);
             });
