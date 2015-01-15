@@ -3,10 +3,14 @@ var helper = require('../../helpers/webhelper.js')
 var cheerio = require('cheerio')
 var http = require("http");
 var qs = require("querystring");
+var EventEmitter = require('events').EventEmitter;
+var emitter = new EventEmitter();
+
 var Mall = function(){
     this.resultDir = "../../result/auto/";
     this.dataDir = '../../appdata/';
     this.resultFile = "yichemall_"+new Date().toString()+".txt";
+    this.resultCityFile = "yichemall_city.txt";
     this.resultItemsFile = "yichemall_items_"+new Date().toString()+".txt";
     this.processFile = "yichemall_progress.txt";
     this.done = {};
@@ -21,16 +25,20 @@ Mall.prototype.init = function(){
 	//this.curPageIdx = fs.readFileSync(this.resultDir+this.processFile).toString().split('\n');
     }
     //console.log("[INFO] Last page index: %d",this.curPageIdx);
+    emitter.on("detaildone",function(){
+	that.wgetCities();
+    });
 }
 
 Mall.prototype.start = function(){
     this.init();
-    var arguments = process.argv.splice(2);
+    /*var arguments = process.argv.splice(2);
     if(arguments[0]=="fromfile"){
 	this.wgetDetail();
     }else{
 	this.getMaxPage(this.wgetList);
-    }
+    }*/
+    emitter.emit("detaildone");
 }
 
 Mall.prototype.getMaxPage = function(fn){
@@ -107,7 +115,7 @@ Mall.prototype.listEnd = function(){
 	helper.request_data(opt,q,function(data,args){
 	    data.Product.forEach(function(item){
 		var path = '/car/detail/c_' + item.CarId + '_' + item.CarName;
-		fs.appendFileSync(that.resultDir+that.resultItemsFile,path+'\n');
+		fs.appendFileSync(that.resultDir+that.resultItemsFile,path+'\t'+item.CarId+'\t'+item.CarName+'\n');
 	    });
 	    that.tasks.pop();
 	    if(that.tasks.length==0){
@@ -119,7 +127,10 @@ Mall.prototype.listEnd = function(){
 
 Mall.prototype.wgetDetail = function(t){
     if(this.items==null){
-	this.items=fs.readFileSync(this.resultDir+this.resultItemsFile).toString().split('\n');
+	this.items=fs.readFileSync(this.resultDir+this.resultItemsFile).toString().split('\n').map(function(line){
+	    var vals = line.split('\t');
+	    return {path:vals[0],carid:vals[1],carname:vals[2]};
+	});
 	console.log("[INFO] total items: %d",this.items.length);
     }
     if(!t){
@@ -130,17 +141,17 @@ Mall.prototype.wgetDetail = function(t){
 	while(this.items.length>0 && !t);
 	
 	if(!t){
-	    console.log("[DONE] job done.");
+	    console.log("[DONE] all detailed pages done.");
+	    emitter.emit("detaildone");
 	    return;
 	}
     }
     
-    var opt = new helper.basic_options("www.yichemall.com",t);
+    var opt = new helper.basic_options("www.yichemall.com",t.path);
     opt.agent = myAgent;
     helper.request_data(opt,null,function(data,args,res){
 	that.processDetail(data,args,res);
     },t);
-
 }
 
 Mall.prototype.processDetail = function(data,args,res){
@@ -167,11 +178,60 @@ Mall.prototype.processDetail = function(data,args,res){
     factoryPrice = factoryPrice && factoryPrice.replace(/\s*/g,'');
     var city = $("#currentCity").text().trim();
     
-    var r = [args[0],brand,model,config,sale,mallPrice,factoryPrice,city].join("\t");
+    var r = [args[0].carid,args[0].path,brand,model,config,sale,mallPrice,factoryPrice,city].join("\t");
     fs.appendFileSync(this.resultDir+this.resultFile,r+'\n');
     this.doneCount++;
     console.log(this.doneCount);
     this.wgetDetail();
+}
+
+Mall.prototype.wgetCities = function(c){
+    if(typeof this.listings=='undefined'){
+	this.listings = fs.readFileSync(this.resultDir+this.resultFile).toString().split('\n').map(function(line){
+	    return line.split("\t")[0];
+	});
+    }
+    if(!c){
+	while(this.listings.length>0 && !c){
+	    c = this.listings.shift();
+	}
+	
+	if(!c){
+	    console.log("job done");
+	    return;
+	}
+    }
+    
+    var opt = new helper.basic_options("www.yichemall.com","/SingleProduct/GetProvinceByCarId","POST",false,true);
+    console.log("[GET] %d",c);
+    helper.request_data(opt,"carId="+c,function(data,args,res){
+	if(!data){
+	    conosle.log("data empty");
+	    that.wgetCities(args[0]);
+	    return;
+	}
+	if(typeof data=="string"){
+	    data = JSON.parse(data);
+	}
+	var len = data.Provinces.length;
+	var cities=[];
+	data.Provinces.forEach(function(province){
+	    var o = new helper.basic_options("www.yichemall.com","/SingleProduct/GetCitysByCarIdAndProvinceId","POST",false,true);
+	    o.agent = myAgent;
+	    helper.request_data(o,qs.stringify({"carId":args[0],"provinceId":province.ProvinceId}),function(data,p){
+		--len;
+		if(!data){
+		    console.log("data empty");
+		}else{
+		    cities = cities.concat(data.Citys);
+		}
+		if(len==0){
+		    fs.appendFileSync(that.resultDir+that.resultCityFile,p[0]+"\t"+cities.map(function(city){return city.CityName;}).join()+"\n");
+		    that.wgetCities();
+		}
+	    },args[0]);
+	});
+    },c);
 }
 
 var instance = new Mall();

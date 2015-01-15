@@ -54,7 +54,6 @@ Dp.prototype.init = function(){
 	++doneCount;
 	return pre;
     },this.doneItems);
-    //console.log(this.doneItems);
     console.log("[DONE COUNT] %d",doneCount);
     console.log("[CITIES] %d",this.cities.length);
     console.log("[CATEGORIES] %d",this.categories.length);
