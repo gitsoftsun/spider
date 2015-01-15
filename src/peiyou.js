@@ -7,27 +7,45 @@ function Worker() {
     this.resultDir = '../result/';
     this.host = '.speiyou.com';
     this.today = new Date().toString();
-    this.cities = [{"name":"北京","code":"sbj"},{"name":"天津","code":"stj"},{"name":"太原","code":"ty"},{"name":"上海","code":"ssh"},{"name":"南京","code":"snj"},{"name":"苏州","code":"su"},{"name":"青岛","code":"qd"},{"name":"广州","code":"sgz"},{"name":"深圳","code":"ssz"},{"name":"武汉","code":"swh"},{"name":"成都","code":"scd"},{"name":"重庆","code":"scq"},{"name":"杭州","code":"shz"},{"name":"郑州","code":"zz"},{"name":"沈阳","code":"sy"},{"name":"西安","code":"sxa"}];
+    this.cities = [{"name":"北京","code":"sbj"},
+		   {"name":"天津","code":"stj"},
+		   {"name":"太原","code":"ty"},
+		   {"name":"石家庄","code":"sjz"},
+		   {"name":"上海","code":"ssh"},
+		   {"name":"南京","code":"snj"},
+		   {"name":"苏州","code":"su"},
+		   {"name":"青岛","code":"qd"},
+		   {"name":"广州","code":"sgz"},
+		   {"name":"深圳","code":"ssz"},
+		   {"name":"武汉","code":"swh"},
+		   {"name":"长沙","code":"cs"},
+		   {"name":"成都","code":"scd"},
+		   {"name":"重庆","code":"scq"},
+		   {"name":"杭州","code":"shz"},
+		   {"name":"郑州","code":"zz"},
+		   {"name":"沈阳","code":"sy"},
+		   {"name":"西安","code":"sxa"}];
     this.grades = [{"name":"小学英语考级课程","path":"/search/index/subject:/grade:ff80808127fabe0c0127fae69bc1004a/gtype:time"},
-{"name":"学前班","path":"/search/index/subject:/grade:0/gtype:time"},
-{"name":"小学一年级","path":"/search/index/subject:/grade:1/gtype:time"},
-{"name":"小学二年级","path":"/search/index/subject:/grade:2/gtype:time"},
-{"name":"小学三年级","path":"/search/index/subject:/grade:3/gtype:time"},
-{"name":"小学四年级","path":"/search/index/subject:/grade:4/gtype:time"},
-{"name":"小学五年级","path":"/search/index/subject:/grade:5/gtype:time"},
-{"name":"小学六年级","path":"/search/index/subject:/grade:6/gtype:time"},
-{"name":"初中一年级","path":"/search/index/subject:/grade:7/gtype:time"},
-{"name":"初中二年级","path":"/search/index/subject:/grade:8/gtype:time"},
-{"name":"初中三年级","path":"/search/index/subject:/grade:9/gtype:time"},
-{"name":"高中一年级","path":"/search/index/subject:/grade:10/gtype:time"},
-{"name":"高中二年级","path":"/search/index/subject:/grade:11/gtype:time"},
-{"name":"高中三年级","path":"/search/index/subject:/grade:12/gtype:time"},
-{"name":"小学组","path":"/search/index/subject:/grade:13/gtype:time"},
-{"name":"初中组","path":"/search/index/subject:/grade:14/gtype:time"},
-{"name":"高中组","path":"/search/index/subject:/grade:15/gtype:time"}];
-    //this.cityFile = "58.regions.txt";
+		   {"name":"学前班","path":"/search/index/subject:/grade:0/gtype:time"},
+		   {"name":"小学一年级","path":"/search/index/subject:/grade:1/gtype:time"},
+		   {"name":"小学二年级","path":"/search/index/subject:/grade:2/gtype:time"},
+		   {"name":"小学三年级","path":"/search/index/subject:/grade:3/gtype:time"},
+		   {"name":"小学四年级","path":"/search/index/subject:/grade:4/gtype:time"},
+		   {"name":"小学五年级","path":"/search/index/subject:/grade:5/gtype:time"},
+		   {"name":"小学六年级","path":"/search/index/subject:/grade:6/gtype:time"},
+		   {"name":"初中一年级","path":"/search/index/subject:/grade:7/gtype:time"},
+		   {"name":"初中二年级","path":"/search/index/subject:/grade:8/gtype:time"},
+		   {"name":"初中三年级","path":"/search/index/subject:/grade:9/gtype:time"},
+		   {"name":"高中一年级","path":"/search/index/subject:/grade:10/gtype:time"},
+		   {"name":"高中二年级","path":"/search/index/subject:/grade:11/gtype:time"},
+		   {"name":"高中三年级","path":"/search/index/subject:/grade:12/gtype:time"},
+		   {"name":"小学组","path":"/search/index/subject:/grade:13/gtype:time"},
+		   {"name":"初中组","path":"/search/index/subject:/grade:14/gtype:time"},
+		   {"name":"高中组","path":"/search/index/subject:/grade:15/gtype:time"},
+		   {"name":"小高组","path":"/search/index/subject:/grade:ff80808144b18aea0144b3fab7a30050/gtype:time"},
+		   {"name":"小升初","path":"/search/index/subject:/grade:0000000049571bfa01495ea8e62b468f/gtype:time"}];
+    
     this.resultFile = 'peiyou.txt';
-    this.pagePerTask = 100;
     this.tasks = [];
 }
 
@@ -37,7 +55,7 @@ Worker.prototype.init = function(){
 	    this.tasks.push({"city":this.cities[i].name,"code":this.cities[i].code,"grade":this.grades[j].name,"path":this.grades[j].path});
 	}
     }
-
+    
     //var arguments = process.argv.splice(2);
     //var start = Number(arguments[0]);
     //var len = Number(arguments[1]);

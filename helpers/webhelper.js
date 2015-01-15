@@ -3,6 +3,7 @@ var zlib = require('zlib')
 var fs = require('fs')
 var Iconv = require('iconv').Iconv
 var url = require('url')
+//var iconv = require('iconv-lite');
 var qs = require("querystring")
 exports.toQuery = function(obj){
     var sb = new exports.StringBuffer();
@@ -325,6 +326,7 @@ exports.request_data=function(opts,data,fn,args){
 		var gbk_to_utf8_iconv = new Iconv('GBK', 'UTF-8//TRANSLIT//IGNORE');
 		if(buffer.length>0){
 		    try{
+			//iconv.decode(buffer)
 			obj = gbk_to_utf8_iconv.convert(buffer).toString();
 		    }catch(e){
 			console.log("[ERROR] %s",e.message);
