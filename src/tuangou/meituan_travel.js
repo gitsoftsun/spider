@@ -106,8 +106,7 @@ Meituan.prototype.wgetDetail = function(data,args,res) {
         }
     } else {
         var $ = cheerio.load(data);
-        var if_empty = 0;
-        //var if_empty = $("div.filter-label-list.filter-section.category-filter-wrapper").length;
+        var if_empty = $("div.filter-label-list.filter-section.category-filter-wrapper ul.inline-block-list.J-filter-list.filter-list--fold").length;
         if(if_empty) {
             console.log("category empty");
             setTimeout(function () {
