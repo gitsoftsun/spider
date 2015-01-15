@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "cheerio": "*",
+    "crawler": "^0.4.1",
     "iconv": "*",
     "iconv-lite": "^0.4.5",
     "nodemailer": "0.7.1",

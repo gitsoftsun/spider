@@ -1,18 +1,18 @@
 var fs = require('fs')
-var http = require('http')
-var querystring = require('querystring')
 var helper = require('../helpers/webhelper.js')
 var cheerio = require('cheerio')
 
 function Rent() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/ganji/';
     this.cities = [];
     this.cityFile = 'ganji.city.txt';
     this.services = [];
     this.serviceFile = "ganji.ershouche.txt";
-    this.resultFile = 'ganji_ershouche.txt';
-    this.pagePerTask = 100;
+    this.today = new Date().toString();
+    var strs = this.today.split('-');
+    this.resultFile = 'ganji_ershouche_'+strs[0]+'-'+strs[1]+'.txt';
+    this.pagePerTask = 1;
 }
 
 Rent.prototype.init = function(){
@@ -42,7 +42,7 @@ Rent.prototype.init = function(){
         for(var j=0;j<this.services.length;j++){
             var service = this.services[j];
             if (!service) continue;
-            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat1_ename":service.cat1_ename,"cat2_name":service.cat2_name,"cat3_name":service.cat3_name,"cat_ename":service.cat_ename,"class":service.class};
+            var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"cat1_name":service.cat1_name,"cat1_ename":service.cat1_ename,"cat2_name":service.cat2_name,"cat3_name":service.cat3_name,"cat_ename":service.cat_ename,"class":Number(service.class)};
             this.tasks.push(tmp);
         }
     }
@@ -85,7 +85,7 @@ Rent.prototype.wgetList = function(t){
 Rent.prototype.processList = function(data,args,res){
     if(!data) {
         console.log("data empty.");
-        if(args[0].class == '1' || args[0].class == '2') {
+        if(args[0].class<3) {
             console.log("[DONE] Category: %s, %s", args[0].cat1_name, args[0].cat2_name);
             setTimeout(function () {
                 that.wgetList();
@@ -121,10 +121,10 @@ Rent.prototype.processList = function(data,args,res){
 	    
             if(member)
                 memberCount++;
-            var record = [t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,member,hot,top,adTop,pub_date,title,user,url_title,url_user,personal?"Y":"N",price,"\n"].join();
+            var record = [t.cityName,t.cat1_name,t.cat2_name,t.cat3_name,member,hot,top,adTop,pub_date,title,user,url_title,url_user,personal?"Y":"N",price,that.today,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
-        if(args[0].class == '1' || args[0].class == '2') {
+        if(args[0].class<3) {
             console.log("[DONE] Category: %s, %s", args[0].cat1_name, args[0].cat2_name);
             setTimeout(function () {
                 that.wgetList();

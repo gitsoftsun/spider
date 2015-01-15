@@ -4,13 +4,15 @@ var cheerio = require('cheerio')
 
 function Rent() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/58/';
     this.cities = [];
     this.cityFile = '58.city.txt';
     this.services = [];
     this.serviceFile = "58.service.txt";
-    this.resultFile = '58_service.txt';
-    this.pagePerTask = 100;
+    this.today = new Date().toString();
+    var strs = this.today.split('-');
+    this.resultFile = '58_service_'+strs[0]+'-'+strs[1]+'.txt';
+    this.pagePerTask = 1;
 }
 
 Rent.prototype.init = function(){
@@ -127,7 +129,7 @@ Rent.prototype.processList = function(data,args,res){
             if(exec_result)
                 pubDate = exec_result[1];
 
-            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,member,jing,top,pubDate,title,user,url_title,url_user,"\n"].join();
+            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,member,jing,top,pubDate,title,user,url_title,url_user,that.today,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
             //console.log("[DONE] %s",record);
         });

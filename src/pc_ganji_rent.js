@@ -4,18 +4,19 @@ var cheerio = require('cheerio')
 
 function Rent() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/ganji/';
     this.cities = [];
     this.cityFile = "ganji.regions.txt";
-    this.resultFile = 'ganji_rent.txt';
-    this.pagePerTask = 100;
+    this.today = new Date().toString();
+    var strs = this.today.split('-');
+    this.resultFile = 'ganji_rent_'+strs[0]+'-'+strs[1]+'.txt';
+    this.pagePerTask = 1;
 }
 
 Rent.prototype.init = function(){
     this.cities = JSON.parse(fs.readFileSync(this.dataDir+this.cityFile).toString());
     this.tasks = [];
     for(var i=0; i< this.cities.length;i++){
-<<<<<<< HEAD
         var city = this.cities[i];
         var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":"全部","regionName":"全部","category":city.cname,"class":'1'};
         this.tasks.push(tmp);
@@ -31,26 +32,6 @@ Rent.prototype.init = function(){
                 }
             }
         }
-=======
-	var city = this.cities[i];
-	for(var j=0;j<city.districts.length;j++){
-	    var district = city.districts[j];
-	    if(district.regions.length==0){
-		var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":district.name,"districtPinyin":district.pinyin};
-		this.tasks.push(tmp);
-		//var r = Object.keys(tmp).map(function(k){return tmp[k];}).join('\t');
-		//fs.appendFileSync(this.resultDir+"tasksout.ganji.txt",r+'\n');
-	    }else{
-		for(var k=0;k<district.regions.length;k++){
-		    var region = district.regions[k];
-		    var tmp = {"cityName":city.cname,"cityPinyin":city.cen,"districtName":district.name,"districtPinyin":district.pinyin,"regionName":region.name,"regionPinyin":region.pinyin}
-		    this.tasks.push(tmp);
-		    //var r = Object.keys(tmp).map(function(k){return tmp[k];}).join('\t');
-		    //fs.appendFileSync(this.resultDir+"tasksout.ganji.txt",r+'\n');
-		}
-	    }
-	}
->>>>>>> 18c815166a58da90dbe00b9d191181233019be7c
     }
     
     var arguments = process.argv.splice(2);
@@ -137,7 +118,7 @@ Rent.prototype.processList = function(data,args,res){
         	var hot = $("span.ico-hot",this).length;
             var jing = $("span.ico-jing",this).length;
         	//jjrName||"",jjcmp||"",jjbranchcmp||""
-        	var record = [args[0].cityName,args[0].districtName,args[0].regionName,member,hot,jing,top,adTop,name,houseName||"",pubDate||"",url,"\n"].join();
+            var record = [args[0].cityName,args[0].districtName,args[0].regionName,member,hot,jing,top,adTop,name,houseName||"",pubDate||"",url,that.today,"\n"].join();
         	fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
         

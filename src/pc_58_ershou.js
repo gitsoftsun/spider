@@ -4,11 +4,13 @@ var cheerio = require('cheerio')
 
 function Rent() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/58/';
     this.cities = [];
     this.cityFile = "58.regions.txt";
-    this.resultFile = '58_ershou.txt';
-    this.pagePerTask = 100;
+    this.today = new Date().toString();
+    var strs = this.today.split('-');
+    this.resultFile = '58_ershou_'+strs[0]+'-'+strs[1]+'.txt';
+    this.pagePerTask = 1;
 }
 
 Rent.prototype.init = function(){
@@ -112,9 +114,9 @@ Rent.prototype.processList = function(data,args,res){
             var jing = $("h1 span.jingpin",td).length;
             var top = $("h1 span.ico.ding",td).length;
             var houseName = $("div.qj-listleft>a",td).text().trim().replace(/[\s]/g,"").replace(/[,，]/g,";");
-
+	    
             var pubDate = $("div.qj-listleft span.qj-listjjr",td).contents().last().text().trim();
-
+	    
             var jjrInfo = $("div.qj-listleft span.qj-listjjr a",td);
             var jjrName,jjcmp,jjbranchcmp;
             if(jjrInfo.length>0){
@@ -127,7 +129,7 @@ Rent.prototype.processList = function(data,args,res){
             if(jjrInfo.length>2){
                 jjbranchcmp = jjrInfo.eq(2).text().trim();
             }
-            var record = [args[0].cityName,args[0].districtName,args[0].regionName,member,jing,top,name,houseName||"",pubDate||"",jjrName||"",jjcmp||"",jjbranchcmp||"",url,"\n"].join();
+            var record = [args[0].cityName,args[0].districtName,args[0].regionName,member,jing,top,name,houseName||"",pubDate||"",jjrName||"",jjcmp||"",jjbranchcmp||"",url,that.today,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
 

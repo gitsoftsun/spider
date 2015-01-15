@@ -1,18 +1,18 @@
 var fs = require('fs')
-var http = require('http')
-var querystring = require('querystring')
 var helper = require('../helpers/webhelper.js')
 var cheerio = require('cheerio')
 
 function Rent() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/ganji/';
     this.cities = [];
     this.cityFile = 'ganji.city.txt';
     this.services = [];
     this.serviceFile = "ganji.service.txt";
-    this.resultFile = 'ganji_service.txt';
-    this.pagePerTask = 100;
+    this.today = new Date().toString();
+    var strs = this.today.split('-');
+    this.resultFile = 'ganji_service_'+strs[0]+'-'+strs[1]+'.txt';
+    this.pagePerTask = 1;
 }
 
 Rent.prototype.init = function(){
@@ -104,14 +104,14 @@ Rent.prototype.processList = function(data,args,res){
             var top = $("a em.ico-stick-yellow",div).length;
             var adTop = $("a em.ico-stick-red",div).length;
             var hot = $("span.ico-hot",this).length;
-            var jing = $("span.ico-jing",this).length;
+            var jing = $("span.ico-hot",this).length;
             var pub_date = $("span.fc9",div).eq(0).text().replace(/[\n\r,，]/g,";");
             var title = $("p.t a.f14",div).text().trim().replace(/[\n\r,，]/g,";");
             var user = $("p.p2 a.website",div).text().trim().replace(/[\n\r,，]/g,";");
             var url_title = $("p.t a.f14",div).attr("href");
             var url_user = $("p.p2 a.website",div).attr("href");
-
-            var record = [t.cityName,t.cat1_name,t.cat2_name,hot,jing,top,adTop,pub_date,title,user,url_title,url_user,"\n"].join();
+	    
+            var record = [t.cityName,t.cat1_name,t.cat2_name,hot,jing,top,adTop,pub_date,title,user,url_title,url_user,that.today,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
 
