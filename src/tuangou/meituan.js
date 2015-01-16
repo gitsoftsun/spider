@@ -113,12 +113,17 @@ Meituan.prototype.wgetDetail = function(data,args,res) {
     } else {
         var $ = cheerio.load(data);
         var if_empty = $("div.filter-label-list.filter-section.category-filter-wrapper").length;
+        var if_no_deal = $("div.poi-list.cf.poi-list--nodeal").length;
         if(if_empty) {
             console.log("category empty");
             setTimeout(function () {
                 that.wgetList();
             }, (Math.random() * 2 + 1) * 1000);
         } else {
+            if(if_no_deal){
+                fs.appendFileSync('no_deal.txt',t.cityName+','+t.cat2_name+'\n');
+                console.log('no deal: %s, %s',t.cityName,t.cat2_name);
+            }
             var next_page = $("div.paginator-wrapper li.next").length;
             if(next_page) {
                 t.exist_next_page = 1;
@@ -184,9 +189,16 @@ Meituan.prototype.processData = function(data,args,res) {
                 var description = $("h3 span.short-title",this).text().replace(/[\n\r,，]/g,";");
                 var url = $("h3 a",this).attr("href");
                 var price = $("p.deal-tile__detail strong",this).text();
+                var shop_price = $("p.deal-tile__detail span.value del.num",this).text().replace('¥','');
                 var sale_num = $("div.deal-tile__extra p.extra-inner span.sales strong.num",this).text();
+                var rate_star = $("div.deal-tile__extra p.extra-inner a.rate-info span.rate-stars",this);
+                if(rate_star.length) {
+                    rate = Number(rate_star.css("width").replace('%',''))*0.05;
+                    rate = rate.toFixed(2);
+                } else
+                    rate = 0;
                 var rate_num = $("div.deal-tile__extra p.extra-inner a.rate-info span.rate-info__count",this).text().replace("人评价",'')||0;
-                var item = [t.cityName,t.cat1_name,t.cat2_name,price,sale_num,rate_num,title,description,url,"\n"].join();
+                var item = [t.cityName,t.cat1_name,t.cat2_name,price,shop_price,sale_num,rate,rate_num,title,description,url,"\n"].join();
                 if(title)
                     fs.appendFileSync(that.resultDir+that.resultFile,item);
             });
