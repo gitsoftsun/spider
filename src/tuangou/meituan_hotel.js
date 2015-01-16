@@ -190,6 +190,10 @@ Meituan.prototype.processData = function(data,args,res) {
                 var title = $("h3 span.xtitle",this).text().replace(/[\n\r,，]/g,";");
                 var description = $("h3 span.short-title",this).text().replace(/[\n\r,，]/g,";");
                 var url = $("h3 a",this).attr("href");
+                var exec_res = /deal\/(\d{1,10})/.exec(url);
+                var item_id = '';
+                if(exec_res)
+                    item_id = exec_res[1];
                 var price = $("p.deal-tile__detail strong",this).text();
                 var shop_price = $("p.deal-tile__detail span.value del.num",this).text().replace('¥','');
                 var sale_num = $("div.deal-tile__extra p.extra-inner span.sales strong.num",this).text();
@@ -200,7 +204,7 @@ Meituan.prototype.processData = function(data,args,res) {
                 } else
                     rate = 0;
                 var rate_num = $("div.deal-tile__extra p.extra-inner a.rate-info span.rate-info__count",this).text().replace("人评价",'')||0;
-                var item = [t.cityName,t.cat1_name,t.cat2_name,price,shop_price,sale_num,rate,rate_num,title,description,url,"\n"].join();
+                var item = [t.cityName,t.cat1_name,t.cat2_name,price,shop_price,sale_num,rate,rate_num,item_id,title,description,"\n"].join();
                 if(title)
                     fs.appendFileSync(that.resultDir+that.resultFile,item);
             });
