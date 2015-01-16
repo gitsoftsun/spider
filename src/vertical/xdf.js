@@ -7,13 +7,13 @@ var iconv = require("iconv-lite")
 var c = new Crawler({
     maxConnections:5
     ,callback:processCity
-    //,userAgent:"Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch)"
+    ,userAgent:"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.111 Safari/537.36"
 });
 
 var n=1
 ,cities=["bj"]
 ,host = "http://souke.xdf.cn"
-,resultFile = "../../result/vertical/leju.txt"
+,resultFile = "../../result/vertical/xdf_"+new Date().toString()+".txt"
 ;
 
 function processCity(error,result,$){
@@ -76,19 +76,28 @@ function processDetail(error,result,$){
     }
     if(!$)
 	return;
-    var records = [""];
-    var cates = $("p.position").text().replace(/>/g,",");
+    var records = [""]
+    ,cates = $("p.position").text().split(/>/);
+    var cate1 = cates[1]
+    ,cate2 = ''
+    ,cate3 = ''
+    ,city = $("#selectcity cite.selected").text().trim()
+    ;
+    if(cates.length>2)
+	cate2=cates[2];
+    if(cates.length>3)
+	cate3 = cates[3];
     
     $("ul.kc_cont").each(function(){
 	var no = $("li.seg2 span.classNum",this).text();
 	var p = $("li.seg2 span.pNum",this).text();
 	
 	var time = $("li.seg6 dl.tLists dd",this).eq(0).text().trim();
+	time = time && time.replace(/时间：/g,'').replace(/\s/g,'');
 	var addr = $("li.seg6 dl.tLists dd",this).eq(1).text().trim();
-	
+	addr = addr && addr.replace(/\s/g,'').replace(/地点：/g,'');
 	var price = $("li.seg10 span.price em",this).text().trim();
-	
-	records.push(cates+","+[no,p,time,addr,price].join());
+	records.push(cate1+"\t"+cate2+"\t"+cate3+'\t'+[no,p,time,addr,price,city].join("\t"));
     });
     var r = records.join("\n");
     console.log(r);
