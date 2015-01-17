@@ -10,10 +10,10 @@ function Meituan() {
     this.categorys = [];
     this.categoryFile = 'meituan.category.txt';
     this.resultFile = 'meituan.txt';
-    this.breakpointDir = './';
+    this.breakpointDir = '../../log/breakpoint/';
     this.breakpointFile = 'meituan.breakpoint';
     this.breakpoint = '';
-    this.noDealFile = 'no_deal.txt';
+    this.noDealFile = '../../log/no_deal.txt';
 }
 
 Meituan.prototype.init = function(){
