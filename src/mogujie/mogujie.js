@@ -3,9 +3,8 @@ var helper = require('../../helpers/webhelper.js')
 var cheerio = require('cheerio')
 
 function Mogujie() {
-    this.dataDir = 'appdata/';
-    this.resultDir = 'result/';
-    this.breakpointDir = 'breakpoint/';
+    this.resultDir = '../../result/';
+    this.breakpointDir = '../../log/breakpoint/';
     this.dealidFile = "";
     this.itemFile = '';
     this.shopFile = '';
@@ -14,10 +13,10 @@ function Mogujie() {
 Mogujie.prototype.init = function(){
     var arguments = process.argv.splice(2);
     this.name = arguments[0];
-    this.dealidFile = this.name + '.dealid.txt';
-    this.breakpointFile = this.name + '.js.breakpoint';
-    this.itemFile = this.name + '.item.txt';
-    this.shopFile = this.name + '.shop.txt';
+    this.dealidFile = 'mogujie.' + this.name + '.dealid.txt';
+    this.breakpointFile = 'mogujie.' + this.name + '.js.breakpoint';
+    this.itemFile = 'mogujie.' + this.name + '.item.txt';
+    this.shopFile = 'mogujie.' + this.name + '.shop.txt';
     var start = Number(arguments[1]);
     var len = Number(arguments[2]);
 
@@ -37,7 +36,7 @@ Mogujie.prototype.init = function(){
     for(var i = 0, l = lines.length; i < l; i++) {
         if(lines[i]) {
             var vals = lines[i].split(',');
-            this.tasks.push({"dealid":vals[0],"sale_num":vals[1]});
+            this.tasks.push({"dealid":vals[0],"sale_num":vals[1],"create_time":vals[2]});
         }
     }
 
@@ -153,7 +152,6 @@ Mogujie.prototype.processData = function(t){
         }, (Math.random() * 1 + 2) * 1000);
     } else {
         var $ = cheerio.load(t.data);
-        fs.appendFileSync("tmp.html",t.data);
 
         var div = $("div.goods-info-box");
         var item_id = t.dealid;
@@ -161,6 +159,7 @@ Mogujie.prototype.processData = function(t){
         var item_price = $("#J_NowPrice").text()||$("p.price.fl span.price-n",div).text();
         var item_sale_num = t.sale_num;
         var item_category = this.name;
+        var item_create_time = t.create_time;
         var item_first_deal_time = t.first_deal_time;
 
         var shop = $("div.header.clearfix");
@@ -176,7 +175,7 @@ Mogujie.prototype.processData = function(t){
         var shop_deliver_time = $("ol.li.li4 li span",shop_info).eq(0).text()
         var shop_return_rate = $("ol.li.li4 li span",shop_info).eq(1).text()
 
-        var item = [item_id,item_price,item_sale_num,item_category,shop_url,item_first_deal_time,item_title,"\n"].join();
+        var item = [item_id,item_price,item_sale_num,item_category,shop_url,item_create_time,item_first_deal_time,item_title,"\n"].join();
         var shop = [shop_url,shop_name,shop_region,shop_product_num,shop_sale_num,shop_create_time,shop_deliver_time,shop_return_rate,"\n"].join();
         if(item_title && shop_url) {
             fs.appendFileSync(that.resultDir+that.itemFile,item);
