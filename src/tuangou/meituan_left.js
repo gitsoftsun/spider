@@ -14,6 +14,7 @@ function Meituan() {
     this.breakpointDir = './';
     this.breakpointFile = 'meituan.left.breakpoint';
     this.breakpoint = '';
+    this.noDealFile = 'no_deal_left.txt'
     this.leftTaskFile = 'no_deal.txt';
 }
 
@@ -150,7 +151,7 @@ Meituan.prototype.wgetDetail = function(data,args,res) {
             }, (Math.random() * 2 + 1) * 1000);
         } else {
             if(if_no_deal){
-                fs.appendFileSync('no_deal.txt',t.cityName+','+t.cat2_name+'\n');
+                fs.appendFileSync(this.noDealFile,t.cityName+','+t.cat2_name+'\n');
                 console.log('no deal: %s, %s',t.cityName,t.cat2_name);
             }
             var next_page = $("div.paginator-wrapper li.next").length;
