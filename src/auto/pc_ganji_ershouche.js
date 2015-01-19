@@ -1,5 +1,5 @@
 var fs = require('fs')
-var helper = require('../helpers/webhelper.js')
+var helper = require('../../helpers/webhelper.js')
 var cheerio = require('cheerio')
 
 function Rent() {
