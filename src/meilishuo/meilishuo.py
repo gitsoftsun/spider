@@ -13,14 +13,14 @@ class Meilishuo:
     def __init__(self, name):
         self.name = name
 
-        self.task_file = "appdata/%s.txt" % self.name
-        self.log_file = "log/%s.log" % self.name
-        self.break_file = "breakpoint/%s.breakpoint" % self.name
-        self.dealid_file = "result/%s.dealid.txt" % self.name
+        self.task_file = "../../appdata/meilishuo.%s.txt" % self.name
+        self.log_file = "../../log/meilishuo.%s.log" % self.name
+        self.break_file = "../../log/breakpoint/meilishuo.%s.py.breakpoint" % self.name
+        self.dealid_file = "../../result/meilishuo.%s.dealid.txt" % self.name
 
         self.breakpoint = self.get_breakpoint()
 
-        self.check_dir()
+        #self.check_dir()
 
     def check_dir(self):
         if not os.path.exists("log"):

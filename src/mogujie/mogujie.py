@@ -2,6 +2,7 @@
 import re
 import os
 import sys
+import time
 import math
 import json
 import time
@@ -16,14 +17,14 @@ class Meilishuo:
     def __init__(self, name):
         self.name = name
 
-        self.task_file = "appdata/%s.txt" % self.name
-        self.log_file = "log/%s.log" % self.name
-        self.break_file = "breakpoint/%s.breakpoint" % self.name
-        self.dealid_file = "result/%s.dealid.txt" % self.name
+        self.task_file = "../../appdata/mogujie.%s.txt" % self.name
+        self.log_file = "../../log/mogujie.%s.log" % self.name
+        self.break_file = "../../log/breakpoint/mogujie.%s.py.breakpoint" % self.name
+        self.dealid_file = "../../result/mogujie.%s.dealid.txt" % self.name
 
         self.breakpoint = self.get_breakpoint()
 
-        self.check_dir()
+        #self.check_dir()
 
     def check_dir(self):
         if not os.path.exists("log"):
@@ -212,10 +213,14 @@ class Meilishuo:
                         for item in item_list:
                             deal_id = item.get('tradeItemId')
                             sale_num = item.get('sale')
+                            create_time = item.get('created')
+                            if create_time:
+                                local_time = time.localtime(float(create_time))
+                                create_time = time.strftime('%Y-%m-%d %H:%M:%S',local_time)
                             #print deal_id,
                             if deal_id and deal_id not in deal_ids:
                                 deal_ids.add(deal_id)
-                                dealid_writer.write(deal_id + ',' + str(sale_num) + '\n')
+                                dealid_writer.write(deal_id + ',' + str(sale_num) + ',' + create_time + '\n')
                         #print '\n'
 
                         if section_end:

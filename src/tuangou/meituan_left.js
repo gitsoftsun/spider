@@ -7,13 +7,15 @@ function Meituan() {
     this.resultDir = '../../result/';
     this.citys = [];
     this.cityFile = 'meituan.city.txt';
+    this.leftTask = {};
     this.categorys = [];
     this.categoryFile = 'meituan.category.txt';
-    this.resultFile = 'meituan.txt';
+    this.resultFile = 'meituan.left.txt';
     this.breakpointDir = '../../log/breakpoint/';
-    this.breakpointFile = 'meituan.breakpoint';
+    this.breakpointFile = 'meituan.left.breakpoint';
     this.breakpoint = '';
-    this.noDealFile = '../../log/no_deal.txt';
+    this.noDealFile = '../../log/no_deal_left.txt'
+    this.leftTaskFile = '../../log/no_deal.txt';
 }
 
 Meituan.prototype.init = function(){
@@ -22,6 +24,21 @@ Meituan.prototype.init = function(){
         if(lines[i]) {
             var vals = lines[i].split(',');
             this.citys.push({"cityName":vals[0],"cityUrl":vals[1]});
+        }
+    }
+
+    var lines = fs.readFileSync(this.leftTaskFile).toString().split('\n');
+    for(var i = 0, l = lines.length; i < l; i++) {
+        if(lines[i]) {
+            var vals = lines[i].split(',');
+            var cityName = vals[0];
+            var cat2_name = vals[1];
+            if(cityName in this.leftTask)
+                this.leftTask[cityName].push(cat2_name);
+            else {
+                this.leftTask[cityName] = [];
+                this.leftTask[cityName].push(cat2_name);
+            }
         }
     }
 
@@ -46,7 +63,19 @@ Meituan.prototype.init = function(){
             var category = this.categorys[j];
             var taskNum = i * this.categorys.length + j;
             var tmp = {"taskNum":taskNum,"cityName":city.cityName,"cityUrl":city.cityUrl,"cat1_name":category.cat1_name,"cat2_name":category.cat2_name,"cat_ename":category.cat_ename};
-            this.tasks.push(tmp);
+            if(tmp['cityName'] in this.leftTask) {
+                for(var k = 0; k < this.leftTask[tmp['cityName']].length; k++) {
+                    if(tmp['cat2_name'] == this.leftTask[tmp['cityName']][k]) {
+                        if_push = 1;
+                        for(var l = 0; l < this.tasks.length; l++) {
+                            if(tmp['taskNum'] == this.tasks[l]['taskNum'])
+                                if_push = 0;
+                        }
+                        if(if_push)
+                            this.tasks.push(tmp);
+                    }
+                }
+            }
         }
     }
     var arguments = process.argv.splice(2);

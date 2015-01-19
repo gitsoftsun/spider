@@ -3,8 +3,7 @@ var helper = require('../../helpers/webhelper.js')
 var cheerio = require('cheerio')
 
 function Meilishuo() {
-    this.dataDir = 'appdata/';
-    this.resultDir = 'result/';
+    this.resultDir = '../../result/';
     this.dealidFile = "";
     this.itemFile = '';
     this.shopFile = '';
@@ -13,9 +12,9 @@ function Meilishuo() {
 Meilishuo.prototype.init = function(){
     var arguments = process.argv.splice(2);
     this.name = arguments[0];
-    this.dealidFile = this.name + '.dealid.txt';
-    this.itemFile = this.name + '.item.txt';
-    this.shopFile = this.name + '.shop.txt';
+    this.dealidFile = 'meilishuo.' + this.name + '.dealid.txt';
+    this.itemFile = 'meilishuo.' + this.name + '.item.txt';
+    this.shopFile = 'meilishuo.' + this.name + '.shop.txt';
     var start = Number(arguments[1]);
     var len = Number(arguments[2]);
 
@@ -132,9 +131,9 @@ Meilishuo.prototype.processData = function(t){
         var $ = cheerio.load(t.data);
 
         var item_id = t.dealid;
-        var item_title = $("div.item-sale h3.s_tle").text().replace(/[\n\r,，]/g,";");
+        var item_title = $("div.item-sale h3.item-title").text().replace(/[\n\r,，]/g,";");
         var item_price = $("#price-now").text();
-        var item_sale_num = $("li.sku-item.merchandise-state ul li div").first().text().replace(/[件 ]/g, '');
+        var item_sale_num = $("ul.item-data li span.item-data-wrap").first().text().replace(/[件 ]/g, '');
         var item_category = this.name;
         var item_first_deal_time = t.first_deal_time;
 
@@ -144,14 +143,15 @@ Meilishuo.prototype.processData = function(t){
         var shop_id = ''
         if(exec_res)
             shop_id = exec_res[1];
-        var shop_name = $("div.shop-wrap a", shop).first().text();
+        var shop_name = $("div.shop-wrap a", shop).first().text().replace(/[\n\r,，]/g,";");
         var shop_region = $("ul.shop-info li", shop).eq(0).text().replace('所在地区：', '');
         var shop_product_num = $("ul.shop-info li", shop).eq(1).text().replace('商品数量：', '');
         var shop_sale_num = $("ul.shop-info li", shop).eq(2).text().replace('销售数量：', '');
-        var shop_create_time = $("ul.shop-info li", shop).eq(3).text().replace('创建时间：', '');
+        var shop_create_time = $("ul.shop-info li i", shop).attr('title').replace('美丽说认证 ', '');
 
         var item = [item_id,item_price,item_sale_num,item_category,shop_id,item_first_deal_time,item_title,"\n"].join();
         var shop = [shop_id,shop_name,shop_region,shop_product_num,shop_sale_num,shop_create_time,"\n"].join();
+        console.log(shop);
         if(item_title && shop_id) {
             fs.appendFileSync(that.resultDir+that.itemFile,item);
             fs.appendFileSync(that.resultDir+that.shopFile,shop);
