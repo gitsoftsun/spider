@@ -32,3 +32,4 @@ python/data2
 *.suo
 obj
 *.out
+.idea
