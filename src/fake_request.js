@@ -2,9 +2,27 @@ var fs = require('fs')
 var readline = require('readline');
 var http = require('http')
 var zlib = require('zlib')
+var Crawler = require("crawler")
 var sprintf = require("sprintf-js").sprintf
 var helper = require('../helpers/webhelper.js')
+var request = require('request')
+
 var url = "http://jing.58.com/adJump?adType=0&target=na33PWNOPjcOnHnzrjbYrjEdsA6YIZTlszqBpB3draOWUvYfXMK_IM-fIyGGIywGmy3fnHEkPHNQrHcvrjmLn1K3sMPCIAd_sjNYrjNYrjN&mobile=-1&useragent=&keywordtactics=0&utm_source=&spm=&isextend=0&disptime=1395224502533&entityid=14055192686730&entitytype=0&params=&local=1&cate=13915&JZEND=END";
+
+var c = new Crawler({
+    maxConnections:1,
+    callback:function(error,result,$){
+	console.log(result);
+    }
+});
+
+//c.queue("http://www.yichemall.com/car/detail/c_112938_2015款 2.5HQ E-CVT 旗舰版/")
+
+request("http://www.yichemall.com/car/detail/c_112938_2015款 2.5HQ E-CVT 旗舰版/",function(error,response,body){
+    console.log(body);
+    console.log();
+    console.log(response);
+});
 
 //var data = fs.readFileSync("ctrip.hotels.list.html").toString();
 //var cnf = data.match(/allRoom.+/)[0];
@@ -41,7 +59,7 @@ helper.request_data(opt,null,function(data,args,res){
     console.log(JSON.stringify(data));
 });*/
 
-
+/*z
 var i=7534;
 function g(){
     helper.request_data("http://tuan.lefeng.com/bjsy/brand/"+i+".html",null,function(data,args,res){
@@ -61,4 +79,4 @@ function g(){
     },i);
 }
 
-g();
+g();*/

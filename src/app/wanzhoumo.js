@@ -6,6 +6,9 @@ var c = new Crawler({
     maxConnections:5,
     callback:function(error,result){
 	var obj = JSON.parse(result.body);
+	if(obj){
+	    console.log(obj);
+	}
 	var lines = obj.result.list.map(function(li){
 	    return Object.keys(li).map(function(k){
 		return li[k];
