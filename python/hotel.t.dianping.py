@@ -14,7 +14,7 @@ DP_HOTEL_URL = 'http://t.dianping.com/hotel/'
 def get_city_list(url):
     """返回点评团购酒店业务所有的城市, 放在一个文件中， 中间用制表符分割"""
     print "get city list start..."
-    request = urllib2.Request(url, headers={'User-Agent': 'Magic BrowserR'})
+    request = urllib2.Request(url, headers={'User-Agent': 'Magic Browser'})
     citylist_html = urllib2.urlopen(request).read()
     # print citylist_html # return chinese is right
     py_cl_html = pq(unicode(citylist_html))(".cityes-list a")
