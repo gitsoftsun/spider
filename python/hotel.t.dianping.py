@@ -18,7 +18,7 @@ def get_city_list(url):
     citylist_html = urllib2.urlopen(request).read()
     # print citylist_html # return chinese is right
     py_cl_html = pq(unicode(citylist_html))(".cityes-list a")
-    fw = open('../result/dp_city_code.txt', 'w+')
+    fw = open('../result/auto/dp_city_code.txt', 'w+')
     for i in range(0, len(py_cl_html)):
         city_pinyin = py_cl_html.eq(i).attr['href'].strip('/')
         city_name = py_cl_html.eq(i).text()
@@ -32,7 +32,7 @@ def get_area_list():
     """根据城市来获取城市的行政区的url"""
     area_part_url = '#classify-tab|0|2'
     fr = open('../appdata/dp_city.txt', 'r')
-    fw = open('../result/dp_city_area_url.txt', 'w+')
+    fw = open('../result/auto/dp_city_area_url.txt', 'w+')
     for line in fr:
         if line.__contains__('qita,'):
             continue
@@ -64,8 +64,8 @@ DP_GROUP_URL = "http://t.dianping.com"
 
 def get_deal_url_list():
     """根据url获取单子url"""
-    fr = open('../result/dp_city_area_url.txt', 'r')
-    fw = open('../result/dp_hotel_deal_url.txt', 'w+')
+    fr = open('../result/auto/dp_city_area_url.txt', 'r')
+    fw = open('../result/auto/dp_hotel_deal_url.txt', 'w+')
     for line in fr:   # area url
         (city, city_area, hotel_deal_url) = line.strip().split(',')
         city_add = city+city_area
@@ -98,8 +98,8 @@ def get_deal_url_list():
 
 
 def get_detailed_info():
-    fr = open('../result/dp_hotel_deal_url.txt', 'r')
-    fw = open('../result/dp_hotel_deal_info.txt', 'w+')
+    fr = open('../result/auto/dp_hotel_deal_url.txt', 'r')
+    fw = open('../result/auto/dp_hotel_deal_info.txt', 'w+')
     for line in fr:
         (city_address, deal_url) = line.strip().split(',')
         request = urllib2.Request(deal_url.strip(), headers={'User-Agent': 'Magic Browser'})
