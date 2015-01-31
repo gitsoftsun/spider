@@ -1,8 +1,6 @@
 # -*- coding: UTF-8 -*-
 __author__ = 'User19'
 
-import urllib
-from urllib import unquote
 import urllib2
 from pyquery import PyQuery as pq
 import time
@@ -75,22 +73,26 @@ def get_deal_url_list():
         deal_url = DP_GROUP_URL + str(hotel_deal_url).strip()
         fw.write(city_add+","+deal_url+"\n")
         request = urllib2.Request(deal_url, headers={'User-Agent': 'Magic Browser'})
-        page = urllib2.urlopen(request).read()
+        try:
+            page = urllib2.urlopen(request).read()
 
-        # judge page is char
-        if isinstance(page, str):
-            page = unicode(page, encoding='utf-8')
+            # judge page is char
+            if isinstance(page, str):
+                page = unicode(page, encoding='utf-8')
 
-        deal_pq = pq(page)('.tg-paginator-wrap a')
-        max_num = 0
-        for i in range(1, len(deal_pq)):
-            page_num = deal_pq.eq(i).attr['data-page'].strip()
-            if max_num < int(page_num):
-                max_num = int(page_num)
-        page_url_p = '&pageIndex='
-        for j in range(1, max_num):
-            temp_url = deal_url+page_url_p+str(j).strip()
-            fw.write(city_add+","+temp_url+"\n")
+            deal_pq = pq(page)('.tg-paginator-wrap a')
+            max_num = 0
+            for i in range(1, len(deal_pq)):
+                page_num = deal_pq.eq(i).attr['data-page'].strip()
+                if max_num < int(page_num):
+                    max_num = int(page_num)
+            page_url_p = '&pageIndex='
+            for j in range(1, max_num):
+                temp_url = deal_url+page_url_p+str(j).strip()
+                fw.write(city_add+","+temp_url+"\n")
+        except BaseException, e:
+            print e.message
+
     fr.close()
     fw.close()
 
@@ -101,51 +103,48 @@ def get_detailed_info():
     for line in fr:
         (city_address, deal_url) = line.strip().split(',')
         request = urllib2.Request(deal_url.strip(), headers={'User-Agent': 'Magic Browser'})
-        page = urllib2.urlopen(request).read()
-        # judge page is char
-        if isinstance(page, str):
-            page = unicode(page, encoding='utf-8')
-        page_pq = pq(page)('.tg-floor-item')
-        for i in range(0, len(page_pq)):
-            hotel_name = page_pq.eq(i)('h3').text()
-            hotel_price_old = page_pq.eq(i)('.tg-floor-price-old del').text()
-            hotel_price_now = page_pq.eq(i)('.tg-floor-price-new em').text()
-            sales_quantity = page_pq.eq(i)('.tg-floor-soldnum').text()
-            if len(sales_quantity) == 0:
-                sales_quantity = '已售0'
-            sales_quantity = sales_quantity.decode('utf8')[2:].encode('utf8')
-            hotel_desc = page_pq.eq(i)('h4').text()
-            hotel_comment = page_pq.eq(i)('.tg-floor-comment').text()
-            entity = ('%s\t%s\t%s\t%s\t%s\t%s\n') % (hotel_name, hotel_price_old, hotel_price_now, sales_quantity, hotel_comment, ''.join(hotel_desc.split()))
-            print entity
-            fw.write(entity)
+        try:
+            page = urllib2.urlopen(request).read()
+            # judge page is char
+            if isinstance(page, str):
+                page = unicode(page, encoding='utf-8')
+            page_pq = pq(page)('.tg-floor-item')
+            for i in range(0, len(page_pq)):
+                hotel_deal_id = page_pq.eq(i)('.tg-floor-title').attr['href']
+                hotel_deal_id = hotel_deal_id.strip()[12:]
+                hotel_name = page_pq.eq(i)('h3').text()
+                hotel_price_old = page_pq.eq(i)('.tg-floor-price-old del').text()
+                hotel_price_now = page_pq.eq(i)('.tg-floor-price-new em').text()
+                sales_quantity = page_pq.eq(i)('.tg-floor-soldnum').text()
+                if len(sales_quantity) == 0:
+                    sales_quantity = '已售0'
+                sales_quantity = sales_quantity.decode('utf8')[2:].encode('utf8')
+                hotel_desc = page_pq.eq(i)('h4').text()
+                hotel_comment = page_pq.eq(i)('.tg-floor-comment').text()
+                if len(hotel_comment) == 0:
+                    hotel_comment = '0条评价'
+                hotel_comment = hotel_comment.strip().decode('utf8')[:-3].encode('utf8')
+                entity = '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (hotel_deal_id, hotel_name, hotel_price_old,
+                                                               hotel_price_now, sales_quantity, hotel_comment,
+                                                               ''.join(hotel_desc.split()),
+                                                               time.strftime('%Y-%m-%d', time.localtime(time.time())))
+                print entity
+                fw.write(entity)
+        except BaseException, e:
+            print e.message
         time.sleep(2)
     fr.close()
     fw.close()
 
 
-# def get_all_deal_list_url(deal_url, page):
-#     url_list = [deal_url]
-#     deal_pq = pq(page)('.tg-paginator-wrap a')
-#     max_num = 0
-#     for i in range(0, len(deal_pq)):
-#         page_num = deal_pq.eq(i).attr['data-page'].strip()
-#         if max_num < int(page_num):
-#             max_num = int(page_num)
-#     page_url_p = '&pageIndex='
-#     for j in range(1, max_num):
-#         temp_url = deal_url+page_url_p+str(j).strip()
-#         url_list.append(temp_url)
-#     return url_list
-
-
 def main():
     print "process area list"
-    # get_area_list()  #获取一个城市的各个行政区的url
-    # get_deal_url_list() # 获取一个行政区的酒店单子
+    get_area_list()  # 获取一个城市的各个行政区的url
+    print '--------- GET AREA DONE --------------'
+    get_deal_url_list()  # 获取一个行政区的酒店单子
+    print '--------- GET DEAL URL DONE --------------'
     get_detailed_info()  # 获取详细的信息
-
-
+    print '--------- GET DEAL INFO DONE --------------'
 
 
 if __name__ == '__main__':
