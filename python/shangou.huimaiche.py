@@ -57,7 +57,6 @@ def get_info(urls):
         json_string = js_text[int(str(js_text).index("_carsCb(["))+8:len(js_text)-4]
         
         data = json.loads(json_string)
-        # print data
         for car_info in data:
                 entity = car_info['SaleCity'].encode('utf8') +"\t"+car_info['CarYear'].encode('utf8') +"\t"+car_info['CsName'].encode('utf8') +"\t"+car_info['CarName'].encode('utf8') +"\t"+str(car_info['Stock']) +"\t"+car_info['RapidPrice'].encode('utf8') +"\t"+car_info['ReferPrice'].encode('utf8') +"\t"+car_info['CurTime'].encode('utf8') +"\t"+str(car_info['TimeType']) +"\t"+car_info['MaxSave'].encode('utf8') +"\t"+str(car_info['Buyer']) +"\n"
                 fw.write(entity)
