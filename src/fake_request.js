@@ -4,7 +4,7 @@ var http = require('http')
 var zlib = require('zlib')
 var Crawler = require("crawler")
 var sprintf = require("sprintf-js").sprintf
-var helper = require('../helpers/webhelper.js')
+//var helper = require('../helpers/webhelper.js')
 var request = require('request')
 var cheerio = require('cheerio')
 
