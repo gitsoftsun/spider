@@ -76,7 +76,7 @@ def get_goods_info():
     fw = open('../result/auto/dp_goods_info.txt', 'w+')
     for line in fr:
         (city_name, category, category_url) = line.strip().split(',')
-        print 'processing : '+city_name+" goods"
+        print 'processing : '+city_name+" goods category : "+category
         try:
             request = urllib2.Request(category_url, headers={"User-Agent": "Magic Browser"})
             deal_list_page = urllib2.urlopen(request).read()
@@ -95,7 +95,6 @@ def get_goods_info():
                 entity = '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (city_name, category, deal_id, deal_title,
                                                                    deal_price_old, deal_price_now, sales_quantity,
                                                                    deal_desc, time.strftime('%Y-%m-%d', time.localtime(time.time())))
-                print entity
                 fw.write(entity)
             time.sleep(1)
         except BaseException, e:
