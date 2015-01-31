@@ -4,7 +4,6 @@ import urllib2
 import json
 import os
 
-
 def   get_info(urls):
     print os.getcwd()
     fw = open('../result/auto/yiche_shangou.txt', 'w+')

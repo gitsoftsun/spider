@@ -2,6 +2,7 @@ var fs = require('fs')
 var helper = require('../../helpers/webhelper.js')
 var cheerio = require('cheerio')
 var url = require('url')
+var Crawler = require("crawler")
 
 var Dealer = function(){
     this.resultDir = "../../result/auto/";
@@ -11,8 +12,16 @@ var Dealer = function(){
     this.done = {};
     this.curPageIdx = 1;
     this.cities = [];
+    this.c = new Crawler({
+	maxConnections:2,
+	callback:
+    });
 }
 //http://deal.autohome.com.cn/china/?k=2, 综合经销商
+
+Dealer.prototype.wgetShop = function(){
+    
+}
 
 Dealer.prototype.init = function(){
     if(fs.existsSync(this.resultDir+this.progressFile)){

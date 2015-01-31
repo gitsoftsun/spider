@@ -104,7 +104,7 @@ Mall.prototype.start = function(){
 	this.getMaxPage(this.wgetList);
     }
     //this.c.queue("http://www.yichemall.com/car/list");
-    emitter.emit("detaildone");
+//    emitter.emit("detaildone");
 }
 
 Mall.prototype.getMaxPage = function(fn){
@@ -195,7 +195,14 @@ Mall.prototype.wgetDetail = function(t){
     if(this.items==null){
 	this.items=fs.readFileSync(this.resultDir+this.resultItemsFile).toString().split('\n').map(function(line){
 	    var vals = line.split('\t');
-	    return {path:vals[0],carid:vals[1],carname:vals[2]};
+	    if(vals.length==1){
+		var m = vals[0].match(/c_(\d+)_(.+)/);
+		if(m){
+		    return {path:vals[0],carid:m[1],carname:m[2]};
+		}
+	    }else{
+		return {path:vals[0],carid:vals[1],carname:vals[2]};
+	    }
 	});
 	console.log("[INFO] total items: %d",this.items.length);
     }
@@ -243,8 +250,9 @@ Mall.prototype.processDetail = function(data,args,res){
     var factoryPrice = $("#FactoryPrice").text().trim();
     factoryPrice = factoryPrice && factoryPrice.replace(/\s*/g,'');
     var city = $("#currentCity").text().trim();
-    
-    var r = [args[0].carid,args[0].path,brand,model,config,sale,mallPrice,factoryPrice,city].join("\t");
+    var subtitle = $("#subtitle").text().trim();
+    subtitle = subtitle && subtitle.replace(/\s/g,'');
+    var r = [args[0].carid,args[0].path,brand,model,config,sale,mallPrice,factoryPrice,subtitle,city].join("\t");
     fs.appendFileSync(this.resultDir+this.resultFile,r+'\n');
     this.doneCount++;
     console.log(this.doneCount);
