@@ -10,7 +10,7 @@ def get_goods_category_url():
     """团购商品各个城市分类url"""
     goods_url = 'http://t.dianping.com/goods/'
     fr = open('../appdata/dp_city.txt', 'r')
-    fw = open('../result/dp_goods_urls.txt', 'w+')
+    fw = open('../result/dp/dp_goods_urls.txt', 'w+')
     for line in fr:
         (city_id, city_name, city_py) = line.strip().split(',')
         print 'processing : '+city_name
@@ -38,8 +38,8 @@ def get_goods_category_url():
 def get_good_cat_page_url():
     """团购商品详细url"""
     dp_url = 'http://t.dianping.com'
-    fr = open('../result/dp_goods_urls.txt', 'r')
-    fw = open('../result/dp_goods_all_url.txt', 'w+')
+    fr = open('../result/dp/dp_goods_urls.txt', 'r')
+    fw = open('../result/dp/dp_goods_all_url.txt', 'w+')
     for line in fr:
         (city_name, city_cat_name, city_cat_url) = line.strip().split(',')
         detail_cat = city_name + city_cat_name
@@ -60,7 +60,6 @@ def get_good_cat_page_url():
             for j in range(2, max_page_num+1):
                 temp_url = url[0:-11] + '?pageno=' + `j` +url[-11:]
                 entity = '%s,%s,%s\n' % (city_name, city_cat_name, temp_url)
-                print entity
                 fw.write(entity)
         except BaseException, e:
             print e.message
@@ -72,11 +71,12 @@ def get_good_cat_page_url():
 
 def get_goods_info():
     """商品详细情况"""
-    fr = open('../result/dp_goods_all_url.txt', 'r')
-    fw = open('../result/dp_goods_info.txt', 'w+')
+    fr = open('../result/dp/dp_goods_all_url.txt', 'r')
+    path = '../result/dp/dp_goods_info_'+time.strftime('%Y_%m_%d', time.localtime(time.time()))+".txt"
+    fw = open(path, 'w+')
     for line in fr:
         (city_name, category, category_url) = line.strip().split(',')
-        print 'processing : '+city_name+" goods"
+        print 'processing : '+city_name+" goods category : "+category
         try:
             request = urllib2.Request(category_url, headers={"User-Agent": "Magic Browser"})
             deal_list_page = urllib2.urlopen(request).read()
@@ -95,7 +95,6 @@ def get_goods_info():
                 entity = '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (city_name, category, deal_id, deal_title,
                                                                    deal_price_old, deal_price_now, sales_quantity,
                                                                    deal_desc, time.strftime('%Y-%m-%d', time.localtime(time.time())))
-                print entity
                 fw.write(entity)
             time.sleep(1)
         except BaseException, e:
@@ -107,8 +106,8 @@ def get_goods_info():
 
 def main():
     """Main"""
-    get_goods_category_url()
-    get_good_cat_page_url()
+    # get_goods_category_url()
+    # get_good_cat_page_url()
     get_goods_info()
 if __name__ == '__main__':
     main()
