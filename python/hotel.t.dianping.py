@@ -109,6 +109,7 @@ def get_detailed_info():
             if isinstance(page, str):
                 page = unicode(page, encoding='utf-8')
             page_pq = pq(page)('.tg-floor-item')
+            print 'processing : '+city_address
             for i in range(0, len(page_pq)):
                 hotel_deal_id = page_pq.eq(i)('.tg-floor-title').attr['href']
                 hotel_deal_id = hotel_deal_id.strip()[12:]
