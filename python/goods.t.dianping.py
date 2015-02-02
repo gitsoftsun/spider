@@ -109,8 +109,8 @@ def get_goods_info():
 
 def main():
     """Main"""
-    # get_goods_category_url()
-    # get_good_cat_page_url()
+    get_goods_category_url()
+    get_good_cat_page_url()
     get_goods_info()
 if __name__ == '__main__':
     main()
