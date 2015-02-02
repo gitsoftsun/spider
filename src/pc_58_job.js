@@ -4,13 +4,16 @@ var cheerio = require('cheerio')
 
 function Rent() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/58/';
     this.cities = [];
     this.cityFile = '58.city.txt';
     this.services = [];
     this.serviceFile = "58.job.txt";
-    this.resultFile = '58_job.txt';
-    this.pagePerTask = 100;
+    this.today = new Date().toString();
+    var strs = this.today.split('-');
+    
+    this.resultFile = '58_job_'+strs[0]+'-'+strs[1]+'.txt';
+    this.pagePerTask = 1;
 }
 
 Rent.prototype.init = function(){
@@ -74,7 +77,7 @@ Rent.prototype.wgetList = function(t){
         var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_enname+"/");
     else
         var opt = new helper.basic_options(t.cityPinyin+".58.com","/"+t.cat_enname+"/pn"+t.pn+"/");
-
+    
     opt.agent = false;
     console.log("[GET ] %s, %s, %s, %d",t.cityName,t.cat1_name,t.cat2_name,t.pn);
     helper.request_data(opt,null,function(data,args,res){
@@ -99,6 +102,7 @@ Rent.prototype.processList = function(data,args,res){
     } else {
         var $ = cheerio.load(data);
         var end_flag = 0;
+	var timeRegexp = /[今天|小时|分钟]/;
         $("div#infolist dl").each(function(){
             if($(this).text().indexOf("以上本地信息更新较少") >= 0) {
                 end_flag = 1;
@@ -108,15 +112,17 @@ Rent.prototype.processList = function(data,args,res){
                 end_flag = 1;
                 return false;
             }
-
+	    
             var title = $("dt a.t",this).text().replace(/[\n\r,，]/g,";");
             var url_title = $("dt a.t",this).attr("href");
             var user = $("dd.w271 a.fl",this).text().replace(/[\n\r,，]/g,";");
             var url_user = $("dd.w271 a.fl",this).attr("href");
             var post_time = $("dd.w68",this).text()
+	    end_flag = !timeRegexp.test(post_time);
+	    
             var jing = $("a.ico.jingpin",this).length;
             var top = $("a.ico.ding1",this).length;
-            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,jing,top,title,user,post_time,url_title,url_user,"\n"].join();
+            var record = [args[0].cityName,args[0].cat1_name,args[0].cat2_name,jing,top,title,user,post_time,url_title,url_user,that.today,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
 

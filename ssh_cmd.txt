@@ -5,11 +5,15 @@ ssh root@120.27.39.47 "sudo apt-get install python-software-properties -y;sudo a
 ssh root@121.41.114.220 "sudo apt-get install python-software-properties -y;sudo add-apt-repository ppa:chris-lea/node.js;sudo apt-get update;sudo apt-get install -y build-essential;sudo apt-get install -y git;mkdir spider;cd spider;git init;git pull https://gitcafe.com/mike442144/spider.git;sudo apt-get install -y nodejs;sudo apt-get install -y npm;mkdir node_modules;mkdir result;npm config set registry http://registry.npmjs.org/;sudo npm install -d;cd src/review/;nohup node yelp.js 164 41"
 ssh root@121.40.172.199 "sudo apt-get install python-software-properties -y;sudo add-apt-repository ppa:chris-lea/node.js;sudo apt-get update;sudo apt-get install -y build-essential;sudo apt-get install -y git;mkdir spider;cd spider;git init;git pull https://gitcafe.com/mike442144/spider.git;sudo apt-get install -y nodejs;sudo apt-get install -y npm;mkdir node_modules;mkdir result;npm config set registry http://registry.npmjs.org/;sudo npm install -d;cd src/review/;nohup node yelp.js 164 41"
 
-ssh root@121.42.54.198 "cd spider;git pull https://github.com/mike442144/spider.git"&
-ssh root@121.42.53.253 "cd spider;git pull https://github.com/mike442144/spider.git"&
-ssh root@120.27.39.51 "cd spider;git pull https://github.com/mike442144/spider.git"&
-ssh root@120.27.39.47 "cd spider;git pull https://github.com/mike442144/spider.git"&
-ssh root@121.41.114.220 "cd spider;git pull https://github.com/mike442144/spider.git"&
-ssh root@121.40.172.199 "cd spider;git pull https://github.com/mike442144/spider.git"&
+ssh root@121.42.54.198 "mkdir sp;cd sp;git init;git pull https://github.com/mike442144/spider.git;mkdir node_modules;mkdir result;mkdir result/58;mkdir result/ganji;npm install -d;"&
+ssh root@121.42.53.253 "mkdir sp;cd sp;git init;git pull https://github.com/mike442144/spider.git;mkdir node_modules;mkdir result;mkdir result/58;mkdir result/ganji;npm install -d;"&
+ssh root@120.27.39.51 "mkdir sp;cd sp;git init;git pull https://github.com/mike442144/spider.git;mkdir node_modules;mkdir result;mkdir result/58;mkdir result/ganji;npm install -d;"&
+ssh root@120.27.39.47 "mkdir sp;cd sp;git init;git pull https://github.com/mike442144/spider.git;mkdir node_modules;mkdir result;mkdir result/58;mkdir result/ganji;npm install -d;"&
+ssh root@121.41.114.220 "mkdir sp;cd sp;git init;git pull https://github.com/mike442144/spider.git;mkdir node_modules;mkdir result;mkdir result/58;mkdir result/ganji;npm install -d;"&
+ssh root@121.40.172.199 "mkdir sp;cd sp;git init;git pull https://github.com/mike442144/spider.git;mkdir node_modules;mkdir result;mkdir result/58;mkdir result/ganji;npm install -d;"&
+
+ssh root@121.42.54.198 "cd sp/src;nohup node pc_58_job.js 0 5760 &"
+ssh root@121.42.54.198 "cd sp/src;nohup node pc_ganji_job.js 0 6564 &"
+
 ssh root@114.215.80.125 "cd spider;git pull https://github.com/mike442144/spider.git"&
 ssh root@114.215.80.120 "cd spider;git pull https://github.com/mike442144/spider.git"&

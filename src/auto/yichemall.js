@@ -4,6 +4,7 @@ var cheerio = require('cheerio')
 var http = require("http");
 var qs = require("querystring");
 var EventEmitter = require('events').EventEmitter;
+var Crawler = require('crawler');
 var emitter = new EventEmitter();
 
 var Mall = function(){
@@ -28,17 +29,82 @@ Mall.prototype.init = function(){
     emitter.on("detaildone",function(){
 	that.wgetCities();
     });
+/*    
+    this.c = new Crawler({
+	maxConnections:2,
+	callback:function(error,result,$){
+	    $(".list_page ul.pro_main li.mod div.mod-wrap > a").each(function(){
+		var id = $(this).attr("href").match(/\d+/)[0];
+		
+		that.c.queue({
+		    uri:"http://www.yichemall.com/SingleProduct/GetProductList",
+		    callback:function(error,result,$){
+			if(error){
+			    console.log(error);
+			    return;
+			}
+			var data = null;
+			if(typeof result.body == "string"){
+			    data = JSON.parse(result.body);
+			}else if(typeof result.body=="object"){
+			    data = result.body;
+			}
+			if(data){
+			    data.Product.forEach(function(item){
+				var u = 'http://www.yichemall.com/car/detail/c_' + item.CarId + '_' + item.CarName;
+				that.c.queue({
+				    uri:u,
+				    callback:function(error,result,$){
+					console.log(result);
+					var title = $("h2").attr("title");
+					var words = title && title.split(/\s+/);
+					var brand,model;
+					if(words && words.length>0)
+					    brand = words[0];
+					if(words && words.length>1)
+					    model = words[1];
+					
+					var config = $("#ProductName").val();
+					var sale = $("strong#jinrong0").text().trim();*/
+					//sale = sale && sale.replace(/\s*/g,'');
+					//var mallPrice = $("#MallPrice").text().trim();
+					//mallPrice = mallPrice && mallPrice.replace(/\s*/g,'');
+					//var factoryPrice = $("#FactoryPrice").text().trim();
+					//factoryPrice = factoryPrice && factoryPrice.replace(/\s*/g,'');
+					/*var city = $("#currentCity").text().trim();
+					var matches = result.request.uri.pathname.match(/c_(\d+)_(.+)/);
+					if(matches){
+					    var r = [matches[1],matches[2],brand,model,config,sale,mallPrice,factoryPrice,city].join("\t");
+					    fs.appendFileSync(that.resultDir+that.resultFile,r+'\n');
+					}
+				    }
+				});
+				//fs.appendFileSync(that.resultDir+that.resultItemsFile,path+'\t'+item.CarId+'\t'+item.CarName+'\n');
+			    });
+			}
+		    },
+		    method:"POST",
+		    form:{"modelId": id}
+		});
+		//if($(".pagin span.next-disabled").length == 0){
+		//    var p=$(".pagin a.current").next().text();
+		//    that.c.queue("http://www.yichemall.com/car/list?&p="+p);
+		//}
+	    });
+	}
+    });*/
 }
 
 Mall.prototype.start = function(){
     this.init();
-    /*var arguments = process.argv.splice(2);
+    var arguments = process.argv.splice(2);
     if(arguments[0]=="fromfile"){
 	this.wgetDetail();
     }else{
 	this.getMaxPage(this.wgetList);
-    }*/
-    emitter.emit("detaildone");
+    }
+    //this.c.queue("http://www.yichemall.com/car/list");
+//    emitter.emit("detaildone");
 }
 
 Mall.prototype.getMaxPage = function(fn){
@@ -129,7 +195,14 @@ Mall.prototype.wgetDetail = function(t){
     if(this.items==null){
 	this.items=fs.readFileSync(this.resultDir+this.resultItemsFile).toString().split('\n').map(function(line){
 	    var vals = line.split('\t');
-	    return {path:vals[0],carid:vals[1],carname:vals[2]};
+	    if(vals.length==1){
+		var m = vals[0].match(/c_(\d+)_(.+)/);
+		if(m){
+		    return {path:vals[0],carid:m[1],carname:m[2]};
+		}
+	    }else{
+		return {path:vals[0],carid:vals[1],carname:vals[2]};
+	    }
 	});
 	console.log("[INFO] total items: %d",this.items.length);
     }
@@ -177,8 +250,9 @@ Mall.prototype.processDetail = function(data,args,res){
     var factoryPrice = $("#FactoryPrice").text().trim();
     factoryPrice = factoryPrice && factoryPrice.replace(/\s*/g,'');
     var city = $("#currentCity").text().trim();
-    
-    var r = [args[0].carid,args[0].path,brand,model,config,sale,mallPrice,factoryPrice,city].join("\t");
+    var subtitle = $("#subtitle").text().trim();
+    subtitle = subtitle && subtitle.replace(/\s/g,'');
+    var r = [args[0].carid,args[0].path,brand,model,config,sale,mallPrice,factoryPrice,subtitle,city].join("\t");
     fs.appendFileSync(this.resultDir+this.resultFile,r+'\n');
     this.doneCount++;
     console.log(this.doneCount);

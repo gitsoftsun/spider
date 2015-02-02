@@ -14,7 +14,7 @@ qunar_flight
 qunar_flights
 qunar_hotel
 htmlfiles
-qunar_hotel - ¸±±¾
+qunar_hotel - ï¿½ï¿½ï¿½ï¿½
 recognition.rar
 output.txt
 pc_ctrip_done_hotel.txt
@@ -32,3 +32,5 @@ python/data2
 *.suo
 obj
 *.out
+.idea
+test

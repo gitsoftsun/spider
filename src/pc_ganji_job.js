@@ -1,18 +1,18 @@
 var fs = require('fs')
-var http = require('http')
-var querystring = require('querystring')
 var helper = require('../helpers/webhelper.js')
 var cheerio = require('cheerio')
 
 function Rent() {
     this.dataDir = '../appdata/';
-    this.resultDir = '../result/';
+    this.resultDir = '../result/ganji/';
     this.cities = [];
     this.cityFile = 'ganji.city.txt';
     this.services = [];
     this.serviceFile = "ganji.job.txt";
-    this.resultFile = 'ganji_job.txt';
-    this.pagePerTask = 100;
+    this.today = new Date().toString();
+    var strs = this.today.split('-');
+    this.resultFile = 'ganji_job_'+strs[0]+'-'+strs[1]+'.txt';
+    this.pagePerTask = 1;
 }
 
 Rent.prototype.init = function(){
@@ -26,7 +26,7 @@ Rent.prototype.init = function(){
         var vals = line.split(',');
         return { cname: vals[0], cen: vals[1] };
     });
-
+    
     //load service category file
     this.services = fs.readFileSync(this.dataDir+this.serviceFile).toString().split('\n').map(function (line) {
         if(!line) return;
@@ -113,7 +113,7 @@ Rent.prototype.processList = function(data,args,res){
 
             if(member)
                 memberCount++;
-            var record = [t.cityName,t.cat1_name,t.cat2_name,member,hot,top,adTop,pub_date,title,user,url_title,url_user,"\n"].join();
+            var record = [t.cityName,t.cat1_name,t.cat2_name,member,hot,top,adTop,pub_date,title,user,url_title,url_user,that.today,"\n"].join();
             fs.appendFileSync(that.resultDir+that.resultFile,record);
         });
 

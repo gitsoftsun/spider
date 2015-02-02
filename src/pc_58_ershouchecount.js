@@ -9,7 +9,7 @@ function Car() {
     this.lastSendTime = new Date();
     this.cities = [];
     this.cityFile = "58.city.all.txt";
-    this.resultFile = '58_ershouche_'+new Date().toString()+'.txt';
+    this.resultFile = '58_ershouchecount_'+new Date().toString()+'.txt';
     this.done={};
     //this.pagePerTask = 100;
 }

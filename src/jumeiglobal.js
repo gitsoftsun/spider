@@ -1,10 +1,32 @@
 var fs = require('fs')
 var helper = require('../helpers/webhelper.js')
+var Crawler = require('crawler')
+var url = require('url')
 
 var index = 0;
 var pagesize=50;
 var d = new Date().toString();
 var resultFile = "../result/jumeiglobal.txt";
+var resultCountFile = "../result/jumeiglobal_count.txt";
+
+var c = new Crawler({
+    maxConnections:2,
+    callback:function(error,result,$){
+	var num = $("em.get_people").text();
+	var id = $("#hid_hashid").val();
+	if(!id){
+	    try{
+		id=url.parse(result.uri,true).query.hash_id;
+		id = id || url.parse(result.uri).pathname.match(/(\w+)\.html/)[1];
+	    }catch(e){
+		console.log(e);
+	    }
+	}
+	var r = d+"\t"+id+"\t"+num+'\n';
+	console.log(r);
+	fs.appendFileSync(resultCountFile,r);
+    }
+});
 
 function wgetList(idx,type){
     var q = {"type":type,"pagesize":pagesize,"index":idx};
@@ -35,6 +57,8 @@ function process(data,args,res){
     records.push(first);
     data.list.forEach(function(li){
 	var r = [d,li.pro_stitle,li.pro_foreign_name,li.area_name.currency_symbol+""+li.price_foreign,li.price_home,li.price_ref,li.discount,li.brand_id,li.hash_id].join('\t');
+	c.queue(li.url);
+	console.log(li.url);
 	records.push(r);
     });
     fs.appendFileSync(resultFile,records.join("\n"));

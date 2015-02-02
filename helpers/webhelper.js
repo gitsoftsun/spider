@@ -181,7 +181,7 @@ exports.request_data=function(opts,data,fn,args){
 	req.abort();
 	console.log('Request Timeout.');
     }, 20000);
-    
+    debugger;
     req = http.request(opts, function(res) {
 	clearTimeout(request_timer);
 	var response_timer = setTimeout(function() {
