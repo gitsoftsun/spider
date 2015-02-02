@@ -45,7 +45,8 @@ Meilishuo.prototype.wgetItemHtml = function(t){
         t = this.tasks.shift();
         console.log('task left: %d', this.tasks.length);
     }
-    var opt = new helper.basic_options("www.meilishuo.com", "/share/item/" + t.dealid);
+    //var opt = new helper.basic_options("www.meilishuo.com", "/share/item/" + t.dealid);
+    var opt = new helper.basic_options("www.meilishuo.com", "/share/item/1111111");
     opt.agent = false;
     console.log("[GET dealid:] %s", t.dealid);
     helper.request_data(opt,null,function(data,args,res){
@@ -141,13 +142,14 @@ Meilishuo.prototype.processData = function(t){
         var shop_url = $("div.shop-wrap a", shop).first().attr("href");
         var exec_res = /shop\/(\d{1,10})/.exec(shop_url);
         var shop_id = ''
-        if(exec_res)
+        if(exec_res) {
             shop_id = exec_res[1];
-        var shop_name = $("div.shop-wrap a", shop).first().text().replace(/[\n\r,，]/g,";");
-        var shop_region = $("ul.shop-info li", shop).eq(0).text().replace('所在地区：', '');
-        var shop_product_num = $("ul.shop-info li", shop).eq(1).text().replace('商品数量：', '');
-        var shop_sale_num = $("ul.shop-info li", shop).eq(2).text().replace('销售数量：', '');
-        var shop_create_time = $("ul.shop-info li i", shop).attr('title').replace('美丽说认证 ', '');
+            var shop_name = $("div.shop-wrap a", shop).first().text().replace(/[\n\r,，]/g,";");
+            var shop_region = $("ul.shop-info li", shop).eq(0).text().replace('所在地区：', '');
+            var shop_product_num = $("ul.shop-info li", shop).eq(1).text().replace('商品数量：', '');
+            var shop_sale_num = $("ul.shop-info li", shop).eq(2).text().replace('销售数量：', '');
+            var shop_create_time = $("ul.shop-info li i", shop).attr('title').replace('美丽说认证 ', '');
+        }
 
         var item = [item_id,item_price,item_sale_num,item_category,shop_id,item_first_deal_time,item_title,"\n"].join();
         var shop = [shop_id,shop_name,shop_region,shop_product_num,shop_sale_num,shop_create_time,"\n"].join();
