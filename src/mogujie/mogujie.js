@@ -92,7 +92,7 @@ Mogujie.prototype.getFirstDealPage = function(data,args,res) {
 
 Mogujie.prototype.getFirstDealRecord = function(data,args,res) {
     t = args[0];
-    if(!data) {
+    if(!data || data[0] != '{') {
         console.log("first deal page data empty");
         t.first_deal_time = '';
         that.processData(t);
@@ -127,7 +127,7 @@ Mogujie.prototype.getFirstDealRecord = function(data,args,res) {
 
 Mogujie.prototype.parseFirstDealTime = function(data,args,res) {
     t = args[0];
-    if(!data) {
+    if(!data || data[0] != '{') {
         console.log("first deal record data empty");
         t.first_deal_time = '';
         that.processData(t);
