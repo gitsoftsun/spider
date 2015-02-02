@@ -1,9 +1,13 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 __author__ = 'User19'
 
 import urllib2
 from pyquery import PyQuery as pq
 import time
+import sys
+
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 DP_CITY_LIST_URL = 'http://t.dianping.com/citylist'
 DP_HOTEL_URL = 'http://t.dianping.com/hotel/'

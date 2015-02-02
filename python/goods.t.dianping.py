@@ -1,10 +1,13 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 __author__ = 'User19'
 
 import urllib2
 from pyquery import PyQuery as pq
 import time
+import sys
 
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 def get_goods_category_url():
     """团购商品各个城市分类url"""
@@ -112,3 +115,4 @@ def main():
     get_goods_info()
 if __name__ == '__main__':
     main()
+ 
