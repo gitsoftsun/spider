@@ -45,8 +45,7 @@ Meilishuo.prototype.wgetItemHtml = function(t){
         t = this.tasks.shift();
         console.log('task left: %d', this.tasks.length);
     }
-    //var opt = new helper.basic_options("www.meilishuo.com", "/share/item/" + t.dealid);
-    var opt = new helper.basic_options("www.meilishuo.com", "/share/item/1111111");
+    var opt = new helper.basic_options("www.meilishuo.com", "/share/item/" + t.dealid);
     opt.agent = false;
     console.log("[GET dealid:] %s", t.dealid);
     helper.request_data(opt,null,function(data,args,res){
