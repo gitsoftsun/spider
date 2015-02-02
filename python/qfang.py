@@ -103,7 +103,8 @@ def get_info(city_url, ids_url):
         for i in range(0, len(store_info)):
             temp = store_info.eq(i).text().strip()
             store_add = store_add + ' - '+temp
-        entity = '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (sale_id.strip('\n'), house_id, broker_name, broker_tel, store_add, release_time,
+        entity = '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' % (sale_id.strip('\n'), house_id, broker_name, broker_tel, store_add,
+                                                   release_time,
                                                    time.strftime('%Y-%m-%d', time.localtime(time.time())))
         print sale_id
         fw.write(entity)
@@ -113,9 +114,11 @@ def get_info(city_url, ids_url):
 def main():
     """main"""
     bj = r'http://beijing.qfang.com/sale/'  # 单独跑北京花费时间：277 (s)
-    # sh = r'http://shanghai.qfang.com/sale/'  # 花费时间：
-    # sz = r'http://shanghai.qfang.com/sale/'  # 请求过于频繁造成请求拥堵， 先加入间隔0.5s
-    citys = [bj]
+    # sz = r'http://shanghai.qfang.com/sale/'  # 请求过于频繁造成请求拥堵， 通过catch然后再次发送请求， 如果被server端禁止了ip那就需要另一套解决方案了
+    citys = []
+    for arg in range(1, len(sys.argv)):
+        temp = r'http://'+sys.argv[arg]+r'.qfang.com/sale/'
+        citys.append(temp)
     if not os.path.isdir('../result/qfang'):
         os.makedirs('../result/qfang')
     start_time = datetime.datetime.now()
