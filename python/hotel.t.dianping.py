@@ -144,9 +144,9 @@ def get_detailed_info():
 
 def main():
     print "process area list"
-    # get_area_list()  # 获取一个城市的各个行政区的url
+    get_area_list()  # 获取一个城市的各个行政区的url
     print '--------- GET AREA DONE --------------'
-    # get_deal_url_list()  # 获取一个行政区的酒店单子
+    get_deal_url_list()  # 获取一个行政区的酒店单子
     print '--------- GET DEAL URL DONE --------------'
     get_detailed_info()  # 获取详细的信息
     print '--------- GET DEAL INFO DONE --------------'
