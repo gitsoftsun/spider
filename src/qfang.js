@@ -88,19 +88,21 @@ function processBrokerInfo(error, result, $){
 	if (!$) {
 		return;
 	};
+	var city_name = $(".bread_crumbs_inner a").text();
+	city_name = String(city_name).substring(0, String(city_name).search(/\w/));
 	var house_id = $(".house_number span").text();
 	var broker_name = $(".broker_basic_name").text();
 	var broker_tel = $(".mtel_num").text();
 	var release_time = $(".release_time").text();
-	var store_add = ""
+	var store_add = "";
 	$(".store_info").each(function(){
 		var temp = $(this).text();
 		store_add = store_add+temp;
 	})
 	//保存这些字段
 	var entity = [""];
-	var sale_id = String(result.uri).substring(String(result.uri).search(/\d+/g))
-	entity.push([sale_id.replace(/\s/, ""), String(house_id).replace(/\s/, ""), String(broker_name).trim().replace(/\s/, ""), broker_tel, release_time, store_add, date_str].join("\t"));
+	var sale_id = String(result.uri).substring(String(result.uri).search(/\d+/g));
+	entity.push([city_name, sale_id.replace(/\s/, ""), String(house_id).replace(/\s/, ""), String(broker_name).trim().replace(/\s/, ""), broker_tel, release_time, store_add, date_str].join("\t"));
 	console.log(entity.join("\n").toString());
 	fs.appendFileSync(resultFile,entity.join("\n").toString());
 
