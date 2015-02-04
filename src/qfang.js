@@ -107,5 +107,12 @@ function processBrokerInfo(error, result, $){
 
 }
 
-/*开启线程之后开始执行默认的callback函数*/
-c.queue("http://shenzhen.qfang.com/sale/");
+
+args = process.argv;
+if (args.length == 2) {
+	args[3] = "shenzhen";
+};
+for (var i = 2; i < args.length; i++) {
+	city_url = "http://"+String(args[i]).trim()+".qfang.com/sale/"
+	c.queue(city_url);
+};
