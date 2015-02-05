@@ -5,7 +5,9 @@ var Crawler = require('crawler');
 
 var c = new Crawler({
 	maxConnections:1,
-	callback: processUrls
+	callback: processUrls,
+	User-Agent:"",
+	ratesLimted:"" //url queue访问的时间间隔
 });
 
 /*获取分类url并放入队列*/
@@ -16,15 +18,29 @@ function processUrls(error, result, $){
 	if (!$) {
 		return;
 	};
-	$()
+	$(".tg-classify-all:last a:gt(0)").each)(function(){
+		var cat_url = $(this).attr("href");
+		var cat_name = $(this).text();
+		console.log("Catory: "+cat_name+" - "+cat_url);
+		var category_url = t_dp_url+cat_url;
+		console.log("category_url : " + category_url);
+		c.queue({uri:category_url, callback:processListInfo});
+	})
 	return;
 }
 /*抓取信息内容*/
 function processListInfo(error, result, $){
+	if (error) {
+		console.log(error);
+		return;
+	};
+	if (!$) {
+		return;
+	};
 	return;
 }
 
-/*依次读入每个城市， 城市之间停顿一秒（？）*/
+/*依次读入每个城市， 城市之间停顿一秒（可以设置参数：ratasLimits ??????*/
 var read_path = "../appdata/dp_city.txt";
 var city_codes = fs.readFileSync(read_path, "utf-8");
 var citys = String(city_codes).split(/\n/);

@@ -72,7 +72,7 @@ function processUrls(error, result, $){
 		next_url = $(".turnpage_next").attr("href");
 		p_url = (String(result.uri).substring(0, String(result.uri).search(/\/sale/g))+next_url).trim();
 		// console.log("input queue url is : "+p_url);
-		c.queue({uri: p_url, callback:processUrls});
+		c.queue({uri: p_url, priority: 6, callback:processUrls});
 	}
 	// console.log(result.uri + "  ending");
 	return;
