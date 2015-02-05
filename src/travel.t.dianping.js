@@ -6,8 +6,8 @@ var Crawler = require('crawler');
 var c = new Crawler({
 	maxConnections:1,
 	callback: processUrls,
-	User-Agent:"",
-	ratesLimted:"" //url queue访问的时间间隔
+	userAgent:"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
+	rateLimits: 3000 //url queue访问的时间间隔
 });
 
 /*获取分类url并放入队列*/
