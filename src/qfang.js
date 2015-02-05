@@ -17,10 +17,10 @@ var resultFile = "../result/qfang/js_qfang_"+date_str+".txt";
 function processUrls(error, result, $){
 	
 	if(error){
-		console.log(error);
+		console.log("processUrls : "+error);
 		return;
     }
-    console.log(result.uri+ " starting!")
+    console.log(result.uri+ " receive!")
     if(!$){
 		return;
     }
@@ -54,6 +54,13 @@ function processUrls(error, result, $){
 			ids_list.push(entity);
 		};
 	})
+	if (is_Today == 0) {
+		next_url = $(".turnpage_next").attr("href");
+		p_url = (String(result.uri).substring(0, String(result.uri).search(/\/sale/g))+next_url).trim();
+		console.log("input queue url is : "+p_url);
+		c.queue({uri: p_url, priority: 9, 	callback:processUrls});
+	}
+
 	/*组装url并调用 processBrokerInfo*/
 	for (var i = 0; i < ids_list.length; i++) {
 		//去掉/f***
@@ -65,15 +72,11 @@ function processUrls(error, result, $){
 			temp_url = result.uri+"/";
 		}
 		var detail_url =  temp_url + ids_list[i];
-		// console.log("detail_url : ", detail_url);
+		console.log("detail_url : ", detail_url);
+		detail_url = String(detail_url).replace(/^\s/, "");
 		c.queue({uri:detail_url, callback:processBrokerInfo});
 	}
-	if (is_Today == 0) {
-		next_url = $(".turnpage_next").attr("href");
-		p_url = (String(result.uri).substring(0, String(result.uri).search(/\/sale/g))+next_url).trim();
-		// console.log("input queue url is : "+p_url);
-		c.queue({uri: p_url, priority: 6, callback:processUrls});
-	}
+	
 	// console.log(result.uri + "  ending");
 	return;
 }
@@ -82,7 +85,7 @@ function processUrls(error, result, $){
 function processBrokerInfo(error, result, $){
 	
 	if (error) {
-		console.log(error);
+		console.log("processBrokerInfo : "+error);
 		return;
 	};
 	if (!$) {
