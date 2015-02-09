@@ -12,6 +12,7 @@
     "nodemailer": "0.7.1",
     "request": "*",
     "sprintf-js": "*",
+    "tough-cookie": "^0.12.1",
     "xmlhttprequest": "*"
   }
 }

@@ -72,12 +72,20 @@ Meilishuo.prototype.getFirstDealPage = function(data,args,res) {
 
 Meilishuo.prototype.getFirstDealRecord = function(data,args,res) {
     t = args[0];
-    if(!data) {
+    if(!data || data[0] != '{') {
         console.log("first deal page data empty");
         t.first_deal_time = '';
         that.processData(t);
     } else {
-        var deal_info = JSON.parse(data);
+	try{
+	    var deal_info = JSON.parse(data);
+	}catch(e){
+	    console.log(e);
+	    t.first_deal_time = '';
+            that.processData(t);
+	    return;
+	}
+        
         var c_info = deal_info['cInfos'];
         var deal_total_num = parseInt(deal_info['pages']['totalNum']);
         if(deal_total_num == 0) {
@@ -105,12 +113,20 @@ Meilishuo.prototype.getFirstDealRecord = function(data,args,res) {
 
 Meilishuo.prototype.parseFirstDealTime = function(data,args,res) {
     t = args[0];
-    if(!data) {
+    if(!data || data[0] != '{') {
         console.log("first deal record data empty");
         t.first_deal_time = '';
         that.processData(t);
     } else {
-        var deal_info = JSON.parse(data);
+	try{
+	    var deal_info = JSON.parse(data);
+	}catch(e){
+	    console.log(e);
+	    t.first_deal_time = '';
+            that.processData(t);
+	    return;
+	}
+        
         var c_info = deal_info['cInfos'];
         item_info = c_info.pop();
         if(item_info && "time" in item_info)
