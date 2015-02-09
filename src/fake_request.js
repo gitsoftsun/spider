@@ -18,7 +18,7 @@ var c = new Crawler({
 
 //c.queue("http://www.yichemall.com/car/detail/c_112938_2015款 2.5HQ E-CVT 旗舰版/")
 
-request("http://www.yichemall.com/car/detail/c_112938_2015款 2.5HQ E-CVT 旗舰版/",function(error,response,body){
+request.get("http://www.yichemall.com/car/detail/c_112938_2015款 2.5HQ E-CVT 旗舰版/",{jar:request.jar()},function(error,response,body){
     console.log(body);
     console.log();
     console.log(response);
