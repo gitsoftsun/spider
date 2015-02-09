@@ -6,6 +6,7 @@ var Crawler = require("crawler")
 var sprintf = require("sprintf-js").sprintf
 //var helper = require('../helpers/webhelper.js')
 var request = require('request')
+var cheerio = require('cheerio')
 
 var url = "http://jing.58.com/adJump?adType=0&target=na33PWNOPjcOnHnzrjbYrjEdsA6YIZTlszqBpB3draOWUvYfXMK_IM-fIyGGIywGmy3fnHEkPHNQrHcvrjmLn1K3sMPCIAd_sjNYrjNYrjN&mobile=-1&useragent=&keywordtactics=0&utm_source=&spm=&isextend=0&disptime=1395224502533&entityid=14055192686730&entitytype=0&params=&local=1&cate=13915&JZEND=END";
 
@@ -30,13 +31,9 @@ request.get("http://www.yichemall.com/car/detail/c_112938_2015款 2.5HQ E-CVT �
 //console.log(url);
 
 /*
-http.get("http://www.sina.com.cn",function(res){
+http.get(encodeURI("http://www.yichemall.com/car/detail/c_112938_2015款 2.5HQ E-CVT 旗舰版/"),function(res){
     console.log(res.statusCode);
-    var t = setTimeout(function(){
-	console.log("response timeout.");
-	res.destroy();
-    },100);
-    console.log(t);
+    console.log(res.headers["location"]);
     var chunks = [];
     res.on('data',function(chunk){
 	//console.log("get chunk.");
@@ -44,9 +41,9 @@ http.get("http://www.sina.com.cn",function(res){
     });
     res.on('end',function(){
 	console.log('request end');
-	console.log(t);
-	clearTimeout(t);
-	//var buffer = Buffer.concat(chunks);
+	var buffer = Buffer.concat(chunks);
+	var $ = cheerio.load(buffer.toString());
+	console.log($("title").text());
 	//console.log(buffer.toString());
     });
 });

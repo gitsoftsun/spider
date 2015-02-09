@@ -7,21 +7,15 @@ var Crawler = require("crawler")
 var Dealer = function(){
     this.resultDir = "../../result/auto/";
     this.dataDir = '../../appdata/';
-    this.resultFile = "athmec_"+new Date().toString()+".txt";
+    this.resultFile = "athmec_shop_"+new Date().toString()+".txt";
     this.progressFile = "athmec_progress_"+new Date().toString()+".txt";
     this.done = {};
     this.curPageIdx = 1;
     this.cities = [];
-    this.c = new Crawler({
-	maxConnections:2,
-	callback:
-    });
+    this.shops = [];
+    this.items = [];
 }
 //http://deal.autohome.com.cn/china/?k=2, 综合经销商
-
-Dealer.prototype.wgetShop = function(){
-    
-}
 
 Dealer.prototype.init = function(){
     if(fs.existsSync(this.resultDir+this.progressFile)){
@@ -91,14 +85,16 @@ Dealer.prototype.processList = function(data,args,res){
 	return;
     }
     var $ = cheerio.load(data);
-    var records = [""];
+    //var records = [""];
+    
     $("ul.card-list li.card a").each(function(){
 	var name = $("h2",this).text().trim();
 	name = name && name.replace(/\s/g,'');
 	var price = $("strong.promotion-bigcard-price",this).text().trim();
-	if(!price)
+	if(price)
 	    return;
-	
+	that.shops.push({url:$(this).attr("href"),page:1,city:$("#AreaCity_x").val(),items:[]});
+	/*
 	var delta = $("strong.promotion-bigcard-info",this).text().trim();
 	var matches = $("p.promotion-bigcard-leftnumber",this).eq(0).text().match(/\d+/);
 	var leftCount = matches && matches[0];
@@ -112,10 +108,10 @@ Dealer.prototype.processList = function(data,args,res){
 	promo = promo && promo.replace(/[\s]/g,'');
 	var record = [args[0].name,name,price,delta,leftCount,leftTime,promo,started?"Y":"N"].join('\t');
 	console.log(record);
-	records.push(record);
+	records.push(record);*/
     });
     
-    fs.appendFileSync(this.resultDir+this.resultFile,records.join('\n'));
+    //fs.appendFileSync(this.resultDir+this.resultFile,records.join('\n'));
     //fs.appendFileSync(this.resultDir+this.progressFile,this.curPageIdx+"\n");
     //var nextPage = $("div.page a").last();
     //var nextPageClass = nextPage && nextPage.attr('class');
@@ -126,7 +122,89 @@ Dealer.prototype.processList = function(data,args,res){
     //}else{
 //	this.curPageIdx++;
 //    }
-    this.wgetList();
+    this.wgetShop();
+}
+
+Dealer.prototype.wgetShop = function(shop){
+    if(!shop){
+	if(this.shops.length==0){
+	    this.wgetList();
+	    return;
+	}
+	shop = this.shops.pop();
+    }
+    var urlObj = url.parse(shop.url);
+    
+    console.log("[GET] shop: %s",shop.url);
+    var opt = new helper.basic_options(urlObj.host,urlObj.pathname,"POST",false,false,{cityId:shop.city,pageNum:shop.page});
+    helper.request_data(shop.url,null,function(data,args,res){
+	that.processShop(data,args,res);
+    },shop);
+}
+
+Dealer.prototype.processShop = function(data,args,res){
+    if(!data){
+	console.log("empty");
+	this.wgetDetail(args[0]);
+	return;
+    }
+    var $ = cheerio.load(data);
+    
+    $("ul.pop-index-list li a").each(function(){
+	args[0].items.push($(this).attr("href"));
+    });
+    console.log("[DATA] %d items.",args[0].items.length);
+    var nextPage = Number($(".businessl-sub a.active").next().text());
+    console.log(nextPage);
+    if(isNaN(nextPage) || nextPage <= args[0].page){
+	args[0].end=true;
+    }else{
+	args[0].end=false;
+	++args[0].page;
+    }
+    
+    this.wgetDetail(args[0]);
+}
+
+Dealer.prototype.wgetDetail = function(shop){
+    if(shop.items.length==0){
+	if(shop.end){
+	    this.wgetShop();
+	}else{
+	    this.wgetShop(shop);
+	}
+	return;
+    }
+    var item = shop.items.pop();
+    
+    console.log("[GET] detail: %s",item);
+    helper.request_data(item,null,function(data,args,res){
+	that.processDetail(data,args,res);
+    },shop);
+}
+Dealer.prototype.processDetail = function(data,args,res){
+    if(!data){
+	console.log("empty");
+	this.wgetDetail(args[0]);
+	return;
+    }
+    var $ = cheerio.load(data);
+    
+    var brand = $("div.auto-introduction-left h2").text().trim();
+    var tit = $("div.auto-introduction-right h3").text().trim();
+    var li = $("#car-model li");
+    
+    var shopPrice = li.attr("shopprice");
+    var origPrice = li.attr("origprice");
+    var prePay = li.attr("prepay");
+    var marketPrice = li.attr("marketprice");
+    //console.log(res);
+    var r = [brand,tit,shopPrice,origPrice,prePay,marketPrice,res.req.path].join("\t");
+    console.log(r);
+    fs.appendFileSync(that.resultDir+that.resultFile,r+"\n");
+    setTimeout(function(){
+	that.wgetDetail(args[0]);
+    },0);
 }
 
 var instance = new Dealer();

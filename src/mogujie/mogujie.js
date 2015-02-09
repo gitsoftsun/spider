@@ -55,14 +55,21 @@ Mogujie.prototype.wgetItemHtml = function(t){
         console.log("job done.");
         return;
     }
-    t = this.tasks.shift();
+    while(!t&&this.tasks.length>0){
+	t = this.tasks.shift();
+    }
+    
+    if(!t){
+	return;
+    }
+    
     while(this.breakpoint && t.dealid != this.breakpoint) {
         t = this.tasks.shift();
     }
     this.breakpoint = '';
-
+    
     console.log('task left: %d', this.tasks.length);
-
+    
     var opt = new helper.basic_options("shop.mogujie.com", "/detail/" + t.dealid);
     opt.agent = false;
     console.log("[GET dealid:] %s", t.dealid);
@@ -92,7 +99,7 @@ Mogujie.prototype.getFirstDealPage = function(data,args,res) {
 
 Mogujie.prototype.getFirstDealRecord = function(data,args,res) {
     t = args[0];
-    if(!data) {
+    if(!data || data[0] != '{') {
         console.log("first deal page data empty");
         t.first_deal_time = '';
         that.processData(t);
@@ -127,7 +134,7 @@ Mogujie.prototype.getFirstDealRecord = function(data,args,res) {
 
 Mogujie.prototype.parseFirstDealTime = function(data,args,res) {
     t = args[0];
-    if(!data) {
+    if(!data || data[0] != '{') {
         console.log("first deal record data empty");
         t.first_deal_time = '';
         that.processData(t);
