@@ -4,6 +4,7 @@ import urllib2
 import json
 from pyquery import PyQuery as pq
 import time
+import chardet
 
 URL = 'http://beijing.huimaiche.com/shangou/list'
 urlp1 = 'http://ajax.huimaiche.com/RapidIndexCars.ashx?v=1422431019054&callback=jQuery11100478390209376812_1422431017426&ccode='
@@ -12,12 +13,13 @@ urlp2 = '&top=1000&all=1&callback=%24.brand_oneprice.loaders.rapidCarskLoader._c
 
 def get_city_urls():
     print "get city urls"
-    shangou_urls = {URL[7: URL.index('.huimaiche')]: URL}
+    shangou_urls = {}
     html = urllib2.urlopen(URL).read()
     htmlPq = pq(html)(".change-city li a")
-    for i in range(1, len(htmlPq)):
+    for i in range(0, len(htmlPq)):
         url = htmlPq.eq(i).attr['href']
         shangou_urls[url[7: url.index('.huimaiche')]] = url
+    print shangou_urls
     print "DONE"
     return shangou_urls
 
@@ -53,12 +55,12 @@ def get_info(urls):
             js_text = urllib2.urlopen(url).read()
         except urllib2.URLError, e:
             print e.reason
-        json_string = js_text[int(str(js_text).index("_carsCb(["))+8:len(js_text)-4]
-        
+        js_text = unicode(js_text, chardet.detect(js_text)['encoding']).encode('utf-8')
+        json_string = js_text[int(str(js_text).index("_carsCb(["))+8:int(str(js_text).index("]"))+1]
         data = json.loads(json_string)
         for car_info in data:
-                entity = car_info['SaleCity'].encode('utf8') +"\t"+car_info['CarYear'].encode('utf8') +"\t"+car_info['CsName'].encode('utf8') +"\t"+car_info['CarName'].encode('utf8') +"\t"+str(car_info['Stock']) +"\t"+car_info['RapidPrice'].encode('utf8') +"\t"+car_info['ReferPrice'].encode('utf8') +"\t"+car_info['CurTime'].encode('utf8') +"\t"+str(car_info['TimeType']) +"\t"+car_info['MaxSave'].encode('utf8') +"\t"+str(car_info['Buyer']) +"\n"
-                fw.write(entity)
+            entity = car_info['SaleCity'] +"\t"+car_info['CarYear'] +"\t"+car_info['CsName'] +"\t"+car_info['CarName'] +"\t"+str(car_info['Stock']) +"\t"+car_info['RapidPrice'] +"\t"+car_info['ReferPrice'] +"\t"+car_info['CurTime'] +"\t"+str(car_info['TimeType']) +"\t"+car_info['MaxSave'] +"\t"+str(car_info['Buyer']) +"\n"
+            fw.write(entity)
     fw.close()
     print "DONE"
 
