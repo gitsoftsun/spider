@@ -7,11 +7,11 @@ var c = new Crawler({
 	maxConnections:1,
 	callback: processUrls,
 	userAgent:"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36",
-	rateLimits: 3000 
+	rateLimits: 2000
 });
 var current_time = new Date();
 var time_str = current_time.getFullYear()+"_"+(current_time.getMonth()+1)+"_"+current_time.getDate();
-var write_path = "../result/dp/travel_"+time_str+".txt";
+var write_path = "../result/dp/dp_travel_"+time_str+".txt";
 /*获取分类url并放入队列*/
 function processUrls(error, result, $){
 	if (error) {
@@ -74,7 +74,7 @@ function processListInfo(error, result, $){
 }
 
 /*依次读入每个城市， 城市之间停顿一秒（可以设置参数：ratasLimits ??????*/
-var read_path = "../result/dp/dp_city.txt";
+var read_path = "../appdata/dp_city.txt";
 var city_codes = fs.readFileSync(read_path, "utf-8");
 var citys = String(city_codes).split(/\n/);
 for (var i =0; i < citys.length-1; i++){
