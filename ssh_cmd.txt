@@ -17,3 +17,30 @@ ssh root@121.42.54.198 "cd sp/src;nohup node pc_ganji_job.js 0 6564 &"
 
 ssh root@114.215.80.125 "cd spider;git pull https://github.com/mike442144/spider.git"&
 ssh root@114.215.80.120 "cd spider;git pull https://github.com/mike442144/spider.git"&
+
+
+scp root@121.42.54.198:~/sp/result/meituan.txt ./meituan.1.txt &
+scp root@121.42.53.253:~/sp/result/meituan.txt ./meituan.2.txt&
+scp root@120.27.39.51:~/sp/result/meituan.txt ./meituan.3.txt&
+scp root@120.27.39.47:~/sp/result/meituan.txt ./meituan.4.txt&
+scp root@121.41.114.220:~/sp/result/meituan.txt ./meituan.5.txt&
+scp root@121.40.172.199:~/sp/result/meituan.txt ./meituan.6.txt&
+
+
+scp root@103.227.76.176:~/spider/result/auto/58_ershouche_2015-02.txt ./58_ershouche_2015-02.1.txt&
+scp root@103.227.76.175:~/spider/result/auto/58_ershouche_2015-02.txt ./58_ershouche_2015-02.2.txt&
+scp root@103.227.76.174:~/spider/result/auto/58_ershouche_2015-02.txt ./58_ershouche_2015-02.3.txt&
+scp root@103.227.76.173:~/spider/result/auto/58_ershouche_2015-02.txt ./58_ershouche_2015-02.4.txt&
+scp root@103.227.76.172:~/spider/result/auto/58_ershouche_2015-02.txt ./58_ershouche_2015-02.5.txt&
+scp root@103.227.76.171:~/spider/result/auto/58_ershouche_2015-02.txt ./58_ershouche_2015-02.6.txt&
+scp root@103.227.76.169:~/spider/result/auto/58_ershouche_2015-02.txt ./58_ershouche_2015-02.7.txt&
+scp root@103.227.76.168:~/spider/result/auto/58_ershouche_2015-02.txt ./58_ershouche_2015-02.8.txt&
+
+scp root@103.227.76.176:~/spider/result/auto/ganji_ershouche_2015-02.txt ./ganji_ershouche_2015-02.1.txt&
+scp root@103.227.76.175:~/spider/result/auto/ganji_ershouche_2015-02.txt ./ganji_ershouche_2015-02.2.txt&
+scp root@103.227.76.174:~/spider/result/auto/ganji_ershouche_2015-02.txt ./ganji_ershouche_2015-02.3.txt&
+scp root@103.227.76.173:~/spider/result/auto/ganji_ershouche_2015-02.txt ./ganji_ershouche_2015-02.4.txt&
+scp root@103.227.76.172:~/spider/result/auto/ganji_ershouche_2015-02.txt ./ganji_ershouche_2015-02.5.txt&
+scp root@103.227.76.171:~/spider/result/auto/ganji_ershouche_2015-02.txt ./ganji_ershouche_2015-02.6.txt&
+scp root@103.227.76.169:~/spider/result/auto/ganji_ershouche_2015-02.txt ./ganji_ershouche_2015-02.7.txt&
+scp root@103.227.76.168:~/spider/result/auto/ganji_ershouche_2015-02.txt ./ganji_ershouche_2015-02.8.txt&
