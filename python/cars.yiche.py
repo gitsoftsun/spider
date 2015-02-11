@@ -23,14 +23,13 @@ def process_info(car_url):
         car_html = urllib2.urlopen(car_request).read()
     process_detail_info(car_html)
     car_pq = pq(car_html)('.the_pages a')
-    for i in range(0, len(car_pq)):
-        if car_pq.eq(-1).text() == '下一页':
-            url_p = r'http://car.bitauto.com/langdong/m105935/baojia/c0/'
-            url_page = car_pq.eq(-1).attr['href']
-            url = url_p + url_page
-            process_info(url)
-        else:
-            return
+    if car_pq.eq(len(car_pq)-1).text() == '下一页':
+        url_p = str(car_url)[0: str(car_url).index('?')]
+        url_page = car_pq.eq(len(car_pq)-1).attr['href']
+        url = url_p + url_page
+        process_info(url)
+    else:
+        return
 
 
 def process_detail_info(html_content):
@@ -40,18 +39,40 @@ def process_detail_info(html_content):
     """
     reference_price = pq(html_content)('.card-tit strong').text()
     html_obj = pq(html_content)('.jxs-list .clearfix')
+    shop_tel_html = pq(html_content)('.jxs-list .clearfix')
+    shop_tel_fades = ''
+    for i in range(len(shop_tel_html)):
+        temp = shop_tel_html.eq(i)('.p-intro input:hidden').attr['value']
+        if i != len(shop_tel_html)-1:
+            temp = temp.strip()+','
+        else:
+            temp = temp.strip()
+        shop_tel_fades += temp
+    tel_url = 'http://autocall.bitauto.com/eil/das2.ashx?userid='+shop_tel_fades.strip()+'&mediaid=10&source=bitauto'
+    shop_tel_json = str(urllib2.urlopen(tel_url).read())
+    shop_tel_json = shop_tel_json[shop_tel_json.index('['): shop_tel_json.index(']')+1]
+    tels = {}
+    shop_tels = json.loads(shop_tel_json)
+    for shop_obj in shop_tels:
+        if not len(shop_tel_json) == 2:
+            dealerid = shop_obj['dealerId']
+            shop_tel = shop_obj['tel']
+            tels[dealerid] = shop_tel
     for i in range(0, len(html_obj)):
         html_index = html_obj.eq(i)
         shop_name = html_index('.intro-box .p-tit a').text()
         shop_sales_promotion = html_index('.p-intro:first a').text()
         shop_adr = html_index('.p-intro .add-sty').text()
         shop_adr = str(shop_adr).strip().decode(chardet.detect(str(shop_adr))['encoding'])[0: -4].encode('utf-8')
-        shop_tel_fade = html_index('.p-intro input:hidden').attr['value']
-        tel_url = 'http://autocall.bitauto.com/eil/das2.ashx?userid='+str(shop_tel_fade).strip()+'&mediaid=10&source=bitauto'
-        shop_tel_json = str(urllib2.urlopen(tel_url).read())
-        shop_tel_json = shop_tel_json[shop_tel_json.index('['): shop_tel_json.index(']')+1]
-        if not len(shop_tel_json) == 2:
-            shop_tel = json.loads(shop_tel_json)[0]['tel']
+        shop_tel_f = html_index('.p-intro input:hidden').attr['value'].strip()
+        # tel_url = 'http://autocall.bitauto.com/eil/das2.ashx?userid='+str(shop_tel_fade).strip()+'&mediaid=10&source=bitauto'
+        # shop_tel_json = str(urllib2.urlopen(tel_url).read())
+        # shop_tel_json = shop_tel_json[shop_tel_json.index('['): shop_tel_json.index(']')+1]
+        # if not len(shop_tel_json) == 2:
+        #     shop_tel = json.loads(shop_tel_json)[0]['tel']
+        # else:
+        if shop_tel_f in tels:
+            shop_tel = tels.get(shop_tel_f)
         else:
             shop_tel = '400-000-0000'
         shop_tel = str(shop_tel).strip()
@@ -78,10 +99,10 @@ def main():
     for line in fr:
         if isinstance(line, str):
             line = line.decode(chardet.detect(line)['encoding']).encode('utf-8')
-        (car_brand, car_type, car_config, Price, car_url) = line.strip().split('\t')
+        (car_brand, car_type, car_config, price, car_url) = line.strip().split('\t')
         print "car_brand :"+car_brand+"car_url"+car_url
         global car_info
-        car_info = '%s\t%s\t%s\t%s\t' % (car_brand, car_type, car_config, Price)
+        car_info = '%s\t%s\t%s\t%s\t' % (car_brand, car_type, car_config, price)
         process_info(car_url)
     fr.close()
     fw.close()
