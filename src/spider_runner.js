@@ -2,12 +2,12 @@
 
 //var spider_file = 'dp_tiny_hotpot.js 1 300';
 //var spider_file = 'dp_get_city.js';
-var spider_file = 'dp_tuan_num.js';
-//var spider_file = 'dp_tuan_products.js';
+//var spider_file = 'dp_tuan_num.js';
+var spider_file = 'dp_tuan_products.js';
 var goon = true;
 
 var run_spider = function(){
-    var spider = exec('node ' + spider_file); 
+    var spider = exec('node ' + spider_file);
 
     spider.stdout.on('data', function (data) { 
         console.log(data); 

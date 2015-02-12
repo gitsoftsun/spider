@@ -188,6 +188,7 @@ Dp.prototype.processList = function (data, args, res) {
             itemSelector = "div.tg-list div.tg-tab-box ul.tg-floor-list li.tg-floor-item div.tg-floor-item-wrap";
             $(itemSelector).each(function () {
                 var shop_title = $("a.tg-floor-title h3", this).text().trim().replace(/\,/g, ' ') || "xx";
+		var dealid = $("a.tg-floor-title", this).attr("href");
                 var product_name = $("a.tg-floor-title h4", this).text().trim().replace(/\，/g, ' ').replace(/\,/g, ' ').replace(/\n/g, ' ') || "xx";
                 var old_price = $("span.tg-floor-price span.tg-floor-price-old del", this).text().trim() || "xx";
                 var new_price = $("span.tg-floor-price span.tg-floor-price-new em", this).text().trim() || "xx";
@@ -203,6 +204,7 @@ Dp.prototype.processList = function (data, args, res) {
                     old_price,
                     new_price,
                     sold_count,
+		    dealid,
                     '\n'].join();
                 fs.appendFileSync(that.resultDir + that.resultFile, record);
                 //console.log("[DONE] %s", record);
