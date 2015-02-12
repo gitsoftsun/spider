@@ -49,6 +49,7 @@ def get_area_list():
             html_content = page.read()
             # response content process
             area_pq = pq(unicode(html_content, 'utf-8'))('div[data-id="classify-group"] ul')
+            print 'regions: %d' % area_pq.length
             for i in range(1, 2):
               area_py_p = area_pq.eq(i)('a')
               for j in range(0, len(area_py_p)):
@@ -57,8 +58,8 @@ def get_area_list():
                   record = '%s, %s, %s ' % (cityname, area_name, area_url)
                   fw.write(record+"\n")
             time.sleep(3)
-        except urllib2.URLError, e:
-            e.reason
+        except Exception, e:
+            print e
     fr.close()
     fw.close()
     print 'end'
@@ -146,9 +147,9 @@ def main():
     print "process area list"
     get_area_list()  # 获取一个城市的各个行政区的url
     print '--------- GET AREA DONE --------------'
-    get_deal_url_list()  # 获取一个行政区的酒店单子
+    #get_deal_url_list()  # 获取一个行政区的酒店单子
     print '--------- GET DEAL URL DONE --------------'
-    get_detailed_info()  # 获取详细的信息
+    #get_detailed_info()  # 获取详细的信息
     print '--------- GET DEAL INFO DONE --------------'
 
 
