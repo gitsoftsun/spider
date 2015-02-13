@@ -107,7 +107,7 @@ def process_detail_info(detail_page):
     # detail_quantity = pq(detail_page)('.tm-ind-panel .tm-ind-sellCount').text() # 详情页的月销量， 暂时无法得到
     # if not detail_quantity:
     #     detail_quantity = -1
-    entity = '%s\t%s\t%s\t' % (pay_type, car_brand, car_type)
+    entity = '%s\t%s\t%s' % (pay_type, car_brand, car_type)
     # print entity
     return entity
 
