@@ -98,11 +98,16 @@ def process_detail_info(detail_page):
         pay_type = pay_types['other']
     # car_price = pq(detail_page)('.tm-price-panel .tm-price').text()  # 价格是再次加载进去的
     car_brand = pq(detail_page)('#J_attrBrandName').text()
+    car_brand = str(car_brand).replace(u'品牌:', u'')
     car_type = pq(detail_page)('#J_AttrUL li').eq(1).text()
+    if str(car_type).__contains__(u'车型:'):
+        car_type = str(car_type).replace(u'车型:', u'')
+    if str(car_type).__contains__(u'车系，'):
+        car_type = str(car_type).replace(u'车系，', u'')
     # detail_quantity = pq(detail_page)('.tm-ind-panel .tm-ind-sellCount').text() # 详情页的月销量， 暂时无法得到
     # if not detail_quantity:
     #     detail_quantity = -1
-    entity = '%s\t%s\t%s\t' % (pay_type, str(car_brand).decode(str(car_brand)), car_type)
+    entity = '%s\t%s\t%s\t' % (pay_type, car_brand, car_type)
     # print entity
     return entity
 
